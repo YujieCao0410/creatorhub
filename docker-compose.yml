@@ -1,0 +1,24 @@
+# Optional: a local PostgreSQL for developing against a production-like database.
+#
+#   docker compose up -d
+#   # then in prisma/schema.prisma set  provider = "postgresql"
+#   # and in .env set the postgresql DATABASE_URL from .env.example
+#   npm run db:migrate
+#
+# SQLite remains the zero-setup default; this file is not required to run the app.
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: creatorhub
+      POSTGRES_PASSWORD: creatorhub
+      POSTGRES_DB: creatorhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - creatorhub_pgdata:/var/lib/postgresql/data
+
+volumes:
+  creatorhub_pgdata:
