@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { paginationQuerySchema } from "./common";
 
 const title = z.string().trim().min(1, "Title is required").max(140);
 const content = z.string().trim().min(1, "Content is required").max(50_000);
@@ -30,9 +31,7 @@ export const updatePostSchema = z
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 
 /** Query string for `GET /api/posts`. */
-export const listPostsQuerySchema = z.object({
-  cursor: z.string().min(1).optional(),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
+export const listPostsQuerySchema = paginationQuerySchema.extend({
   authorHandle: z.string().trim().toLowerCase().min(1).optional(),
 });
 export type ListPostsQuery = z.infer<typeof listPostsQuerySchema>;

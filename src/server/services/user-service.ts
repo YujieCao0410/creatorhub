@@ -58,11 +58,14 @@ export type CreatorProfile = PublicUser & {
     followers: number;
     following: number;
   };
+  /** Whether the requesting user follows this creator (false when anonymous). */
+  isFollowing: boolean;
 };
 
 /** A public creator profile with aggregate counts (published posts only). */
 export async function getCreatorProfile(
   handle: string,
+  viewerId?: string,
 ): Promise<CreatorProfile | null> {
   const user = await prisma.user.findUnique({
     where: { handle },
@@ -78,6 +81,16 @@ export async function getCreatorProfile(
   });
   if (!user) return null;
 
+  const isFollowing =
+    viewerId != null &&
+    viewerId !== user.id &&
+    (await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: { followerId: viewerId, followingId: user.id },
+      },
+      select: { id: true },
+    })) !== null;
+
   return {
     ...toPublicUser(user),
     counts: {
@@ -85,6 +98,7 @@ export async function getCreatorProfile(
       followers: user._count.followers,
       following: user._count.following,
     },
+    isFollowing,
   };
 }
 

@@ -2,6 +2,7 @@ import { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
 import { AuthorizationError, NotFoundError } from "@/lib/errors";
 import { uniqueSlug } from "@/lib/slug";
+import type { PaginationQuery } from "@/lib/validation/common";
 import type {
   CreatePostInput,
   ListPostsQuery,
@@ -139,33 +140,22 @@ export type PostList = {
   nextCursor: string | null;
 };
 
-/**
- * Published posts, newest first, keyset-paginated. `authorHandle` narrows to
- * one creator. Drafts are never returned here, even the viewer's own.
- */
-export async function listPosts(
-  query: ListPostsQuery,
+/** Shared keyset-paginated query over published posts. */
+async function paginatePublishedPosts(
+  where: Prisma.PostWhereInput,
+  { cursor, limit }: PaginationQuery,
   viewerId?: string,
 ): Promise<PostList> {
-  const where: Prisma.PostWhereInput = {
-    published: true,
-    ...(query.authorHandle
-      ? { author: { handle: query.authorHandle } }
-      : {}),
-  };
-
   const rows = await prisma.post.findMany({
-    where,
+    where: { published: true, ...where },
     include: postInclude,
     orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
-    take: query.limit + 1,
-    ...(query.cursor
-      ? { cursor: { id: query.cursor }, skip: 1 }
-      : {}),
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
   });
 
-  const hasMore = rows.length > query.limit;
-  const page = hasMore ? rows.slice(0, query.limit) : rows;
+  const hasMore = rows.length > limit;
+  const page = hasMore ? rows.slice(0, limit) : rows;
 
   const liked = await likedPostIds(
     viewerId,
@@ -174,8 +164,38 @@ export async function listPosts(
 
   return {
     data: page.map((r) => toSummary(r, liked.has(r.id))),
-    nextCursor: hasMore ? page[page.length - 1].id : null,
+    nextCursor: hasMore ? page[page.length - 1]!.id : null,
   };
+}
+
+/**
+ * Published posts, newest first, keyset-paginated. `authorHandle` narrows to
+ * one creator. Drafts are never returned here, even the viewer's own.
+ */
+export function listPosts(
+  query: ListPostsQuery,
+  viewerId?: string,
+): Promise<PostList> {
+  return paginatePublishedPosts(
+    query.authorHandle ? { author: { handle: query.authorHandle } } : {},
+    query,
+    viewerId,
+  );
+}
+
+/**
+ * The signed-in user's personalized feed: published posts by the creators
+ * they follow, newest first.
+ */
+export function listFeed(
+  viewerId: string,
+  query: PaginationQuery,
+): Promise<PostList> {
+  return paginatePublishedPosts(
+    { author: { followers: { some: { followerId: viewerId } } } },
+    query,
+    viewerId,
+  );
 }
 
 async function loadOwnedPost(slug: string, userId: string) {
