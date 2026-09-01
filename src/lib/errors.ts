@@ -51,3 +51,19 @@ export class ConflictError extends AppError {
     super(message, 409, "CONFLICT");
   }
 }
+
+/** Client has sent too many requests in a window. 429. */
+export class RateLimitError extends AppError {
+  constructor(retryAfterSeconds: number) {
+    super("Too many requests. Please try again later.", 429, "RATE_LIMITED", {
+      retryAfterSeconds,
+    });
+  }
+}
+
+/** A required Pro membership is missing. 402. */
+export class PaymentRequiredError extends AppError {
+  constructor(message = "This feature requires a Pro membership") {
+    super(message, 402, "PAYMENT_REQUIRED");
+  }
+}

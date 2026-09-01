@@ -1,9 +1,13 @@
 import { createSession } from "@/lib/auth/session";
 import { created, withErrorHandling } from "@/lib/http";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/request";
 import { registerSchema } from "@/lib/validation/auth";
 import { registerUser } from "@/server/services/auth-service";
 
 export const POST = withErrorHandling(async (req: Request) => {
+  enforceRateLimit(`register:${clientIp(req)}`, { limit: 5, windowMs: 60_000 });
+
   const body = await req.json().catch(() => null);
   const input = registerSchema.parse(body);
 

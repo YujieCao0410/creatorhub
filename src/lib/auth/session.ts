@@ -1,6 +1,8 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { AuthenticationError } from "@/lib/errors";
 import { getUserById, type SelfUser } from "@/server/services/user-service";
+import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "./constants";
 import { signSessionToken, verifySessionToken } from "./jwt";
 
 /**
@@ -10,38 +12,41 @@ import { signSessionToken, verifySessionToken } from "./jwt";
  * cookie on cross-site POSTs, which covers the common CSRF cases.
  */
 
-const COOKIE_NAME = "session";
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
-
 export async function createSession(userId: string): Promise<void> {
   const token = await signSessionToken(userId);
   const store = await cookies();
-  store.set(COOKIE_NAME, token, {
+  store.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE_SECONDS,
+    maxAge: SESSION_MAX_AGE_SECONDS,
   });
 }
 
 export async function destroySession(): Promise<void> {
   const store = await cookies();
-  store.delete(COOKIE_NAME);
+  store.delete(SESSION_COOKIE_NAME);
 }
 
-/** The signed-in user, or null. Safe to call in route handlers and RSCs. */
-export async function getCurrentUser(): Promise<SelfUser | null> {
-  const store = await cookies();
-  const token = store.get(COOKIE_NAME)?.value;
-  if (!token) return null;
+/**
+ * The signed-in user, or null. Safe to call in route handlers and RSCs.
+ * Wrapped in `cache` so multiple callers in one request share a single
+ * token verification + database lookup.
+ */
+export const getCurrentUser = cache(
+  async (): Promise<SelfUser | null> => {
+    const store = await cookies();
+    const token = store.get(SESSION_COOKIE_NAME)?.value;
+    if (!token) return null;
 
-  const userId = await verifySessionToken(token);
-  if (!userId) return null;
+    const userId = await verifySessionToken(token);
+    if (!userId) return null;
 
-  // Always resolve against the database so a deleted user can't keep a session.
-  return getUserById(userId);
-}
+    // Always resolve against the database so a deleted user can't keep a session.
+    return getUserById(userId);
+  },
+);
 
 /** Like `getCurrentUser` but throws a 401 instead of returning null. */
 export async function requireUser(): Promise<SelfUser> {
