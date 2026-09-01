@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Badge, Card } from "@/components/ui/misc";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { FREE_DRAFT_LIMIT } from "@/lib/membership";
 import { stripeConfigured } from "@/lib/stripe";
 import { getMembershipInfo } from "@/server/services/membership-service";
@@ -11,7 +11,7 @@ import {
 } from "./membership-actions";
 
 export default async function MembershipPage() {
-  const user = await requireUser();
+  const user = await requireUserPage();
   const info = await getMembershipInfo(user.id);
   const isPro = info.membership === "PRO";
 

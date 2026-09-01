@@ -1,8 +1,8 @@
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { ProfileForm } from "./profile-form";
 
 export default async function ProfilePage() {
-  const user = await requireUser();
+  const user = await requireUserPage();
 
   return (
     <div className="max-w-lg space-y-6">

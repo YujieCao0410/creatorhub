@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { PostEditor } from "../post-editor";
 
 export const metadata: Metadata = { title: "New post" };
 
 export default async function NewPostPage() {
-  await requireUser();
+  await requireUserPage();
 
   return (
     <div className="space-y-6">

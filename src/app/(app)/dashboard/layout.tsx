@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { DashboardNav } from "./dashboard-nav";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -10,10 +9,9 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Middleware already gates /dashboard; this is defense in depth and gives
-  // us the user for the shell.
-  const user = await getCurrentUser();
-  if (!user) redirect("/login?next=/dashboard");
+  // Proxy already gates /dashboard; this redirect is defense in depth for
+  // stale sessions (valid token, missing user).
+  await requireUserPage();
 
   return (
     <div className="grid gap-8 md:grid-cols-[200px_1fr]">

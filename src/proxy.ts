@@ -6,15 +6,17 @@ import { verifySessionToken } from "@/lib/auth/jwt";
  * Proxy (formerly "middleware" — renamed in Next.js 16): a first, cheap
  * authorization gate for page routes.
  *
- * It only checks that the session cookie carries a validly-signed, unexpired
- * token — it does not hit the database. Pages and API routes still do the full
- * `requireUser()` check (which re-resolves the user against the database), so a
- * revoked or deleted account cannot slip through. The point here is to redirect
- * unauthenticated visitors before rendering a protected page.
+ * It only checks the session cookie's signature — it never hits the database.
+ * The authoritative check is `requireUserPage()` / `requireUser()`, which
+ * re-resolves the user against the database. So this file must not make the
+ * opposite decision from those guards: it only redirects *unauthenticated*
+ * visitors away from protected pages, and it clears a cookie whose token no
+ * longer verifies. Deciding "logged in, bounce away from /login" here would
+ * loop against the DB-backed guard when a token is valid but the user is gone;
+ * that redirect lives in `(auth)/layout.tsx` instead.
  */
 
 const PROTECTED_PREFIXES = ["/dashboard"];
-const AUTH_ROUTES = ["/login", "/register"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -29,17 +31,15 @@ export async function proxy(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(pathname)}`;
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    if (token) res.cookies.delete(SESSION_COOKIE_NAME); // stale/expired token
+    return res;
   }
 
-  if (AUTH_ROUTES.includes(pathname) && userId) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.next();
+  // Expose the current path to Server Components (used for post-login redirects).
+  const headers = new Headers(req.headers);
+  headers.set("x-pathname", pathname);
+  return NextResponse.next({ request: { headers } });
 }
 
 export const config = {

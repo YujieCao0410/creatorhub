@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/misc";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 
 export default async function SettingsPage() {
-  const user = await requireUser();
+  const user = await requireUserPage();
 
   return (
     <div className="max-w-lg space-y-6">

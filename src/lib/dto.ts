@@ -64,6 +64,15 @@ export type PostSummary = {
 
 export type PostDetail = PostSummary & { content: string };
 
+export type Comment = {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: PostAuthor;
+  /** Whether the requesting user may delete this comment. */
+  canDelete: boolean;
+};
+
 export type Paginated<T> = {
   data: T[];
   nextCursor: string | null;
@@ -71,6 +80,7 @@ export type Paginated<T> = {
 
 export type PostList = Paginated<PostSummary>;
 export type UserPage = Paginated<PublicUser>;
+export type CommentList = Paginated<Comment>;
 
 export type LikeState = {
   likes: number;

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/misc";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { getDashboardStats } from "@/server/services/user-service";
 
 export default async function DashboardOverviewPage() {
-  const user = await requireUser();
+  const user = await requireUserPage();
   const stats = await getDashboardStats(user.id);
 
   const tiles = [

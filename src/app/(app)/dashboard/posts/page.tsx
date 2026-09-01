@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
 import { Badge, Card, EmptyState } from "@/components/ui/misc";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { listAuthoredPosts } from "@/server/services/post-service";
 import { PostRowActions } from "./post-row-actions";
 
 export default async function ContentPage() {
-  const user = await requireUser();
+  const user = await requireUserPage();
   const posts = await listAuthoredPosts(user.id);
 
   return (

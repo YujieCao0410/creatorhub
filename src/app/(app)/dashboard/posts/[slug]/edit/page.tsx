@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth/session";
+import { requireUserPage } from "@/lib/auth/page-guards";
 import { AppError } from "@/lib/errors";
 import { getPostBySlug } from "@/server/services/post-service";
 import { PostEditor } from "../../post-editor";
@@ -12,7 +12,7 @@ export default async function EditPostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const user = await requireUser();
+  const user = await requireUserPage();
   const { slug } = await params;
 
   let post;
