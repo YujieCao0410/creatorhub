@@ -67,3 +67,10 @@ export class PaymentRequiredError extends AppError {
     super(message, 402, "PAYMENT_REQUIRED");
   }
 }
+
+/** A dependency (e.g. billing) is not configured or is down. 503. */
+export class ServiceUnavailableError extends AppError {
+  constructor(message = "This service is temporarily unavailable") {
+    super(message, 503, "SERVICE_UNAVAILABLE");
+  }
+}

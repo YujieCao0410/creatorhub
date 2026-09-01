@@ -1,7 +1,14 @@
+import { Suspense } from "react";
 import { Badge, Card } from "@/components/ui/misc";
 import { requireUser } from "@/lib/auth/session";
 import { FREE_DRAFT_LIMIT } from "@/lib/membership";
+import { stripeConfigured } from "@/lib/stripe";
 import { getMembershipInfo } from "@/server/services/membership-service";
+import {
+  CheckoutNotice,
+  ManageBillingButton,
+  UpgradeButton,
+} from "./membership-actions";
 
 export default async function MembershipPage() {
   const user = await requireUser();
@@ -14,6 +21,10 @@ export default async function MembershipPage() {
         <h1 className="text-xl font-semibold">Membership</h1>
         <p className="text-sm text-muted">Your current plan and usage.</p>
       </div>
+
+      <Suspense fallback={null}>
+        <CheckoutNotice />
+      </Suspense>
 
       <Card className="flex items-center justify-between">
         <div>
@@ -64,17 +75,21 @@ export default async function MembershipPage() {
         </Card>
       )}
 
-      {!isPro && (
-        <Card className="opacity-70">
-          <div className="flex items-center justify-between">
-            <p className="font-medium">Upgrade to Pro</p>
-            <Badge tone="brand">Coming soon</Badge>
-          </div>
-          <p className="mt-1 text-sm text-muted">
-            Stripe Checkout is wired up in the next phase.
-          </p>
-        </Card>
-      )}
+      <div>
+        {!stripeConfigured ? (
+          <Card className="opacity-70">
+            <p className="font-medium">Billing not configured</p>
+            <p className="mt-1 text-sm text-muted">
+              Set the Stripe environment variables (see .env.example) to enable
+              upgrades.
+            </p>
+          </Card>
+        ) : isPro ? (
+          <ManageBillingButton />
+        ) : (
+          <UpgradeButton />
+        )}
+      </div>
     </div>
   );
 }
