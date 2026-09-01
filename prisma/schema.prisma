@@ -6,6 +6,9 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
+  // "native" for local dev; the linux targets cover Docker (Debian) and most
+  // serverless platforms (RHEL/Amazon Linux).
+  binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

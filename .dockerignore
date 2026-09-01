@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+*.db
+*.db-journal
+coverage
+test-results
+playwright-report
+.env
+.env.*
+!.env.example
+README.md
+DEPLOYMENT.md
+e2e

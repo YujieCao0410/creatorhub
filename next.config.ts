@@ -43,6 +43,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Self-contained server bundle for Docker / container deploys.
+  output: "standalone",
   // Keep Prisma's engine out of the server bundle; it's loaded at runtime.
   serverExternalPackages: ["@prisma/client", "prisma"],
   poweredByHeader: false,
