@@ -8,6 +8,8 @@ const TEST_DATABASE_URL = "file:./test.db";
 export default defineConfig({
   test: {
     environment: "node",
+    // Playwright specs live in e2e/ and are run by `npm run test:e2e`.
+    exclude: ["e2e/**", "node_modules/**", "dist/**", ".next/**"],
     env: {
       NODE_ENV: "test",
       DATABASE_URL: TEST_DATABASE_URL,

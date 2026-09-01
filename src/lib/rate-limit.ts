@@ -50,8 +50,13 @@ export function checkRateLimit(
   };
 }
 
-/** Throws `RateLimitError` (HTTP 429) when the caller is over the limit. */
+/**
+ * Throws `RateLimitError` (HTTP 429) when the caller is over the limit.
+ * A no-op when RATE_LIMIT_DISABLED is set (used by the e2e suite, which drives
+ * many requests from a single IP).
+ */
 export function enforceRateLimit(key: string, options: RateLimitOptions): void {
+  if (process.env.RATE_LIMIT_DISABLED === "1") return;
   const result = checkRateLimit(key, options);
   if (!result.ok) {
     throw new RateLimitError(

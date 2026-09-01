@@ -21,6 +21,9 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   STRIPE_PRICE_PRO: z.string().optional(),
+
+  /** Set to "1" to disable API rate limiting (e2e tests only). */
+  RATE_LIMIT_DISABLED: z.enum(["0", "1"]).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

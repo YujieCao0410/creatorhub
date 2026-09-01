@@ -54,6 +54,7 @@ export function LikeButton({
       type="button"
       onClick={toggle}
       aria-pressed={liked}
+      aria-label={liked ? "Unlike" : "Like"}
       className={cn(
         "inline-flex items-center gap-1.5 text-sm transition-colors",
         liked ? "text-red-600" : "text-muted hover:text-foreground",
