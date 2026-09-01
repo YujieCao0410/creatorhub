@@ -20,8 +20,15 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   function update(key: keyof typeof values) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
       setValues((v) => ({ ...v, [key]: e.target.value }));
+      setFieldErrors((errs) => {
+        if (!errs[key]) return errs;
+        const next = { ...errs };
+        delete next[key];
+        return next;
+      });
+    };
   }
 
   async function onSubmit(e: React.FormEvent) {
