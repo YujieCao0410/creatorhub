@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { AppError } from "./errors";
+import { AppError, ValidationError } from "./errors";
 
 /**
  * Shared HTTP helpers for route handlers.
@@ -64,6 +64,22 @@ export function handleApiError(error: unknown): NextResponse<ErrorBody> {
     { error: { code: "INTERNAL_SERVER_ERROR", message: "Something went wrong" } },
     { status: 500 },
   );
+}
+
+/**
+ * Reads and parses a JSON request body, rejecting oversized payloads before
+ * they are buffered. Returns `null` for absent or malformed JSON so callers can
+ * hand it straight to `schema.parse()`.
+ */
+export async function readJsonBody(
+  req: Request,
+  maxBytes = 100_000,
+): Promise<unknown> {
+  const declared = Number(req.headers.get("content-length") ?? 0);
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    throw new ValidationError(undefined, "Request body is too large");
+  }
+  return req.json().catch(() => null);
 }
 
 /**

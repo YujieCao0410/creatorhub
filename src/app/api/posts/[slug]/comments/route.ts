@@ -1,5 +1,6 @@
 import { getCurrentUser, requireUser } from "@/lib/auth/session";
-import { created, ok, withErrorHandling } from "@/lib/http";
+import { created, ok, readJsonBody, withErrorHandling } from "@/lib/http";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { createCommentSchema } from "@/lib/validation/comment";
 import { paginationQuerySchema } from "@/lib/validation/common";
 import {
@@ -23,7 +24,9 @@ export const GET = withErrorHandling(async (req: Request, ctx: Ctx) => {
 export const POST = withErrorHandling(async (req: Request, ctx: Ctx) => {
   const { slug } = await ctx.params;
   const user = await requireUser();
-  const body = await req.json().catch(() => null);
+  enforceRateLimit(`comment-create:${user.id}`, { limit: 15, windowMs: 60_000 });
+
+  const body = await readJsonBody(req);
   const input = createCommentSchema.parse(body);
   return created({ comment: await createComment(user.id, slug, input) });
 });

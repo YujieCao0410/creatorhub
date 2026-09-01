@@ -1,5 +1,5 @@
 import { getCurrentUser, requireUser } from "@/lib/auth/session";
-import { noContent, ok, withErrorHandling } from "@/lib/http";
+import { noContent, ok, readJsonBody, withErrorHandling } from "@/lib/http";
 import { updatePostSchema } from "@/lib/validation/post";
 import {
   deletePost,
@@ -21,7 +21,7 @@ export const GET = withErrorHandling(async (_req: Request, ctx: Ctx) => {
 export const PATCH = withErrorHandling(async (req: Request, ctx: Ctx) => {
   const { slug } = await ctx.params;
   const user = await requireUser();
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBody(req);
   const input = updatePostSchema.parse(body);
 
   const post = await updatePost(slug, user.id, input);

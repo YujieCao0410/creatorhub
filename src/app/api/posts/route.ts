@@ -1,5 +1,6 @@
 import { getCurrentUser, requireUser } from "@/lib/auth/session";
-import { created, ok, withErrorHandling } from "@/lib/http";
+import { created, ok, readJsonBody, withErrorHandling } from "@/lib/http";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import {
   createPostSchema,
   listPostsQuerySchema,
@@ -21,7 +22,9 @@ export const GET = withErrorHandling(async (req: Request) => {
 
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
-  const body = await req.json().catch(() => null);
+  enforceRateLimit(`post-create:${user.id}`, { limit: 20, windowMs: 60_000 });
+
+  const body = await readJsonBody(req);
   const input = createPostSchema.parse(body);
 
   const post = await createPost(user.id, input);

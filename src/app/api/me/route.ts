@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth/session";
-import { ok, withErrorHandling } from "@/lib/http";
+import { ok, readJsonBody, withErrorHandling } from "@/lib/http";
 import { updateProfileSchema } from "@/lib/validation/user";
 import { updateProfile } from "@/server/services/user-service";
 
@@ -13,7 +13,7 @@ export const GET = withErrorHandling(async () => {
 
 export const PATCH = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
-  const body = await req.json().catch(() => null);
+  const body = await readJsonBody(req);
   const input = updateProfileSchema.parse(body);
 
   const updated = await updateProfile(user.id, input);
