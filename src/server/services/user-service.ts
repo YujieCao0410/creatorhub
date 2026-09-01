@@ -1,5 +1,6 @@
 import type { User } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
+import type { UpdateProfileInput } from "@/lib/validation/user";
 
 /**
  * User serializers and lookups.
@@ -49,4 +50,56 @@ export async function getUserByHandle(
 ): Promise<PublicUser | null> {
   const user = await prisma.user.findUnique({ where: { handle } });
   return user ? toPublicUser(user) : null;
+}
+
+export type CreatorProfile = PublicUser & {
+  counts: {
+    posts: number;
+    followers: number;
+    following: number;
+  };
+};
+
+/** A public creator profile with aggregate counts (published posts only). */
+export async function getCreatorProfile(
+  handle: string,
+): Promise<CreatorProfile | null> {
+  const user = await prisma.user.findUnique({
+    where: { handle },
+    include: {
+      _count: {
+        select: {
+          posts: { where: { published: true } },
+          followers: true,
+          following: true,
+        },
+      },
+    },
+  });
+  if (!user) return null;
+
+  return {
+    ...toPublicUser(user),
+    counts: {
+      posts: user._count.posts,
+      followers: user._count.followers,
+      following: user._count.following,
+    },
+  };
+}
+
+/** Updates the signed-in user's own profile. Undefined fields are left as-is. */
+export async function updateProfile(
+  userId: string,
+  input: UpdateProfileInput,
+): Promise<SelfUser> {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: input.name,
+      bio: input.bio,
+      avatarUrl: input.avatarUrl,
+    },
+  });
+  return toSelfUser(user);
 }
