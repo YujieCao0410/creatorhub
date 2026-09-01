@@ -1,18 +1,11 @@
 import { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
+import type { FollowState, UserPage } from "@/lib/dto";
 import { NotFoundError, ValidationError } from "@/lib/errors";
 import type { PaginationQuery } from "@/lib/validation/common";
-import { toPublicUser, type PublicUser } from "./user-service";
+import { toPublicUser } from "./user-service";
 
-export type FollowState = {
-  following: boolean;
-  followerCount: number;
-};
-
-export type UserPage = {
-  data: PublicUser[];
-  nextCursor: string | null;
-};
+export type { FollowState, UserPage } from "@/lib/dto";
 
 async function creatorIdByHandle(handle: string): Promise<string> {
   const user = await prisma.user.findUnique({

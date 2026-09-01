@@ -1,5 +1,6 @@
 import { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
+import type { PostDetail, PostList, PostSummary } from "@/lib/dto";
 import { AuthorizationError, NotFoundError } from "@/lib/errors";
 import { uniqueSlug } from "@/lib/slug";
 import type { PaginationQuery } from "@/lib/validation/common";
@@ -9,31 +10,12 @@ import type {
   UpdatePostInput,
 } from "@/lib/validation/post";
 
-/* ---------- shapes returned to the client ---------- */
-
-export type PostAuthor = {
-  id: string;
-  handle: string;
-  name: string;
-  avatarUrl: string | null;
-};
-
-export type PostSummary = {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  coverImageUrl: string | null;
-  published: boolean;
-  publishedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  author: PostAuthor;
-  counts: { likes: number; comments: number };
-  viewerHasLiked: boolean;
-};
-
-export type PostDetail = PostSummary & { content: string };
+export type {
+  PostAuthor,
+  PostDetail,
+  PostList,
+  PostSummary,
+} from "@/lib/dto";
 
 /* ---------- internal query helpers ---------- */
 
@@ -135,11 +117,6 @@ export async function getPostBySlug(
   return { ...toSummary(row, liked.has(row.id)), content: row.content };
 }
 
-export type PostList = {
-  data: PostSummary[];
-  nextCursor: string | null;
-};
-
 /** Shared keyset-paginated query over published posts. */
 async function paginatePublishedPosts(
   where: Prisma.PostWhereInput,
@@ -196,6 +173,25 @@ export function listFeed(
     query,
     viewerId,
   );
+}
+
+/**
+ * All of a user's own posts (drafts included), newest first. For the author's
+ * own dashboard — never exposed as another creator's post list.
+ */
+export async function listAuthoredPosts(
+  authorId: string,
+): Promise<PostSummary[]> {
+  const rows = await prisma.post.findMany({
+    where: { authorId },
+    include: postInclude,
+    orderBy: { createdAt: "desc" },
+  });
+  const liked = await likedPostIds(
+    authorId,
+    rows.map((r) => r.id),
+  );
+  return rows.map((r) => toSummary(r, liked.has(r.id)));
 }
 
 /** Case-insensitive search over title, excerpt and content of published posts. */

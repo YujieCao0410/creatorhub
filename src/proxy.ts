@@ -3,7 +3,8 @@ import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 import { verifySessionToken } from "@/lib/auth/jwt";
 
 /**
- * Edge middleware: a first, cheap authorization gate for page routes.
+ * Proxy (formerly "middleware" — renamed in Next.js 16): a first, cheap
+ * authorization gate for page routes.
  *
  * It only checks that the session cookie carries a validly-signed, unexpired
  * token — it does not hit the database. Pages and API routes still do the full
@@ -15,7 +16,7 @@ import { verifySessionToken } from "@/lib/auth/jwt";
 const PROTECTED_PREFIXES = ["/dashboard"];
 const AUTH_ROUTES = ["/login", "/register"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   const userId = token ? await verifySessionToken(token) : null;

@@ -1,0 +1,87 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useSession } from "@/components/session-provider";
+import { Button } from "@/components/ui/button";
+import { Field, Input } from "@/components/ui/field";
+import { Alert } from "@/components/ui/misc";
+import { api, ApiError } from "@/lib/api-client";
+import type { SelfUser } from "@/lib/dto";
+
+export function LoginForm() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const { setUser } = useSession();
+
+  const [values, setValues] = useState({ email: "", password: "" });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  function update(key: keyof typeof values) {
+    return (e: React.ChangeEvent<HTMLInputElement>) =>
+      setValues((v) => ({ ...v, [key]: e.target.value }));
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setFieldErrors({});
+    setFormError(null);
+    try {
+      const { user } = await api.post<{ user: SelfUser }>(
+        "/api/auth/login",
+        values,
+      );
+      setUser(user);
+      router.replace(params.get("next") || "/dashboard");
+      router.refresh();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const fields = err.fieldErrors;
+        setFieldErrors(fields);
+        if (Object.keys(fields).length === 0) setFormError(err.message);
+      } else {
+        setFormError("Something went wrong. Please try again.");
+      }
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      {formError && <Alert>{formError}</Alert>}
+
+      <Field label="Email" htmlFor="email" error={fieldErrors.email}>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={values.email}
+          onChange={update("email")}
+          aria-invalid={Boolean(fieldErrors.email)}
+        />
+      </Field>
+
+      <Field label="Password" htmlFor="password" error={fieldErrors.password}>
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          value={values.password}
+          onChange={update("password")}
+          aria-invalid={Boolean(fieldErrors.password)}
+        />
+      </Field>
+
+      <Button type="submit" className="w-full" loading={loading}>
+        Log in
+      </Button>
+    </form>
+  );
+}

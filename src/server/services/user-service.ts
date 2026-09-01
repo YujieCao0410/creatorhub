@@ -1,6 +1,13 @@
 import type { User } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
+import type {
+  CreatorProfile,
+  PublicUser,
+  SelfUser,
+} from "@/lib/dto";
 import type { UpdateProfileInput } from "@/lib/validation/user";
+
+export type { CreatorProfile, PublicUser, SelfUser } from "@/lib/dto";
 
 /**
  * User serializers and lookups.
@@ -11,19 +18,6 @@ import type { UpdateProfileInput } from "@/lib/validation/user";
  *   - `PublicUser`  — safe to show to anyone (a creator profile)
  *   - `SelfUser`    — `PublicUser` plus `email`, only for the signed-in user
  */
-
-export type PublicUser = {
-  id: string;
-  handle: string;
-  name: string;
-  bio: string | null;
-  avatarUrl: string | null;
-  createdAt: string;
-};
-
-export type SelfUser = PublicUser & {
-  email: string;
-};
 
 export function toPublicUser(user: User): PublicUser {
   return {
@@ -51,16 +45,6 @@ export async function getUserByHandle(
   const user = await prisma.user.findUnique({ where: { handle } });
   return user ? toPublicUser(user) : null;
 }
-
-export type CreatorProfile = PublicUser & {
-  counts: {
-    posts: number;
-    followers: number;
-    following: number;
-  };
-  /** Whether the requesting user follows this creator (false when anonymous). */
-  isFollowing: boolean;
-};
 
 /** A public creator profile with aggregate counts (published posts only). */
 export async function getCreatorProfile(
@@ -99,6 +83,34 @@ export async function getCreatorProfile(
       following: user._count.following,
     },
     isFollowing,
+  };
+}
+
+export type DashboardStats = {
+  posts: { total: number; published: number; drafts: number };
+  followers: number;
+  following: number;
+  likesReceived: number;
+};
+
+/** Aggregate numbers for the signed-in user's dashboard overview. */
+export async function getDashboardStats(
+  userId: string,
+): Promise<DashboardStats> {
+  const [total, published, followers, following, likesReceived] =
+    await Promise.all([
+      prisma.post.count({ where: { authorId: userId } }),
+      prisma.post.count({ where: { authorId: userId, published: true } }),
+      prisma.follow.count({ where: { followingId: userId } }),
+      prisma.follow.count({ where: { followerId: userId } }),
+      prisma.like.count({ where: { post: { authorId: userId } } }),
+    ]);
+
+  return {
+    posts: { total, published, drafts: total - published },
+    followers,
+    following,
+    likesReceived,
   };
 }
 

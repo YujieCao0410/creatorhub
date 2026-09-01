@@ -1,11 +1,9 @@
 import { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
+import type { LikeState } from "@/lib/dto";
 import { NotFoundError } from "@/lib/errors";
 
-export type LikeState = {
-  likes: number;
-  viewerHasLiked: boolean;
-};
+export type { LikeState } from "@/lib/dto";
 
 async function publishedPostId(slug: string): Promise<string> {
   const post = await prisma.post.findUnique({
