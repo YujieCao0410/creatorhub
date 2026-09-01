@@ -63,5 +63,12 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register", "/api/:path*"],
+  // `/api/uploads` is excluded: proxy buffers request bodies (10MB cap), which
+  // would truncate video uploads. That route does its own same-origin check.
+  matcher: [
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+    "/api/((?!uploads).*)",
+  ],
 };

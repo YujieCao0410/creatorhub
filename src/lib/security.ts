@@ -1,3 +1,5 @@
+import { AppError } from "./errors";
+
 /**
  * Same-origin check for state-changing API requests — a second layer behind the
  * SameSite=lax session cookie.
@@ -22,5 +24,19 @@ export function isSameOrigin(req: Request): boolean {
     return originHost === requestHost;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Throws 403 for a cross-site request. Used by routes that opt out of the
+ * proxy-level check (e.g. uploads, which must avoid proxy body buffering).
+ */
+export function assertSameOrigin(req: Request): void {
+  if (!isSameOrigin(req)) {
+    throw new AppError(
+      "Cross-origin request blocked",
+      403,
+      "CROSS_ORIGIN_BLOCKED",
+    );
   }
 }
