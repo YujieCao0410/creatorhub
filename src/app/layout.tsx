@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { I18nProvider } from "@/components/i18n-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { getCurrentUser } from "@/lib/auth/session";
 import { env } from "@/lib/env";
+import { getMessages } from "@/lib/i18n/server";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -31,15 +33,20 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const user = await getCurrentUser();
+  const [user, { locale, messages }] = await Promise.all([
+    getCurrentUser(),
+    getMessages(),
+  ]);
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full">
-        <SessionProvider initialUser={user}>{children}</SessionProvider>
+        <I18nProvider locale={locale} messages={messages}>
+          <SessionProvider initialUser={user}>{children}</SessionProvider>
+        </I18nProvider>
       </body>
     </html>
   );

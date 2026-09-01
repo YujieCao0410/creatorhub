@@ -6,6 +6,7 @@ import { PostFeed } from "@/components/post-feed";
 import { buttonClasses } from "@/components/ui/button";
 import { Avatar, EmptyState } from "@/components/ui/misc";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getT } from "@/lib/i18n/server";
 import { listPosts } from "@/server/services/post-service";
 import { getCreatorProfile } from "@/server/services/user-service";
 
@@ -29,7 +30,7 @@ export default async function CreatorProfilePage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const viewer = await getCurrentUser();
+  const [viewer, t] = await Promise.all([getCurrentUser(), getT()]);
   const creator = await getCreatorProfile(handle.toLowerCase(), viewer?.id);
   if (!creator) notFound();
 
@@ -52,13 +53,13 @@ export default async function CreatorProfilePage({
                   href="/dashboard"
                   className={buttonClasses({ variant: "secondary", size: "sm" })}
                 >
-                  Dashboard
+                  {t("creator.dashboard")}
                 </Link>
                 <Link
                   href="/dashboard/profile"
                   className={buttonClasses({ variant: "secondary", size: "sm" })}
                 >
-                  Edit profile
+                  {t("creator.editProfile")}
                 </Link>
               </div>
             ) : (
@@ -74,15 +75,15 @@ export default async function CreatorProfilePage({
           <dl className="mt-3 flex gap-5 text-sm">
             <div className="flex gap-1">
               <dt className="font-semibold">{creator.counts.posts}</dt>
-              <dd className="text-muted">posts</dd>
+              <dd className="text-muted">{t("creator.posts")}</dd>
             </div>
             <div className="flex gap-1">
               <dt className="font-semibold">{creator.counts.followers}</dt>
-              <dd className="text-muted">followers</dd>
+              <dd className="text-muted">{t("creator.followers")}</dd>
             </div>
             <div className="flex gap-1">
               <dt className="font-semibold">{creator.counts.following}</dt>
-              <dd className="text-muted">following</dd>
+              <dd className="text-muted">{t("creator.following")}</dd>
             </div>
           </dl>
         </div>
@@ -90,14 +91,16 @@ export default async function CreatorProfilePage({
 
       {posts.data.length === 0 ? (
         <EmptyState
-          title={isSelf ? "You haven't published anything yet" : "No posts yet"}
+          title={
+            isSelf ? t("creator.noPostsSelf") : t("creator.noPostsOther")
+          }
           action={
             isSelf ? (
               <Link
                 href="/dashboard/posts/new"
                 className={buttonClasses({ size: "sm" })}
               >
-                Write a post
+                {t("feed.writePost")}
               </Link>
             ) : undefined
           }

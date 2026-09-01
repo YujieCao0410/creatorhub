@@ -8,6 +8,7 @@ import { Avatar, Badge } from "@/components/ui/misc";
 import { getCurrentUser } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors";
 import { formatRelativeDate } from "@/lib/format";
+import { getLocale, getT } from "@/lib/i18n/server";
 import { listComments } from "@/server/services/comment-service";
 import { getPostBySlug } from "@/server/services/post-service";
 
@@ -38,7 +39,11 @@ export default async function PostDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const viewer = await getCurrentUser();
+  const [viewer, t, locale] = await Promise.all([
+    getCurrentUser(),
+    getT(),
+    getLocale(),
+  ]);
   const post = await loadPost(slug, viewer?.id);
   const comments = await listComments(slug, { limit: 20 }, viewer?.id).catch(
     () => ({ data: [], nextCursor: null }),
@@ -67,19 +72,19 @@ export default async function PostDetailPage({
               <p className="text-muted">
                 @{post.author.handle} ·{" "}
                 {post.published
-                  ? formatRelativeDate(post.publishedAt)
-                  : "draft"}
+                  ? formatRelativeDate(post.publishedAt, locale)
+                  : t("post.draft")}
               </p>
             </div>
           </div>
           {canManage && (
             <div className="flex items-center gap-2">
-              {!post.published && <Badge>Draft</Badge>}
+              {!post.published && <Badge>{t("post.draft")}</Badge>}
               <Link
                 href={`/dashboard/posts/${post.slug}/edit`}
                 className={buttonClasses({ variant: "secondary", size: "sm" })}
               >
-                Edit
+                {t("common.edit")}
               </Link>
             </div>
           )}
@@ -109,7 +114,7 @@ export default async function PostDetailPage({
           canInteract={Boolean(viewer)}
         />
         <span className="text-sm text-muted">
-          💬 {post.counts.comments} comments
+          💬 {t("post.commentsLabel", { count: post.counts.comments })}
         </span>
       </div>
 

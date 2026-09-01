@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
+import { getT } from "@/lib/i18n/server";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getT();
   return (
     <div className="mx-auto max-w-md py-16 text-center">
-      <h1 className="text-xl font-semibold">Page not found</h1>
-      <p className="mt-2 text-sm text-muted">
-        The page you&apos;re looking for doesn&apos;t exist or has moved.
-      </p>
+      <h1 className="text-xl font-semibold">{t("common.notFoundTitle")}</h1>
+      <p className="mt-2 text-sm text-muted">{t("common.notFoundBody")}</p>
       <Link href="/" className={buttonClasses({ className: "mt-6" })}>
-        Back home
+        {t("common.backHome")}
       </Link>
     </div>
   );

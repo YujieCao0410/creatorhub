@@ -21,11 +21,15 @@ test.describe("social features", () => {
     await registerNewUser(page);
     await page.goto("/posts/a-note-on-slow-mornings");
 
-    await page.getByRole("button", { name: "Like" }).click();
-    await expect(page.getByRole("button", { name: "Unlike" })).toBeVisible();
+    await page.locator('button[aria-pressed="false"]').first().click();
+    await expect(
+      page.locator('button[aria-pressed="true"]').first(),
+    ).toBeVisible();
 
     await page.reload();
-    await expect(page.getByRole("button", { name: "Unlike" })).toBeVisible();
+    await expect(
+      page.locator('button[aria-pressed="true"]').first(),
+    ).toBeVisible();
   });
 
   test("comment on a post, then delete the comment", async ({ page }) => {

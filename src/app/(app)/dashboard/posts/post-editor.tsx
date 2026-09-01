@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Alert } from "@/components/ui/misc";
@@ -25,6 +26,7 @@ export function PostEditor({
   post?: PostDetail;
 }) {
   const router = useRouter();
+  const t = useT();
 
   const [values, setValues] = useState<Values>(
     post
@@ -76,7 +78,7 @@ export function PostEditor({
         setFieldErrors(fields);
         if (Object.keys(fields).length === 0) setFormError(err.message);
       } else {
-        setFormError("Something went wrong. Please try again.");
+        setFormError(t("common.somethingWrongBody"));
       }
       setBusy(null);
     }
@@ -126,7 +128,11 @@ export function PostEditor({
     >
       {formError && <Alert>{formError}</Alert>}
 
-      <Field label="Title" htmlFor="title" error={fieldErrors.title}>
+      <Field
+        label={t("editor.title")}
+        htmlFor="title"
+        error={fieldErrors.title}
+      >
         <Input
           id="title"
           value={values.title}
@@ -136,9 +142,9 @@ export function PostEditor({
       </Field>
 
       <Field
-        label="Excerpt"
+        label={t("editor.excerpt")}
         htmlFor="excerpt"
-        hint="Optional one-line summary shown in lists"
+        hint={t("editor.excerptHint")}
         error={fieldErrors.excerpt}
       >
         <Input
@@ -151,7 +157,7 @@ export function PostEditor({
       </Field>
 
       <Field
-        label="Cover image URL"
+        label={t("editor.coverImageUrl")}
         htmlFor="coverImageUrl"
         error={fieldErrors.coverImageUrl}
       >
@@ -164,7 +170,11 @@ export function PostEditor({
         />
       </Field>
 
-      <Field label="Content" htmlFor="content" error={fieldErrors.content}>
+      <Field
+        label={t("editor.content")}
+        htmlFor="content"
+        error={fieldErrors.content}
+      >
         <Textarea
           id="content"
           className="min-h-64"
@@ -184,7 +194,7 @@ export function PostEditor({
               loading={busy === "draft"}
               disabled={busy !== null}
             >
-              Save draft
+              {t("editor.saveDraft")}
             </Button>
             <Button
               type="button"
@@ -192,7 +202,7 @@ export function PostEditor({
               loading={busy === "publish"}
               disabled={busy !== null}
             >
-              Publish
+              {t("editor.publish")}
             </Button>
           </>
         ) : (
@@ -203,7 +213,7 @@ export function PostEditor({
               loading={busy === "save"}
               disabled={busy !== null}
             >
-              Save changes
+              {t("common.save")}
             </Button>
             <Button
               type="button"
@@ -212,7 +222,9 @@ export function PostEditor({
               loading={busy === "toggle"}
               disabled={busy !== null}
             >
-              {post!.published ? "Unpublish" : "Publish"}
+              {post!.published
+                ? t("editor.unpublish")
+                : t("editor.publish")}
             </Button>
           </>
         )}

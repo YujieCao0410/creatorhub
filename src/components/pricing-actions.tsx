@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { api, ApiError } from "@/lib/api-client";
 
@@ -14,13 +15,14 @@ export function PricingActions({
   isPro: boolean;
   billingEnabled: boolean;
 }) {
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isAuthenticated) {
     return (
       <Link href="/register?next=/pricing" className={buttonClasses()}>
-        Get started
+        {t("pricing.getStarted")}
       </Link>
     );
   }
@@ -31,13 +33,13 @@ export function PricingActions({
         href="/dashboard/membership"
         className={buttonClasses({ variant: "secondary" })}
       >
-        Manage billing
+        {t("pricing.manageBilling")}
       </Link>
     );
   }
 
   if (!billingEnabled) {
-    return <p className="text-sm text-muted">Billing is not configured.</p>;
+    return <p className="text-sm text-muted">{t("pricing.billingDisabled")}</p>;
   }
 
   async function upgrade() {
@@ -47,7 +49,9 @@ export function PricingActions({
       const { url } = await api.post<{ url: string }>("/api/billing/checkout");
       window.location.href = url;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong.");
+      setError(
+        err instanceof ApiError ? err.message : t("common.somethingWrongBody"),
+      );
       setLoading(false);
     }
   }
@@ -55,7 +59,7 @@ export function PricingActions({
   return (
     <div>
       <Button onClick={upgrade} loading={loading} className="w-full">
-        Upgrade to Pro
+        {t("pricing.upgrade")}
       </Button>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "@/components/i18n-provider";
 import { LikeButton } from "@/components/like-button";
 import { Avatar } from "@/components/ui/misc";
 import type { PostSummary } from "@/lib/dto";
@@ -11,6 +14,8 @@ export function PostCard({
   post: PostSummary;
   currentUserId?: string;
 }) {
+  const { locale } = useI18n();
+
   return (
     <article className="rounded-xl border border-border bg-surface p-5">
       <div className="flex items-center gap-3">
@@ -25,7 +30,8 @@ export function PostCard({
             {post.author.name}
           </Link>
           <p className="text-muted">
-            @{post.author.handle} · {formatRelativeDate(post.publishedAt)}
+            @{post.author.handle} ·{" "}
+            {formatRelativeDate(post.publishedAt, locale)}
           </p>
         </div>
       </div>

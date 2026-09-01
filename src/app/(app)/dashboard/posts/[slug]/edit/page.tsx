@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireUserPage } from "@/lib/auth/page-guards";
 import { AppError } from "@/lib/errors";
+import { getT } from "@/lib/i18n/server";
 import { getPostBySlug } from "@/server/services/post-service";
 import { PostEditor } from "../../post-editor";
 
@@ -12,7 +13,7 @@ export default async function EditPostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const user = await requireUserPage();
+  const [user, t] = await Promise.all([requireUserPage(), getT()]);
   const { slug } = await params;
 
   let post;
@@ -27,7 +28,7 @@ export default async function EditPostPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Edit post</h1>
+      <h1 className="text-xl font-semibold">{t("editor.editPost")}</h1>
       <PostEditor mode="edit" post={post} />
     </div>
   );

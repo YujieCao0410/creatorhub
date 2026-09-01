@@ -1,36 +1,46 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/misc";
 import { requireUserPage } from "@/lib/auth/page-guards";
+import { getLocale, getT } from "@/lib/i18n/server";
 
 export default async function SettingsPage() {
-  const user = await requireUserPage();
+  const [user, t, locale] = await Promise.all([
+    requireUserPage(),
+    getT(),
+    getLocale(),
+  ]);
 
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Account</h1>
-        <p className="text-sm text-muted">Your account details.</p>
+        <h1 className="text-xl font-semibold">{t("dashboard.accountTitle")}</h1>
+        <p className="text-sm text-muted">{t("dashboard.accountSubtitle")}</p>
       </div>
 
       <Card className="divide-y divide-border p-0">
-        <Row label="Name" value={user.name} />
-        <Row label="Handle" value={`@${user.handle}`} />
-        <Row label="Email" value={user.email} />
-        <Row label="Plan" value={user.membership === "PRO" ? "Pro" : "Free"} />
+        <Row label={t("dashboard.fieldName")} value={user.name} />
+        <Row label={t("dashboard.fieldHandle")} value={`@${user.handle}`} />
+        <Row label={t("dashboard.fieldEmail")} value={user.email} />
         <Row
-          label="Member since"
-          value={new Date(user.createdAt).toLocaleDateString()}
+          label={t("dashboard.fieldPlan")}
+          value={
+            user.membership === "PRO" ? t("membership.pro") : t("membership.free")
+          }
+        />
+        <Row
+          label={t("dashboard.memberSince")}
+          value={new Date(user.createdAt).toLocaleDateString(
+            locale === "zh" ? "zh-CN" : "en-US",
+          )}
         />
       </Card>
 
       <Card>
-        <h2 className="font-medium">Membership</h2>
+        <h2 className="font-medium">{t("membership.title")}</h2>
         <p className="mt-1 text-sm text-muted">
-          Manage your plan on the{" "}
           <Link href="/dashboard/membership" className="text-brand-600">
-            Membership
-          </Link>{" "}
-          page.
+            {t("membership.title")}
+          </Link>
         </p>
       </Card>
     </div>

@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 import type { FollowState } from "@/lib/dto";
@@ -15,6 +16,7 @@ export function FollowButton({
   initialFollowing: boolean;
   canInteract: boolean;
 }) {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const [following, setFollowing] = useState(initialFollowing);
@@ -50,7 +52,7 @@ export function FollowButton({
       onClick={toggle}
       loading={pending}
     >
-      {following ? "Following" : "Follow"}
+      {following ? t("creator.unfollow") : t("creator.follow")}
     </Button>
   );
 }

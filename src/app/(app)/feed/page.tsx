@@ -3,8 +3,9 @@ import Link from "next/link";
 import { PostFeed } from "@/components/post-feed";
 import { buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/misc";
-import { cn } from "@/lib/cn";
 import { getCurrentUser } from "@/lib/auth/session";
+import { cn } from "@/lib/cn";
+import { getT } from "@/lib/i18n/server";
 import { listFeed, listPosts } from "@/server/services/post-service";
 
 export const metadata: Metadata = { title: "Explore" };
@@ -15,7 +16,7 @@ export default async function FeedPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   const tab =
     user && (await searchParams).tab === "following" ? "following" : "latest";
 
@@ -29,17 +30,17 @@ export default async function FeedPage({
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-end justify-between">
         <h1 className="text-2xl font-semibold">
-          {user ? "Your feed" : "Explore"}
+          {user ? t("feed.yourFeed") : t("feed.explore")}
         </h1>
       </div>
 
       {user && (
         <div className="flex gap-1 border-b border-border text-sm">
           <TabLink href="/feed" active={tab === "latest"}>
-            Latest
+            {t("feed.tabLatest")}
           </TabLink>
           <TabLink href="/feed?tab=following" active={tab === "following"}>
-            Following
+            {t("feed.tabFollowing")}
           </TabLink>
         </div>
       )}
@@ -48,29 +49,29 @@ export default async function FeedPage({
         <EmptyState
           title={
             tab === "following"
-              ? "Nothing here yet"
-              : "No posts have been published yet"
+              ? t("feed.emptyFollowingTitle")
+              : t("feed.emptyLatestTitle")
           }
           description={
             tab === "following"
-              ? "Follow some creators to see their posts here."
-              : "Check back soon, or be the first to publish."
+              ? t("feed.emptyFollowingBody")
+              : t("feed.emptyLatestBody")
           }
           action={
             tab === "following" ? (
               <Link href="/feed" className={buttonClasses({ size: "sm" })}>
-                Browse latest
+                {t("feed.browseLatest")}
               </Link>
             ) : user ? (
               <Link
                 href="/dashboard/posts/new"
                 className={buttonClasses({ size: "sm" })}
               >
-                Write a post
+                {t("feed.writePost")}
               </Link>
             ) : (
               <Link href="/register" className={buttonClasses({ size: "sm" })}>
-                Get started
+                {t("landing.getStarted")}
               </Link>
             )
           }

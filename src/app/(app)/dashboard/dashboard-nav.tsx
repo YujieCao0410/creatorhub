@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/components/i18n-provider";
 import { cn } from "@/lib/cn";
 
 const ITEMS = [
-  { href: "/dashboard", label: "Overview" },
-  { href: "/dashboard/posts", label: "Content" },
-  { href: "/dashboard/profile", label: "Profile" },
-  { href: "/dashboard/settings", label: "Account" },
-  { href: "/dashboard/membership", label: "Membership" },
-];
+  { href: "/dashboard", key: "dashboard.overview" },
+  { href: "/dashboard/posts", key: "dashboard.content" },
+  { href: "/dashboard/profile", key: "dashboard.profileTitle" },
+  { href: "/dashboard/settings", key: "dashboard.account" },
+  { href: "/dashboard/membership", key: "nav.membership" },
+] as const;
 
 export function DashboardNav() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <nav className="flex flex-col gap-1">
@@ -33,7 +35,7 @@ export function DashboardNav() {
                 : "text-muted hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.06]",
             )}
           >
-            {item.label}
+            {t(item.key)}
           </Link>
         );
       })}

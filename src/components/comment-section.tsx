@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useI18n } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { Avatar } from "@/components/ui/misc";
@@ -21,6 +22,7 @@ export function CommentSection({
   initialCursor: string | null;
   isAuthenticated: boolean;
 }) {
+  const { t, locale } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
@@ -44,7 +46,9 @@ export function CommentSection({
       setBody("");
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not post comment.");
+      setError(
+        err instanceof ApiError ? err.message : t("common.somethingWrong"),
+      );
     } finally {
       setPosting(false);
     }
@@ -80,7 +84,7 @@ export function CommentSection({
   return (
     <section id="comments" className="scroll-mt-20">
       <h2 className="text-lg font-semibold">
-        Comments {items.length > 0 && `(${items.length})`}
+        {t("post.comments")} {items.length > 0 && `(${items.length})`}
       </h2>
 
       {isAuthenticated ? (
@@ -88,13 +92,18 @@ export function CommentSection({
           <Textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Add a comment…"
+            placeholder={t("post.addComment")}
             maxLength={2000}
-            aria-label="Add a comment"
+            aria-label={t("post.addComment")}
           />
           {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button type="submit" size="sm" loading={posting} disabled={!body.trim()}>
-            Comment
+          <Button
+            type="submit"
+            size="sm"
+            loading={posting}
+            disabled={!body.trim()}
+          >
+            {t("post.comment")}
           </Button>
         </form>
       ) : (
@@ -103,9 +112,9 @@ export function CommentSection({
             href={`/login?next=${encodeURIComponent(pathname)}`}
             className="font-medium text-brand-600"
           >
-            Log in
+            {t("nav.login")}
           </Link>{" "}
-          to join the conversation.
+          {t("post.loginToComment")}
         </p>
       )}
 
@@ -128,7 +137,7 @@ export function CommentSection({
                   {comment.author.name}
                 </Link>{" "}
                 <span className="text-muted">
-                  · {formatRelativeDate(comment.createdAt)}
+                  · {formatRelativeDate(comment.createdAt, locale)}
                 </span>
               </p>
               <p className="mt-0.5 whitespace-pre-wrap text-sm">{comment.body}</p>
@@ -137,7 +146,7 @@ export function CommentSection({
                   onClick={() => remove(comment.id)}
                   className="mt-1 text-xs text-muted hover:text-red-600"
                 >
-                  Delete
+                  {t("common.delete")}
                 </button>
               )}
             </div>
@@ -146,7 +155,7 @@ export function CommentSection({
       </ul>
 
       {items.length === 0 && (
-        <p className="mt-6 text-sm text-muted">No comments yet.</p>
+        <p className="mt-6 text-sm text-muted">{t("post.noComments")}</p>
       )}
 
       {cursor && (
@@ -157,7 +166,7 @@ export function CommentSection({
             onClick={loadMore}
             loading={loadingMore}
           >
-            Load more comments
+            {t("post.loadMoreComments")}
           </Button>
         </div>
       )}

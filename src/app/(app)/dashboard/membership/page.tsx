@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Badge, Card } from "@/components/ui/misc";
 import { requireUserPage } from "@/lib/auth/page-guards";
+import { getLocale, getT } from "@/lib/i18n/server";
 import { FREE_DRAFT_LIMIT } from "@/lib/membership";
 import { stripeConfigured } from "@/lib/stripe";
 import { getMembershipInfo } from "@/server/services/membership-service";
@@ -11,15 +12,19 @@ import {
 } from "./membership-actions";
 
 export default async function MembershipPage() {
-  const user = await requireUserPage();
+  const [user, t, locale] = await Promise.all([
+    requireUserPage(),
+    getT(),
+    getLocale(),
+  ]);
   const info = await getMembershipInfo(user.id);
   const isPro = info.membership === "PRO";
 
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Membership</h1>
-        <p className="text-sm text-muted">Your current plan and usage.</p>
+        <h1 className="text-xl font-semibold">{t("membership.title")}</h1>
+        <p className="text-sm text-muted">{t("membership.subtitle")}</p>
       </div>
 
       <Suspense fallback={null}>
@@ -28,22 +33,24 @@ export default async function MembershipPage() {
 
       <Card className="flex items-center justify-between">
         <div>
-          <p className="font-medium">{isPro ? "Pro plan" : "Free plan"}</p>
+          <p className="font-medium">
+            {isPro ? t("membership.proPlan") : t("membership.freePlan")}
+          </p>
           <p className="text-sm text-muted">
             {isPro
-              ? "Unlimited drafts and everything on Free."
-              : `Up to ${FREE_DRAFT_LIMIT} drafts, publishing, following, and the feed.`}
+              ? t("membership.proPlanBody")
+              : t("membership.freePlanBody", { limit: FREE_DRAFT_LIMIT })}
           </p>
         </div>
         <Badge tone={isPro ? "brand" : "neutral"}>
-          {isPro ? "Pro" : "Current"}
+          {isPro ? t("membership.proBadge") : t("membership.current")}
         </Badge>
       </Card>
 
       <Card>
-        <h2 className="font-medium">Usage</h2>
+        <h2 className="font-medium">{t("membership.usage")}</h2>
         <div className="mt-2 flex items-center justify-between text-sm">
-          <span className="text-muted">Drafts</span>
+          <span className="text-muted">{t("dashboard.drafts")}</span>
           <span className="font-medium tabular-nums">
             {info.usage.drafts}
             {info.usage.draftLimit !== null && ` / ${info.usage.draftLimit}`}
@@ -53,21 +60,23 @@ export default async function MembershipPage() {
 
       {info.subscription && (
         <Card>
-          <h2 className="font-medium">Billing</h2>
+          <h2 className="font-medium">{t("membership.billing")}</h2>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between">
-              <dt className="text-muted">Status</dt>
+              <dt className="text-muted">{t("membership.status")}</dt>
               <dd className="font-medium">{info.subscription.status}</dd>
             </div>
             {info.subscription.currentPeriodEnd && (
               <div className="flex justify-between">
                 <dt className="text-muted">
-                  {info.subscription.cancelAtPeriodEnd ? "Ends" : "Renews"}
+                  {info.subscription.cancelAtPeriodEnd
+                    ? t("membership.ends")
+                    : t("membership.renews")}
                 </dt>
                 <dd className="font-medium">
                   {new Date(
                     info.subscription.currentPeriodEnd,
-                  ).toLocaleDateString()}
+                  ).toLocaleDateString(locale === "zh" ? "zh-CN" : "en-US")}
                 </dd>
               </div>
             )}
@@ -78,10 +87,11 @@ export default async function MembershipPage() {
       <div>
         {!stripeConfigured ? (
           <Card className="opacity-70">
-            <p className="font-medium">Billing not configured</p>
+            <p className="font-medium">
+              {t("membership.billingNotConfigured")}
+            </p>
             <p className="mt-1 text-sm text-muted">
-              Set the Stripe environment variables (see .env.example) to enable
-              upgrades.
+              {t("membership.billingNotConfiguredBody")}
             </p>
           </Card>
         ) : isPro ? (

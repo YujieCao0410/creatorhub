@@ -4,47 +4,48 @@ import { PricingActions } from "@/components/pricing-actions";
 import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/misc";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getT } from "@/lib/i18n/server";
 import { FREE_DRAFT_LIMIT } from "@/lib/membership";
 import { stripeConfigured } from "@/lib/stripe";
 
 export const metadata: Metadata = { title: "Pricing" };
 export const dynamic = "force-dynamic";
 
-const FREE_FEATURES = [
-  "Publish unlimited posts",
-  `Up to ${FREE_DRAFT_LIMIT} saved drafts`,
-  "Follows, feed, likes and comments",
-  "Public creator profile",
-];
-
-const PRO_FEATURES = [
-  "Everything in Free",
-  "Unlimited drafts",
-  "Priority in future feature rollouts",
-  "Support CreatorHub's development",
-];
-
 export default async function PricingPage() {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   const isPro = user?.membership === "PRO";
+
+  const freeFeatures = [
+    t("pricing.freeFeatures.0"),
+    t("pricing.freeFeatures.1", { limit: FREE_DRAFT_LIMIT }),
+    t("pricing.freeFeatures.2"),
+    t("pricing.freeFeatures.3"),
+  ];
+  const proFeatures = [
+    t("pricing.proFeatures.0"),
+    t("pricing.proFeatures.1"),
+    t("pricing.proFeatures.2"),
+    t("pricing.proFeatures.3"),
+  ];
 
   return (
     <div className="mx-auto max-w-3xl space-y-10 py-6">
       <div className="text-center">
-        <h1 className="text-3xl font-semibold">Simple pricing</h1>
-        <p className="mt-2 text-muted">
-          Start free. Upgrade when CreatorHub becomes part of your routine.
-        </p>
+        <h1 className="text-3xl font-semibold">{t("pricing.title")}</h1>
+        <p className="mt-2 text-muted">{t("pricing.subtitle")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="flex flex-col">
-          <h2 className="text-lg font-semibold">Free</h2>
+          <h2 className="text-lg font-semibold">{t("pricing.free")}</h2>
           <p className="mt-1 text-3xl font-semibold">
-            $0<span className="text-base font-normal text-muted">/mo</span>
+            $0
+            <span className="text-base font-normal text-muted">
+              {t("pricing.perMonth")}
+            </span>
           </p>
           <ul className="mt-4 flex-1 space-y-2 text-sm">
-            {FREE_FEATURES.map((f) => (
+            {freeFeatures.map((f) => (
               <li key={f} className="flex gap-2">
                 <span aria-hidden className="text-brand-600">
                   ✓
@@ -56,26 +57,31 @@ export default async function PricingPage() {
           <div className="mt-6">
             {user ? (
               <span className="text-sm text-muted">
-                {isPro ? "Included with Pro" : "Your current plan"}
+                {isPro
+                  ? t("pricing.includedWithPro")
+                  : t("pricing.currentPlan")}
               </span>
             ) : (
               <Link
                 href="/register"
                 className={buttonClasses({ variant: "secondary" })}
               >
-                Create account
+                {t("pricing.createAccount")}
               </Link>
             )}
           </div>
         </Card>
 
         <Card className="flex flex-col border-brand-500">
-          <h2 className="text-lg font-semibold">Pro</h2>
+          <h2 className="text-lg font-semibold">{t("pricing.pro")}</h2>
           <p className="mt-1 text-3xl font-semibold">
-            $9<span className="text-base font-normal text-muted">/mo</span>
+            $9
+            <span className="text-base font-normal text-muted">
+              {t("pricing.perMonth")}
+            </span>
           </p>
           <ul className="mt-4 flex-1 space-y-2 text-sm">
-            {PRO_FEATURES.map((f) => (
+            {proFeatures.map((f) => (
               <li key={f} className="flex gap-2">
                 <span aria-hidden className="text-brand-600">
                   ✓
@@ -95,7 +101,7 @@ export default async function PricingPage() {
       </div>
 
       <p className="text-center text-xs text-muted">
-        Payments are processed by Stripe. Cancel anytime from your dashboard.
+        {t("pricing.processedByStripe")}
       </p>
     </div>
   );

@@ -2,32 +2,40 @@ import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
 import { Badge, Card, EmptyState } from "@/components/ui/misc";
 import { requireUserPage } from "@/lib/auth/page-guards";
+import { getLocale, getT } from "@/lib/i18n/server";
 import { listAuthoredPosts } from "@/server/services/post-service";
 import { PostRowActions } from "./post-row-actions";
 
 export default async function ContentPage() {
-  const user = await requireUserPage();
+  const [user, t, locale] = await Promise.all([
+    requireUserPage(),
+    getT(),
+    getLocale(),
+  ]);
   const posts = await listAuthoredPosts(user.id);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Content</h1>
-        <Link href="/dashboard/posts/new" className={buttonClasses({ size: "sm" })}>
-          New post
+        <h1 className="text-xl font-semibold">{t("dashboard.content")}</h1>
+        <Link
+          href="/dashboard/posts/new"
+          className={buttonClasses({ size: "sm" })}
+        >
+          {t("dashboard.newPost")}
         </Link>
       </div>
 
       {posts.length === 0 ? (
         <EmptyState
-          title="No posts yet"
-          description="Write your first post and publish it to your profile."
+          title={t("dashboard.noPostsTitle")}
+          description={t("dashboard.noPostsBody")}
           action={
             <Link
               href="/dashboard/posts/new"
               className={buttonClasses({ size: "sm" })}
             >
-              New post
+              {t("dashboard.newPost")}
             </Link>
           }
         />
@@ -42,14 +50,18 @@ export default async function ContentPage() {
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium">{post.title}</span>
                   {post.published ? (
-                    <Badge tone="green">Published</Badge>
+                    <Badge tone="green">{t("dashboard.published")}</Badge>
                   ) : (
-                    <Badge>Draft</Badge>
+                    <Badge>{t("post.draft")}</Badge>
                   )}
                 </div>
                 <p className="mt-0.5 text-xs text-muted">
-                  {post.counts.likes} likes · updated{" "}
-                  {new Date(post.updatedAt).toLocaleDateString()}
+                  {t("dashboard.likesUpdated", {
+                    likes: post.counts.likes,
+                    date: new Date(post.updatedAt).toLocaleDateString(
+                      locale === "zh" ? "zh-CN" : "en-US",
+                    ),
+                  })}
                 </p>
               </div>
               <PostRowActions slug={post.slug} published={post.published} />

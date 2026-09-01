@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -12,6 +13,7 @@ import type { SelfUser } from "@/lib/dto";
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const t = useT();
   const { setUser } = useSession();
 
   const [values, setValues] = useState({ email: "", password: "" });
@@ -50,7 +52,7 @@ export function LoginForm() {
         setFieldErrors(fields);
         if (Object.keys(fields).length === 0) setFormError(err.message);
       } else {
-        setFormError("Something went wrong. Please try again.");
+        setFormError(t("common.somethingWrongBody"));
       }
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export function LoginForm() {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       {formError && <Alert>{formError}</Alert>}
 
-      <Field label="Email" htmlFor="email" error={fieldErrors.email}>
+      <Field label={t("auth.email")} htmlFor="email" error={fieldErrors.email}>
         <Input
           id="email"
           name="email"
@@ -73,7 +75,11 @@ export function LoginForm() {
         />
       </Field>
 
-      <Field label="Password" htmlFor="password" error={fieldErrors.password}>
+      <Field
+        label={t("auth.password")}
+        htmlFor="password"
+        error={fieldErrors.password}
+      >
         <Input
           id="password"
           name="password"
@@ -87,7 +93,7 @@ export function LoginForm() {
       </Field>
 
       <Button type="submit" className="w-full" loading={loading}>
-        Log in
+        {t("auth.loginButton")}
       </Button>
     </form>
   );

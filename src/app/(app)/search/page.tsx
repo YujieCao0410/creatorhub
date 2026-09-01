@@ -4,6 +4,7 @@ import { PostCard } from "@/components/post-card";
 import { SearchBox } from "@/components/search-box";
 import { EmptyState } from "@/components/ui/misc";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getT } from "@/lib/i18n/server";
 import { searchQuerySchema } from "@/lib/validation/search";
 import { searchPosts } from "@/server/services/post-service";
 import { searchCreators } from "@/server/services/user-service";
@@ -18,7 +19,7 @@ export default async function SearchPage({
 }) {
   const raw = (await searchParams).q ?? "";
   const parsed = searchQuerySchema.safeParse({ q: raw });
-  const viewer = await getCurrentUser();
+  const [viewer, t] = await Promise.all([getCurrentUser(), getT()]);
 
   const results = parsed.success
     ? await Promise.all([
@@ -30,19 +31,15 @@ export default async function SearchPage({
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="mb-4 text-2xl font-semibold">Search</h1>
+        <h1 className="mb-4 text-2xl font-semibold">{t("search.title")}</h1>
         <SearchBox initialQuery={raw} autoFocus />
       </div>
 
       {!parsed.success ? (
         raw.trim().length > 0 ? (
-          <p className="text-sm text-muted">
-            Enter at least 2 characters to search.
-          </p>
+          <p className="text-sm text-muted">{t("search.minChars")}</p>
         ) : (
-          <p className="text-sm text-muted">
-            Search for creators by name or handle, and posts by title or content.
-          </p>
+          <p className="text-sm text-muted">{t("search.prompt")}</p>
         )
       ) : (
         <SearchResults
@@ -50,6 +47,12 @@ export default async function SearchPage({
           posts={results![1]}
           query={parsed.data.q}
           currentUserId={viewer?.id}
+          labels={{
+            creators: t("search.creators"),
+            posts: t("search.posts"),
+            noResults: t("search.noResults", { query: parsed.data.q }),
+            noResultsBody: t("search.noResultsBody"),
+          }}
         />
       )}
     </div>
@@ -59,20 +62,23 @@ export default async function SearchPage({
 function SearchResults({
   creators,
   posts,
-  query,
   currentUserId,
+  labels,
 }: {
   creators: Awaited<ReturnType<typeof searchCreators>>;
   posts: Awaited<ReturnType<typeof searchPosts>>;
   query: string;
   currentUserId?: string;
+  labels: {
+    creators: string;
+    posts: string;
+    noResults: string;
+    noResultsBody: string;
+  };
 }) {
   if (creators.length === 0 && posts.length === 0) {
     return (
-      <EmptyState
-        title={`No results for "${query}"`}
-        description="Try a different search term."
-      />
+      <EmptyState title={labels.noResults} description={labels.noResultsBody} />
     );
   }
 
@@ -81,7 +87,7 @@ function SearchResults({
       {creators.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-            Creators
+            {labels.creators}
           </h2>
           <div className="space-y-2">
             {creators.map((creator) => (
@@ -94,7 +100,7 @@ function SearchResults({
       {posts.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-            Posts
+            {labels.posts}
           </h2>
           <div className="space-y-4">
             {posts.map((post) => (

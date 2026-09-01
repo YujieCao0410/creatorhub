@@ -2,11 +2,13 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/misc";
 import { api, ApiError } from "@/lib/api-client";
 
 function useBillingRedirect(path: string) {
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +20,7 @@ function useBillingRedirect(path: string) {
       window.location.href = url;
     } catch (err) {
       setError(
-        err instanceof ApiError ? err.message : "Something went wrong.",
+        err instanceof ApiError ? err.message : t("common.somethingWrong"),
       );
       setLoading(false);
     }
@@ -28,11 +30,12 @@ function useBillingRedirect(path: string) {
 }
 
 export function UpgradeButton() {
+  const t = useT();
   const { go, loading, error } = useBillingRedirect("/api/billing/checkout");
   return (
     <div>
       <Button onClick={go} loading={loading}>
-        Upgrade to Pro
+        {t("pricing.upgrade")}
       </Button>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
@@ -40,11 +43,12 @@ export function UpgradeButton() {
 }
 
 export function ManageBillingButton() {
+  const t = useT();
   const { go, loading, error } = useBillingRedirect("/api/billing/portal");
   return (
     <div>
       <Button variant="secondary" onClick={go} loading={loading}>
-        Manage billing
+        {t("pricing.manageBilling")}
       </Button>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
@@ -52,17 +56,13 @@ export function ManageBillingButton() {
 }
 
 export function CheckoutNotice() {
+  const t = useT();
   const status = useSearchParams().get("checkout");
   if (status === "success") {
-    return (
-      <Alert tone="success">
-        Payment received. Your Pro features unlock as soon as Stripe confirms
-        the subscription — refresh in a moment if the plan still shows Free.
-      </Alert>
-    );
+    return <Alert tone="success">{t("membership.checkoutSuccess")}</Alert>;
   }
   if (status === "cancelled") {
-    return <Alert tone="info">Checkout cancelled — no charge was made.</Alert>;
+    return <Alert tone="info">{t("membership.checkoutCancelled")}</Alert>;
   }
   return null;
 }

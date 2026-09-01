@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/field";
@@ -13,6 +14,7 @@ type Values = { name: string; bio: string; avatarUrl: string };
 
 export function ProfileForm({ initial }: { initial: Values }) {
   const router = useRouter();
+  const t = useT();
   const { setUser } = useSession();
 
   const [values, setValues] = useState<Values>(initial);
@@ -51,7 +53,7 @@ export function ProfileForm({ initial }: { initial: Values }) {
         setFieldErrors(fields);
         if (Object.keys(fields).length === 0) setFormError(err.message);
       } else {
-        setFormError("Something went wrong. Please try again.");
+        setFormError(t("common.somethingWrongBody"));
       }
     } finally {
       setLoading(false);
@@ -61,9 +63,9 @@ export function ProfileForm({ initial }: { initial: Values }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       {formError && <Alert>{formError}</Alert>}
-      {saved && <Alert tone="success">Profile updated.</Alert>}
+      {saved && <Alert tone="success">{t("dashboard.profileUpdated")}</Alert>}
 
-      <Field label="Name" htmlFor="name" error={fieldErrors.name}>
+      <Field label={t("dashboard.fieldName")} htmlFor="name" error={fieldErrors.name}>
         <Input
           id="name"
           value={values.name}
@@ -73,9 +75,9 @@ export function ProfileForm({ initial }: { initial: Values }) {
       </Field>
 
       <Field
-        label="Bio"
+        label={t("dashboard.bio")}
         htmlFor="bio"
-        hint="Up to 280 characters"
+        hint={t("dashboard.bioHint")}
         error={fieldErrors.bio}
       >
         <Textarea
@@ -88,9 +90,9 @@ export function ProfileForm({ initial }: { initial: Values }) {
       </Field>
 
       <Field
-        label="Avatar URL"
+        label={t("dashboard.avatarUrl")}
         htmlFor="avatarUrl"
-        hint="Link to an image"
+        hint={t("dashboard.avatarHint")}
         error={fieldErrors.avatarUrl}
       >
         <Input
@@ -103,7 +105,7 @@ export function ProfileForm({ initial }: { initial: Values }) {
       </Field>
 
       <Button type="submit" loading={loading}>
-        Save changes
+        {t("common.save")}
       </Button>
     </form>
   );

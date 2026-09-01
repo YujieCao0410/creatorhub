@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { Input } from "@/components/ui/field";
 import { cn } from "@/lib/cn";
 
@@ -15,6 +16,7 @@ export function SearchBox({
   className?: string;
 }) {
   const router = useRouter();
+  const t = useT();
   const [value, setValue] = useState(initialQuery);
 
   function submit(e: React.FormEvent) {
@@ -31,8 +33,8 @@ export function SearchBox({
         value={value}
         autoFocus={autoFocus}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Search creators and posts…"
-        aria-label="Search"
+        placeholder={t("search.placeholder")}
+        aria-label={t("search.title")}
       />
     </form>
   );

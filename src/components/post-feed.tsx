@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/i18n-provider";
 import { PostCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
@@ -21,6 +22,7 @@ export function PostFeed({
   endpoint: string;
   currentUserId?: string;
 }) {
+  const t = useT();
   const [items, setItems] = useState(initialItems);
   const [cursor, setCursor] = useState(initialCursor);
   const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ export function PostFeed({
       setItems((prev) => [...prev, ...res.data]);
       setCursor(res.nextCursor);
     } catch {
-      setError("Could not load more posts.");
+      setError(t("common.somethingWrong"));
     } finally {
       setLoading(false);
     }
@@ -55,7 +57,7 @@ export function PostFeed({
       {cursor && (
         <div className="flex justify-center pt-2">
           <Button variant="secondary" onClick={loadMore} loading={loading}>
-            Load more
+            {t("common.loadMore")}
           </Button>
         </div>
       )}
