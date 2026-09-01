@@ -198,6 +198,33 @@ export function listFeed(
   );
 }
 
+/** Case-insensitive search over title, excerpt and content of published posts. */
+export async function searchPosts(
+  query: string,
+  viewerId?: string,
+  limit = 10,
+): Promise<PostSummary[]> {
+  const rows = await prisma.post.findMany({
+    where: {
+      published: true,
+      OR: [
+        { title: { contains: query } },
+        { excerpt: { contains: query } },
+        { content: { contains: query } },
+      ],
+    },
+    include: postInclude,
+    orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+    take: limit,
+  });
+
+  const liked = await likedPostIds(
+    viewerId,
+    rows.map((r) => r.id),
+  );
+  return rows.map((r) => toSummary(r, liked.has(r.id)));
+}
+
 async function loadOwnedPost(slug: string, userId: string) {
   const row = await prisma.post.findUnique({ where: { slug } });
   if (!row) throw new NotFoundError("Post");

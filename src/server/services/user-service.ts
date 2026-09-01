@@ -102,6 +102,25 @@ export async function getCreatorProfile(
   };
 }
 
+/** Case-insensitive search over handle and name. */
+export async function searchCreators(
+  query: string,
+  limit = 10,
+): Promise<PublicUser[]> {
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        { handle: { contains: query } },
+        { name: { contains: query } },
+        { bio: { contains: query } },
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+  return users.map(toPublicUser);
+}
+
 /** Updates the signed-in user's own profile. Undefined fields are left as-is. */
 export async function updateProfile(
   userId: string,
