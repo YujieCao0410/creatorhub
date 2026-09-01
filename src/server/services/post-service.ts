@@ -1,7 +1,12 @@
 import { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
 import type { PostDetail, PostList, PostSummary } from "@/lib/dto";
-import { AuthorizationError, NotFoundError } from "@/lib/errors";
+import {
+  AuthorizationError,
+  NotFoundError,
+  PaymentRequiredError,
+} from "@/lib/errors";
+import { FREE_DRAFT_LIMIT, toMembership } from "@/lib/membership";
 import { uniqueSlug } from "@/lib/slug";
 import type { PaginationQuery } from "@/lib/validation/common";
 import type {
@@ -64,6 +69,24 @@ export async function createPost(
   authorId: string,
   input: CreatePostInput,
 ): Promise<PostDetail> {
+  // FREE accounts are capped on unpublished drafts. PRO is unlimited.
+  if (!input.publish) {
+    const author = await prisma.user.findUnique({
+      where: { id: authorId },
+      select: { membership: true },
+    });
+    if (toMembership(author?.membership) !== "PRO") {
+      const drafts = await prisma.post.count({
+        where: { authorId, published: false },
+      });
+      if (drafts >= FREE_DRAFT_LIMIT) {
+        throw new PaymentRequiredError(
+          `Free accounts can keep ${FREE_DRAFT_LIMIT} drafts. Upgrade to Pro for unlimited drafts.`,
+        );
+      }
+    }
+  }
+
   const publishedAt = input.publish ? new Date() : null;
 
   // Retry on the astronomically unlikely slug collision.

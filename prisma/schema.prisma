@@ -23,14 +23,35 @@ model User {
   passwordHash String
   bio          String?
   avatarUrl    String?
+  /// "FREE" | "PRO" — the effective plan. Kept denormalized on the user so
+  /// authorization checks are a single read; Stripe webhooks keep it in sync
+  /// with the Subscription row.
+  membership   String   @default("FREE")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  posts     Post[]
-  likes     Like[]
-  comments  Comment[]
-  following Follow[]  @relation("follower")
-  followers Follow[]  @relation("following")
+  posts        Post[]
+  likes        Like[]
+  comments     Comment[]
+  following    Follow[]      @relation("follower")
+  followers    Follow[]      @relation("following")
+  subscription Subscription?
+}
+
+/// Billing state mirrored from Stripe. One row per user (created lazily on first
+/// checkout). `status` holds the Stripe subscription status verbatim.
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  status               String    @default("incomplete")
+  priceId              String?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 /// A piece of content written by a user. Drafts have `published = false`;

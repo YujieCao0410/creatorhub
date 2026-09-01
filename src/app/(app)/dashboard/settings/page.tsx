@@ -16,6 +16,7 @@ export default async function SettingsPage() {
         <Row label="Name" value={user.name} />
         <Row label="Handle" value={`@${user.handle}`} />
         <Row label="Email" value={user.email} />
+        <Row label="Plan" value={user.membership === "PRO" ? "Pro" : "Free"} />
         <Row
           label="Member since"
           value={new Date(user.createdAt).toLocaleDateString()}

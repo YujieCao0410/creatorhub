@@ -15,8 +15,24 @@ export type PublicUser = {
   createdAt: string;
 };
 
+export type Membership = "FREE" | "PRO";
+
 export type SelfUser = PublicUser & {
   email: string;
+  membership: Membership;
+};
+
+export type MembershipInfo = {
+  membership: Membership;
+  subscription: {
+    status: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+  } | null;
+  usage: {
+    drafts: number;
+    draftLimit: number | null;
+  };
 };
 
 export type CreatorProfile = PublicUser & {

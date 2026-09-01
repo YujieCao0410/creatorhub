@@ -5,6 +5,7 @@ import type {
   PublicUser,
   SelfUser,
 } from "@/lib/dto";
+import { toMembership } from "@/lib/membership";
 import type { UpdateProfileInput } from "@/lib/validation/user";
 
 export type { CreatorProfile, PublicUser, SelfUser } from "@/lib/dto";
@@ -31,7 +32,11 @@ export function toPublicUser(user: User): PublicUser {
 }
 
 export function toSelfUser(user: User): SelfUser {
-  return { ...toPublicUser(user), email: user.email };
+  return {
+    ...toPublicUser(user),
+    email: user.email,
+    membership: toMembership(user.membership),
+  };
 }
 
 export async function getUserById(id: string): Promise<SelfUser | null> {

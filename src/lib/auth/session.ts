@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { AuthenticationError } from "@/lib/errors";
+import { AuthenticationError, PaymentRequiredError } from "@/lib/errors";
 import { getUserById, type SelfUser } from "@/server/services/user-service";
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "./constants";
 import { signSessionToken, verifySessionToken } from "./jwt";
@@ -52,5 +52,12 @@ export const getCurrentUser = cache(
 export async function requireUser(): Promise<SelfUser> {
   const user = await getCurrentUser();
   if (!user) throw new AuthenticationError();
+  return user;
+}
+
+/** Requires an authenticated user on the PRO plan (throws 401 or 402). */
+export async function requirePro(): Promise<SelfUser> {
+  const user = await requireUser();
+  if (user.membership !== "PRO") throw new PaymentRequiredError();
   return user;
 }
