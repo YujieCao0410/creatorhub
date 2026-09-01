@@ -14,7 +14,8 @@ Live demo: _deploy your own — see [DEPLOYMENT.md](./DEPLOYMENT.md)_
 | --- | --- |
 | **Accounts** | Email/password auth, bcrypt hashing, JWT session in an httpOnly cookie, edge-gated dashboard, rate-limited login/registration |
 | **Creator profiles** | Public page at `/creators/<handle>`, editable name/bio/avatar, follower / following / post counts |
-| **Content** | Draft & publish posts, keyset-paginated feeds, stable slugs, author-only edit/delete |
+| **Content** | Draft & publish posts, cover-image + video upload, tags, keyset-paginated feeds, stable slugs, author-only edit/delete |
+| **Languages** | English / 中文 — follows the browser/OS language, with a manual toggle (cookie) |
 | **Social** | Follow / unfollow, personalized "Following" feed, likes, threaded comments (with post-author moderation) |
 | **Search** | Creators and posts, case-insensitive, `/search?q=` |
 | **Dashboard** | Overview stats, content manager, profile editor, account settings, membership |

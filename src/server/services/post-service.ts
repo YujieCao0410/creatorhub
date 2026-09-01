@@ -33,6 +33,17 @@ const postInclude = {
 
 type PostRow = Prisma.PostGetPayload<{ include: typeof postInclude }>;
 
+/** "design typography" <-> ["design","typography"] */
+function parseTags(stored: string): string[] {
+  return stored.split(" ").filter(Boolean);
+}
+function serializeTags(tags: string[] | undefined): string {
+  if (!tags) return "";
+  return [...new Set(tags.map((tag) => tag.trim().toLowerCase()).filter(Boolean))]
+    .slice(0, 10)
+    .join(" ");
+}
+
 function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
   return {
     id: row.id,
@@ -40,6 +51,8 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
     title: row.title,
     excerpt: row.excerpt,
     coverImageUrl: row.coverImageUrl,
+    videoUrl: row.videoUrl,
+    tags: parseTags(row.tags),
     published: row.published,
     publishedAt: row.publishedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
@@ -99,6 +112,8 @@ export async function createPost(
           content: input.content,
           excerpt: input.excerpt ?? null,
           coverImageUrl: input.coverImageUrl ?? null,
+          videoUrl: input.videoUrl ?? null,
+          tags: serializeTags(input.tags),
           published: input.publish,
           publishedAt,
           authorId,
@@ -230,6 +245,7 @@ export async function searchPosts(
         { title: { contains: query } },
         { excerpt: { contains: query } },
         { content: { contains: query } },
+        { tags: { contains: query.toLowerCase() } },
       ],
     },
     include: postInclude,
@@ -271,6 +287,8 @@ export async function updatePost(
       content: input.content,
       excerpt: input.excerpt,
       coverImageUrl: input.coverImageUrl,
+      videoUrl: input.videoUrl,
+      ...(input.tags !== undefined ? { tags: serializeTags(input.tags) } : {}),
       published: input.published,
       ...(goingPublic ? { publishedAt: new Date() } : {}),
     },

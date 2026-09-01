@@ -92,6 +92,19 @@ docker run -p 3000:3000 \
 
 ---
 
+## 3b. File uploads (important)
+
+`src/lib/storage.ts` writes uploaded cover images and videos to
+`public/uploads/`. That's fine for local development but **not for production**:
+serverless and container filesystems are ephemeral, and Vercel caps request
+bodies at ~4.5 MB (so large video uploads fail there regardless).
+
+For production, replace `saveUpload()` with an object-storage client
+(Cloudflare R2, AWS S3, Vercel Blob). The interface is a single function, and
+`mediaRef` in `src/lib/validation/post.ts` already accepts absolute URLs, so
+returning a full `https://…` URL from the new adapter is all the app needs.
+Prefer a presigned direct-to-storage upload for videos.
+
 ## 4. Post-deploy checklist
 
 - [ ] `DATABASE_URL` points at Postgres; `prisma migrate deploy` has run

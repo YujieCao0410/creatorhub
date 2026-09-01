@@ -66,6 +66,10 @@ model Post {
   excerpt       String?
   content       String
   coverImageUrl String?
+  /// Path to an uploaded video (served from /uploads). Null for text posts.
+  videoUrl      String?
+  /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
+  tags          String    @default("")
   published     Boolean   @default(false)
   publishedAt   DateTime?
   createdAt     DateTime  @default(now())

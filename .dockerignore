@@ -3,6 +3,7 @@ node_modules
 .git
 *.db
 *.db-journal
+public/uploads
 coverage
 test-results
 playwright-report

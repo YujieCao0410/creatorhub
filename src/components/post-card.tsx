@@ -43,13 +43,37 @@ export function PostCard({
         )}
       </Link>
 
-      {post.coverImageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={post.coverImageUrl}
-          alt=""
-          className="mt-3 max-h-80 w-full rounded-lg object-cover"
+      {post.videoUrl ? (
+        <video
+          src={post.videoUrl}
+          poster={post.coverImageUrl ?? undefined}
+          controls
+          preload="metadata"
+          className="mt-3 max-h-96 w-full rounded-lg bg-black"
         />
+      ) : (
+        post.coverImageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={post.coverImageUrl}
+            alt=""
+            className="mt-3 max-h-80 w-full rounded-lg object-cover"
+          />
+        )
+      )}
+
+      {post.tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {post.tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`/search?q=${encodeURIComponent(tag)}`}
+              className="rounded bg-black/[0.05] px-1.5 py-0.5 text-xs text-muted hover:text-foreground dark:bg-white/[0.08]"
+            >
+              #{tag}
+            </Link>
+          ))}
+        </div>
       )}
 
       <div className="mt-4 flex items-center gap-5">

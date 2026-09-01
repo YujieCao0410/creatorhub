@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
+import { MediaUpload } from "@/components/media-upload";
+import { TagInput } from "@/components/tag-input";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Alert } from "@/components/ui/misc";
@@ -13,10 +15,19 @@ type Values = {
   title: string;
   excerpt: string;
   content: string;
-  coverImageUrl: string;
+  coverImageUrl: string | null;
+  videoUrl: string | null;
+  tags: string[];
 };
 
-const EMPTY: Values = { title: "", excerpt: "", content: "", coverImageUrl: "" };
+const EMPTY: Values = {
+  title: "",
+  excerpt: "",
+  content: "",
+  coverImageUrl: null,
+  videoUrl: null,
+  tags: [],
+};
 
 export function PostEditor({
   mode,
@@ -34,20 +45,24 @@ export function PostEditor({
           title: post.title,
           excerpt: post.excerpt ?? "",
           content: post.content,
-          coverImageUrl: post.coverImageUrl ?? "",
+          coverImageUrl: post.coverImageUrl,
+          videoUrl: post.videoUrl,
+          tags: post.tags,
         }
       : EMPTY,
   );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<null | "draft" | "publish" | "save" | "toggle">(
-    null,
-  );
+  const [busy, setBusy] = useState<
+    null | "draft" | "publish" | "save" | "toggle"
+  >(null);
 
-  function update(key: keyof Values) {
-    return (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => setValues((v) => ({ ...v, [key]: e.target.value }));
+  function updateText(key: "title" | "excerpt" | "content") {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setValues((v) => ({ ...v, [key]: e.target.value }));
+  }
+  function set<K extends keyof Values>(key: K, val: Values[K]) {
+    setValues((v) => ({ ...v, [key]: val }));
   }
 
   function payload() {
@@ -55,8 +70,9 @@ export function PostEditor({
       title: values.title,
       content: values.content,
       excerpt: values.excerpt.trim() === "" ? null : values.excerpt,
-      coverImageUrl:
-        values.coverImageUrl.trim() === "" ? null : values.coverImageUrl,
+      coverImageUrl: values.coverImageUrl,
+      videoUrl: values.videoUrl,
+      tags: values.tags,
     };
   }
 
@@ -131,13 +147,47 @@ export function PostEditor({
       <Field
         label={t("editor.title")}
         htmlFor="title"
+        hint={t("editor.titleHint")}
         error={fieldErrors.title}
       >
         <Input
           id="title"
           value={values.title}
-          onChange={update("title")}
+          onChange={updateText("title")}
           aria-invalid={Boolean(fieldErrors.title)}
+        />
+      </Field>
+
+      <Field
+        label={t("editor.tags")}
+        htmlFor="tags"
+        hint={t("editor.tagsHint")}
+        error={fieldErrors.tags}
+      >
+        <TagInput
+          value={values.tags}
+          onChange={(tags) => set("tags", tags)}
+        />
+      </Field>
+
+      <Field label={t("editor.video")} htmlFor="video">
+        <MediaUpload
+          kind="video"
+          value={values.videoUrl}
+          onChange={(url) => set("videoUrl", url)}
+        />
+      </Field>
+
+      <Field
+        label={t("editor.cover")}
+        htmlFor="cover"
+        hint={t("editor.coverHint")}
+        error={fieldErrors.coverImageUrl}
+      >
+        <MediaUpload
+          kind="image"
+          value={values.coverImageUrl}
+          onChange={(url) => set("coverImageUrl", url)}
         />
       </Field>
 
@@ -150,23 +200,9 @@ export function PostEditor({
         <Input
           id="excerpt"
           value={values.excerpt}
-          onChange={update("excerpt")}
+          onChange={updateText("excerpt")}
           maxLength={280}
           aria-invalid={Boolean(fieldErrors.excerpt)}
-        />
-      </Field>
-
-      <Field
-        label={t("editor.coverImageUrl")}
-        htmlFor="coverImageUrl"
-        error={fieldErrors.coverImageUrl}
-      >
-        <Input
-          id="coverImageUrl"
-          type="url"
-          value={values.coverImageUrl}
-          onChange={update("coverImageUrl")}
-          aria-invalid={Boolean(fieldErrors.coverImageUrl)}
         />
       </Field>
 
@@ -179,7 +215,7 @@ export function PostEditor({
           id="content"
           className="min-h-64"
           value={values.content}
-          onChange={update("content")}
+          onChange={updateText("content")}
           aria-invalid={Boolean(fieldErrors.content)}
         />
       </Field>

@@ -53,6 +53,8 @@ export type PostSummary = {
   title: string;
   excerpt: string | null;
   coverImageUrl: string | null;
+  videoUrl: string | null;
+  tags: string[];
   published: boolean;
   publishedAt: string | null;
   createdAt: string;

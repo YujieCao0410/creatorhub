@@ -91,15 +91,39 @@ export default async function PostDetailPage({
         </div>
 
         <h1 className="text-3xl font-semibold leading-tight">{post.title}</h1>
+
+        {post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {post.tags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/search?q=${encodeURIComponent(tag)}`}
+                className="rounded bg-black/[0.05] px-2 py-0.5 text-sm text-muted hover:text-foreground dark:bg-white/[0.08]"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      {post.coverImageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={post.coverImageUrl}
-          alt=""
-          className="w-full rounded-xl object-cover"
+      {post.videoUrl ? (
+        <video
+          src={post.videoUrl}
+          poster={post.coverImageUrl ?? undefined}
+          controls
+          preload="metadata"
+          className="w-full rounded-xl bg-black"
         />
+      ) : (
+        post.coverImageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={post.coverImageUrl}
+            alt=""
+            className="w-full rounded-xl object-cover"
+          />
+        )
       )}
 
       <div className="whitespace-pre-wrap text-[15px] leading-7">
