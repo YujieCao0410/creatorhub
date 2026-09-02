@@ -158,8 +158,10 @@ export async function publishPostToYouTube(
     privacy: "public",
   });
 
-  // Best-effort: reuse the post's cover image as the YouTube thumbnail. Fails
-  // (and is ignored) if the channel has not completed phone verification.
+  // Best-effort: reuse the post's cover image as the YouTube thumbnail.
+  // YouTube rejects thumbnails.set while the freshly-uploaded video is still
+  // transcoding, so retry a few times with a delay. Failure is non-fatal
+  // (unverified channel, persistent processing) — the video keeps publishing.
   if (post.coverImageUrl?.startsWith("/uploads/")) {
     const ext = path.extname(post.coverImageUrl).toLowerCase();
     const coverType = IMAGE_MIME[ext];
@@ -168,7 +170,20 @@ export async function publishPostToYouTube(
         const coverBytes = await readFile(
           path.join(process.cwd(), "public", post.coverImageUrl),
         );
-        await setThumbnail({ accessToken, videoId, bytes: coverBytes, contentType: coverType });
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          try {
+            await setThumbnail({
+              accessToken,
+              videoId,
+              bytes: coverBytes,
+              contentType: coverType,
+            });
+            break;
+          } catch (err) {
+            if (attempt === 5) throw err;
+            await new Promise((r) => setTimeout(r, 5000));
+          }
+        }
       } catch (err) {
         console.warn("YouTube thumbnail not set:", err);
       }
