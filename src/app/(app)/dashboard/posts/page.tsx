@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
 import { Badge, Card, EmptyState } from "@/components/ui/misc";
-import { YouTubePublishButton } from "@/components/youtube-publish-button";
+import { DistributePanel } from "@/components/distribute-panel";
 import { requireUserPage } from "@/lib/auth/page-guards";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { listAuthoredPosts } from "@/server/services/post-service";
@@ -69,9 +69,9 @@ export default async function ContentPage() {
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <PostRowActions slug={post.slug} published={post.published} />
                 {post.videoUrl && (
-                  <YouTubePublishButton
+                  <DistributePanel
                     slug={post.slug}
-                    youtubeUrl={post.youtubeUrl}
+                    targets={post.publishTargets}
                   />
                 )}
               </div>

@@ -91,6 +91,11 @@ model Post {
   videoUrl      String?
   /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
   tags          String    @default("")
+  /// Platform caption for international platforms (YouTube/TikTok/Instagram).
+  /// Falls back to title + content when empty.
+  captionEn     String    @default("")
+  /// Platform caption for Chinese platforms (Douyin/Bilibili/Xiaohongshu).
+  captionZh     String    @default("")
   /// Set once the video has been pushed to YouTube.
   youtubeUrl    String?
   published     Boolean   @default(false)
@@ -101,11 +106,33 @@ model Post {
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  likes    Like[]
-  comments Comment[]
+  likes          Like[]
+  comments       Comment[]
+  publishTargets PublishTarget[]
 
   @@index([authorId])
   @@index([published, publishedAt])
+}
+
+/// One row per (post, platform) distribution attempt. Tracks where a video has
+/// been sent and the outcome. `status`: pending | publishing | published |
+/// failed | manual (needs the creator to upload by hand).
+model PublishTarget {
+  id          String    @id @default(cuid())
+  platform    String
+  locale      String    @default("en")
+  status      String    @default("pending")
+  externalUrl String?
+  error       String?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, platform])
+  @@index([postId])
 }
 
 /// One row per (user, post) like. The composite unique constraint makes

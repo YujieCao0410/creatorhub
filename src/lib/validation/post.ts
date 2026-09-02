@@ -4,6 +4,8 @@ import { paginationQuerySchema } from "./common";
 const title = z.string().trim().min(1, "Title is required").max(140);
 const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
+/** Platform caption (international / Chinese). Empty falls back to title+body. */
+const caption = z.string().trim().max(5_000).optional();
 
 /** A post must carry *something*: body text, a video, or a cover image. */
 function hasBody(data: {
@@ -50,6 +52,8 @@ export const createPostSchema = z
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
+    captionEn: caption,
+    captionZh: caption,
     /** When true the post is published immediately; otherwise a draft. */
     publish: z.boolean().optional().default(false),
   })
@@ -67,6 +71,8 @@ export const updatePostSchema = z
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
+    captionEn: caption,
+    captionZh: caption,
     published: z.boolean().optional(),
   })
   .strict()

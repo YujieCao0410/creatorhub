@@ -47,6 +47,15 @@ export type PostAuthor = {
   avatarUrl: string | null;
 };
 
+export type PublishTargetDTO = {
+  platform: string;
+  locale: string;
+  status: "pending" | "publishing" | "published" | "failed" | "manual";
+  externalUrl: string | null;
+  error: string | null;
+  publishedAt: string | null;
+};
+
 export type PostSummary = {
   id: string;
   slug: string;
@@ -56,6 +65,9 @@ export type PostSummary = {
   videoUrl: string | null;
   youtubeUrl: string | null;
   tags: string[];
+  captionEn: string;
+  captionZh: string;
+  publishTargets: PublishTargetDTO[];
   published: boolean;
   publishedAt: string | null;
   createdAt: string;
@@ -66,6 +78,13 @@ export type PostSummary = {
 };
 
 export type PostDetail = PostSummary & { content: string };
+
+/** What the distribute panel needs: targets plus the caption to paste. */
+export type DistributionPlan = {
+  slug: string;
+  targets: PublishTargetDTO[];
+  captions: { platform: string; caption: string }[];
+};
 
 export type Comment = {
   id: string;

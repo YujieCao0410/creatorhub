@@ -7,6 +7,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/lib/errors";
+import { fullCaption } from "@/lib/caption";
 import {
   refreshAccessToken,
   setThumbnail,
@@ -141,12 +142,16 @@ export async function publishPostToYouTube(
     VIDEO_MIME[path.extname(post.videoUrl).toLowerCase()] ?? "video/mp4";
 
   const tags = post.tags.split(" ").filter(Boolean);
-  const description = [
-    post.content,
-    tags.length ? tags.map((t) => `#${t}`).join(" ") : "",
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+  const description = fullCaption(
+    {
+      title: post.title,
+      content: post.content,
+      captionEn: post.captionEn,
+      captionZh: post.captionZh,
+      tags,
+    },
+    "youtube",
+  );
 
   const { videoId, url } = await uploadVideo({
     accessToken,

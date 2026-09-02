@@ -15,7 +15,8 @@
     "somethingWrongBody": "An unexpected error occurred. You can try again.",
     "notFoundTitle": "Page not found",
     "notFoundBody": "The page you're looking for doesn't exist or has moved.",
-    "backHome": "Back home"
+    "backHome": "Back home",
+    "close": "Close"
   },
   "nav": {
     "home": "Home",
@@ -201,7 +202,13 @@
     "uploadFailed": "Upload failed",
     "saveDraft": "Save draft",
     "publish": "Publish",
-    "unpublish": "Unpublish"
+    "unpublish": "Unpublish",
+    "captionsTitle": "Platform captions",
+    "captionsHint": "Optional. International platforms get the English caption, Chinese platforms get the Chinese one. Empty falls back to the title + content.",
+    "captionEn": "English caption (YouTube / TikTok / Instagram)",
+    "captionZh": "Chinese caption (Douyin / Bilibili / Xiaohongshu)",
+    "captionEnPlaceholder": "What people see under the video on international platforms",
+    "captionZhPlaceholder": "国内平台视频下方显示的文案"
   },
   "integrations": {
     "title": "Integrations",
@@ -243,5 +250,27 @@
     "billingNotConfiguredBody": "Set the Stripe environment variables (see .env.example) to enable upgrades.",
     "checkoutSuccess": "Payment received. Your Pro features unlock as soon as Stripe confirms the subscription — refresh in a moment if the plan still shows Free.",
     "checkoutCancelled": "Checkout cancelled — no charge was made."
+  },
+  "distribute": {
+    "open": "Distribute",
+    "title": "Distribute this video",
+    "hint": "YouTube publishes over its API. Other platforms give you a ready caption to paste, then mark them done.",
+    "manual": "Manual",
+    "publishSelected": "Publish selected",
+    "loadFailed": "Could not load distribution info",
+    "failed": "Something went wrong",
+    "showCaption": "Show caption to copy",
+    "hideCaption": "Hide caption",
+    "copyCaption": "Copy caption",
+    "copied": "Copied",
+    "pasteUrl": "Paste the live URL (optional)",
+    "markDone": "Mark as posted",
+    "status": {
+      "pending": "Pending",
+      "publishing": "Publishing…",
+      "published": "Published",
+      "failed": "Failed",
+      "manual": "Needs manual upload"
+    }
   }
 }

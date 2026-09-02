@@ -28,6 +28,7 @@ const postInclude = {
   author: {
     select: { id: true, handle: true, name: true, avatarUrl: true },
   },
+  publishTargets: true,
   _count: { select: { likes: true, comments: true } },
 } satisfies Prisma.PostInclude;
 
@@ -54,6 +55,18 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
     videoUrl: row.videoUrl,
     youtubeUrl: row.youtubeUrl,
     tags: parseTags(row.tags),
+    captionEn: row.captionEn,
+    captionZh: row.captionZh,
+    publishTargets: row.publishTargets
+      .map((t) => ({
+        platform: t.platform,
+        locale: t.locale,
+        status: t.status as PostSummary["publishTargets"][number]["status"],
+        externalUrl: t.externalUrl,
+        error: t.error,
+        publishedAt: t.publishedAt?.toISOString() ?? null,
+      }))
+      .sort((a, b) => a.platform.localeCompare(b.platform)),
     published: row.published,
     publishedAt: row.publishedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
@@ -115,6 +128,8 @@ export async function createPost(
           coverImageUrl: input.coverImageUrl ?? null,
           videoUrl: input.videoUrl ?? null,
           tags: serializeTags(input.tags),
+          captionEn: input.captionEn ?? "",
+          captionZh: input.captionZh ?? "",
           published: input.publish,
           publishedAt,
           authorId,
@@ -290,6 +305,8 @@ export async function updatePost(
       coverImageUrl: input.coverImageUrl,
       videoUrl: input.videoUrl,
       ...(input.tags !== undefined ? { tags: serializeTags(input.tags) } : {}),
+      ...(input.captionEn !== undefined ? { captionEn: input.captionEn } : {}),
+      ...(input.captionZh !== undefined ? { captionZh: input.captionZh } : {}),
       published: input.published,
       ...(goingPublic ? { publishedAt: new Date() } : {}),
     },

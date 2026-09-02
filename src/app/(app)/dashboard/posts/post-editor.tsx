@@ -18,6 +18,8 @@ type Values = {
   coverImageUrl: string | null;
   videoUrl: string | null;
   tags: string[];
+  captionEn: string;
+  captionZh: string;
 };
 
 const EMPTY: Values = {
@@ -27,6 +29,8 @@ const EMPTY: Values = {
   coverImageUrl: null,
   videoUrl: null,
   tags: [],
+  captionEn: "",
+  captionZh: "",
 };
 
 export function PostEditor({
@@ -48,6 +52,8 @@ export function PostEditor({
           coverImageUrl: post.coverImageUrl,
           videoUrl: post.videoUrl,
           tags: post.tags,
+          captionEn: post.captionEn,
+          captionZh: post.captionZh,
         }
       : EMPTY,
   );
@@ -57,7 +63,9 @@ export function PostEditor({
     null | "draft" | "publish" | "save" | "toggle"
   >(null);
 
-  function updateText(key: "title" | "excerpt" | "content") {
+  function updateText(
+    key: "title" | "excerpt" | "content" | "captionEn" | "captionZh",
+  ) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setValues((v) => ({ ...v, [key]: e.target.value }));
   }
@@ -73,6 +81,8 @@ export function PostEditor({
       coverImageUrl: values.coverImageUrl,
       videoUrl: values.videoUrl,
       tags: values.tags,
+      captionEn: values.captionEn,
+      captionZh: values.captionZh,
     };
   }
 
@@ -190,6 +200,31 @@ export function PostEditor({
           onChange={(url) => set("coverImageUrl", url)}
         />
       </Field>
+
+      <div className="rounded-lg border border-border bg-surface p-4">
+        <p className="text-sm font-medium">{t("editor.captionsTitle")}</p>
+        <p className="mt-0.5 text-xs text-muted">{t("editor.captionsHint")}</p>
+        <div className="mt-3 space-y-3">
+          <Field label={t("editor.captionEn")} htmlFor="captionEn">
+            <Textarea
+              id="captionEn"
+              className="min-h-20"
+              value={values.captionEn}
+              onChange={updateText("captionEn")}
+              placeholder={t("editor.captionEnPlaceholder")}
+            />
+          </Field>
+          <Field label={t("editor.captionZh")} htmlFor="captionZh">
+            <Textarea
+              id="captionZh"
+              className="min-h-20"
+              value={values.captionZh}
+              onChange={updateText("captionZh")}
+              placeholder={t("editor.captionZhPlaceholder")}
+            />
+          </Field>
+        </div>
+      </div>
 
       <Field
         label={t("editor.excerpt")}

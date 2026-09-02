@@ -15,7 +15,8 @@
     "somethingWrongBody": "发生了意外错误，可以重试。",
     "notFoundTitle": "页面不存在",
     "notFoundBody": "你要找的页面不存在或已移动。",
-    "backHome": "回到首页"
+    "backHome": "回到首页",
+    "close": "关闭"
   },
   "nav": {
     "home": "首页",
@@ -201,7 +202,13 @@
     "uploadFailed": "上传失败",
     "saveDraft": "存草稿",
     "publish": "发布",
-    "unpublish": "取消发布"
+    "unpublish": "取消发布",
+    "captionsTitle": "平台文案",
+    "captionsHint": "可选。海外平台用英文文案，国内平台用中文文案。留空则用标题 + 正文。",
+    "captionEn": "英文文案（YouTube / TikTok / Instagram）",
+    "captionZh": "中文文案（抖音 / 哔哩哔哩 / 小红书）",
+    "captionEnPlaceholder": "海外平台视频下方显示的文案",
+    "captionZhPlaceholder": "国内平台视频下方显示的文案"
   },
   "integrations": {
     "title": "集成",
@@ -243,5 +250,27 @@
     "billingNotConfiguredBody": "设置 Stripe 环境变量（见 .env.example）以启用升级。",
     "checkoutSuccess": "已收到付款。Stripe 确认订阅后 Pro 功能就会解锁——如果方案还显示免费版，过一会儿刷新一下。",
     "checkoutCancelled": "已取消结账，未扣款。"
+  },
+  "distribute": {
+    "open": "分发",
+    "title": "把这条视频分发出去",
+    "hint": "YouTube 通过 API 直接发布。其他平台会生成好文案供你复制，发完手动标记。",
+    "manual": "手动",
+    "publishSelected": "发布所选平台",
+    "loadFailed": "加载分发信息失败",
+    "failed": "出错了",
+    "showCaption": "显示文案以复制",
+    "hideCaption": "隐藏文案",
+    "copyCaption": "复制文案",
+    "copied": "已复制",
+    "pasteUrl": "粘贴发布后的链接（可选）",
+    "markDone": "标记为已发布",
+    "status": {
+      "pending": "待处理",
+      "publishing": "发布中…",
+      "published": "已发布",
+      "failed": "失败",
+      "manual": "需手动上传"
+    }
   }
 }
