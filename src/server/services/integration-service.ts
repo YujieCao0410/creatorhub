@@ -110,6 +110,7 @@ export async function publishPostToYouTube(
   userId: string,
   slug: string,
   lang = "en",
+  captionOverride: string | null = null,
 ): Promise<{ url: string }> {
   const post = await prisma.post.findUnique({ where: { slug } });
   if (!post) throw new NotFoundError("Post");
@@ -143,16 +144,18 @@ export async function publishPostToYouTube(
     VIDEO_MIME[path.extname(post.videoUrl).toLowerCase()] ?? "video/mp4";
 
   const tags = post.tags.split(" ").filter(Boolean);
-  const description = fullCaption(
-    {
-      title: post.title,
-      content: post.content,
-      captions: toCaptionMap(post.captions),
-      tags,
-    },
-    "youtube",
-    lang,
-  );
+  const description =
+    captionOverride?.trim() ||
+    fullCaption(
+      {
+        title: post.title,
+        content: post.content,
+        captions: toCaptionMap(post.captions),
+        tags,
+      },
+      "youtube",
+      lang,
+    );
 
   const { videoId, url } = await uploadVideo({
     accessToken,

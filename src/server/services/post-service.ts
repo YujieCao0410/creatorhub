@@ -52,6 +52,7 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
       .map((t) => ({
         platform: t.platform,
         lang: t.lang,
+        caption: t.caption,
         status: t.status as PostSummary["publishTargets"][number]["status"],
         externalUrl: t.externalUrl,
         error: t.error,

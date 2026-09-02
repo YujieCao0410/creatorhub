@@ -23,9 +23,8 @@ export function DistributePanel({ post }: { post: PostSummary }) {
   const [open, setOpen] = useState(false);
   const [targets, setTargets] = useState<PublishTargetDTO[]>(post.publishTargets);
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const [langByPlatform, setLangByPlatform] = useState<Record<string, string>>(
-    {},
-  );
+  const [lang, setLang] = useState<Record<string, string>>({});
+  const [caption, setCaption] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,30 +34,29 @@ export function DistributePanel({ post }: { post: PostSummary }) {
     [targets],
   );
 
-  // Languages the creator can send each platform: caption languages, or the
-  // platform default when the post has no captions yet.
   const captionLangs = Object.keys(post.captions);
 
-  function langFor(platformId: string): string {
+  function langFor(id: string): string {
     return (
-      langByPlatform[platformId] ??
-      targetByPlatform.get(platformId)?.lang ??
-      getPlatform(platformId)?.defaultLang ??
+      lang[id] ??
+      targetByPlatform.get(id)?.lang ??
+      getPlatform(id)?.defaultLang ??
       "en"
     );
   }
 
-  function captionFor(platformId: string): string {
+  function composedCaption(id: string): string {
+    const existing = targetByPlatform.get(id)?.caption;
+    if (existing) return existing;
     return fullCaption(
-      {
-        title: post.title,
-        content: "",
-        captions: post.captions,
-        tags: post.tags,
-      },
-      platformId,
-      langFor(platformId),
+      { title: post.title, content: "", captions: post.captions, tags: post.tags },
+      id,
+      langFor(id),
     );
+  }
+
+  function captionFor(id: string): string {
+    return caption[id] ?? composedCaption(id);
   }
 
   function openPanel() {
@@ -66,6 +64,8 @@ export function DistributePanel({ post }: { post: PostSummary }) {
       targets.filter((x) => x.status === "published").map((x) => x.platform),
     );
     setChecked(new Set(PLATFORMS.map((p) => p.id).filter((id) => !done.has(id))));
+    setCaption({});
+    setLang({});
     setError(null);
     setOpen(true);
   }
@@ -75,6 +75,17 @@ export function DistributePanel({ post }: { post: PostSummary }) {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      return next;
+    });
+  }
+
+  function onLangChange(id: string, value: string) {
+    setLang((m) => ({ ...m, [id]: value }));
+    // A language switch replaces an untouched caption with the new composition.
+    setCaption((m) => {
+      if (m[id] === undefined) return m;
+      const next = { ...m };
+      delete next[id];
       return next;
     });
   }
@@ -89,6 +100,7 @@ export function DistributePanel({ post }: { post: PostSummary }) {
           targets: [...checked].map((platform) => ({
             platform,
             lang: langFor(platform),
+            caption: captionFor(platform),
           })),
         },
       );
@@ -168,20 +180,20 @@ export function DistributePanel({ post }: { post: PostSummary }) {
                     key={platform.id}
                     label={platform.label}
                     api={platform.api}
+                    limit={platform.captionLimit}
                     lang={langFor(platform.id)}
                     langOptions={
-                      captionLangs.length
-                        ? captionLangs
-                        : [platform.defaultLang]
+                      captionLangs.length ? captionLangs : [platform.defaultLang]
                     }
-                    onLangChange={(lang) =>
-                      setLangByPlatform((m) => ({ ...m, [platform.id]: lang }))
-                    }
+                    onLangChange={(v) => onLangChange(platform.id, v)}
                     checked={checked.has(platform.id)}
                     disabled={isPublished || busy}
                     onToggle={() => toggle(platform.id)}
                     target={target}
                     caption={captionFor(platform.id)}
+                    onCaptionChange={(v) =>
+                      setCaption((m) => ({ ...m, [platform.id]: v }))
+                    }
                     onMarkDone={(url) => markDone(platform.id, url)}
                     t={t}
                   />
@@ -212,6 +224,7 @@ export function DistributePanel({ post }: { post: PostSummary }) {
 function PlatformRow({
   label,
   api: isApi,
+  limit,
   lang,
   langOptions,
   onLangChange,
@@ -220,11 +233,13 @@ function PlatformRow({
   onToggle,
   target,
   caption,
+  onCaptionChange,
   onMarkDone,
   t,
 }: {
   label: string;
   api: boolean;
+  limit: number;
   lang: string;
   langOptions: string[];
   onLangChange: (lang: string) => void;
@@ -233,17 +248,16 @@ function PlatformRow({
   onToggle: () => void;
   target: PublishTargetDTO | undefined;
   caption: string;
+  onCaptionChange: (v: string) => void;
   onMarkDone: (url: string) => void;
   t: (k: string) => string;
 }) {
-  const [expanded, setExpanded] = useState(false);
   const [url, setUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
   const isManual = !isApi;
   const isPublished = target?.status === "published";
-  const showManualTools =
-    isManual && (target?.status === "manual" || expanded) && !isPublished;
+  const over = caption.length > limit;
 
   async function copy() {
     try {
@@ -300,53 +314,51 @@ function PlatformRow({
         <p className="mt-1.5 text-xs text-red-600">{target.error}</p>
       )}
 
-      {isPublished && target?.externalUrl && (
-        <a
-          href={target.externalUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1.5 inline-block text-xs font-medium text-brand-600 hover:underline"
-        >
-          {target.externalUrl}
-        </a>
-      )}
-
-      {isManual && !isPublished && (
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          className="mt-1.5 text-xs text-muted hover:text-foreground"
-        >
-          {expanded ? t("distribute.hideCaption") : t("distribute.showCaption")}
-        </button>
-      )}
-
-      {showManualTools && (
-        <div className="mt-2 space-y-2">
+      {isPublished ? (
+        target?.externalUrl && (
+          <a
+            href={target.externalUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1.5 inline-block text-xs font-medium text-brand-600 hover:underline"
+          >
+            {target.externalUrl}
+          </a>
+        )
+      ) : checked ? (
+        <div className="mt-2 space-y-1.5">
           <textarea
-            readOnly
             value={caption}
-            rows={4}
+            onChange={(e) => onCaptionChange(e.target.value)}
+            rows={3}
             className="w-full resize-none rounded-md border border-border bg-background p-2 text-xs"
-            onFocus={(e) => e.currentTarget.select()}
           />
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={copy}>
-              {copied ? t("distribute.copied") : t("distribute.copyCaption")}
-            </Button>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder={t("distribute.pasteUrl")}
-              className="min-w-40 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs outline-none"
-            />
-            <Button size="sm" onClick={() => onMarkDone(url)}>
-              {t("distribute.markDone")}
-            </Button>
+          <div className="flex items-center justify-between text-[11px]">
+            <span className={over ? "font-medium text-red-600" : "text-muted"}>
+              {caption.length} / {limit}
+            </span>
+            {isManual && (
+              <Button variant="secondary" size="sm" onClick={copy}>
+                {copied ? t("distribute.copied") : t("distribute.copyCaption")}
+              </Button>
+            )}
           </div>
+          {isManual && target?.status === "manual" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder={t("distribute.pasteUrl")}
+                className="min-w-40 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs outline-none"
+              />
+              <Button size="sm" onClick={() => onMarkDone(url)}>
+                {t("distribute.markDone")}
+              </Button>
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

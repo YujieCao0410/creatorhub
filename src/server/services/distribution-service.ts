@@ -12,12 +12,18 @@ import { publishPostToYouTube } from "./integration-service";
 
 export type { DistributionPlan } from "@/lib/dto";
 
-/** One platform the creator wants to publish to, in a chosen language. */
-export type DistributeTarget = { platform: string; lang: string };
+/** One platform the creator wants to publish to. */
+export type DistributeTarget = {
+  platform: string;
+  lang: string;
+  /** Optional per-platform caption override; empty/undefined = compose it. */
+  caption?: string;
+};
 
 type TargetRow = {
   platform: string;
   lang: string;
+  caption: string | null;
   status: string;
   externalUrl: string | null;
   error: string | null;
@@ -28,6 +34,7 @@ function toTargetDTO(row: TargetRow): PublishTargetDTO {
   return {
     platform: row.platform,
     lang: row.lang,
+    caption: row.caption,
     status: row.status as PublishTargetDTO["status"],
     externalUrl: row.externalUrl,
     error: row.error,
@@ -55,17 +62,25 @@ function langFor(post: OwnedPost, platformId: string): string {
   return target?.lang ?? getPlatform(platformId)?.defaultLang ?? "en";
 }
 
-function captionsFor(post: OwnedPost): DistributionPlan["captions"] {
+/** The caption to publish for a platform: its override, or a composed one. */
+function composedCaption(post: OwnedPost, platformId: string): string {
+  const target = post.publishTargets.find((t) => t.platform === platformId);
+  if (target?.caption?.trim()) return target.caption;
   const input = {
     title: post.title,
     content: post.content,
     captions: toCaptionMap(post.captions),
     tags: post.tags.split(" ").filter(Boolean),
   };
-  return PLATFORMS.map((p) => {
-    const lang = langFor(post, p.id);
-    return { platform: p.id, lang, caption: fullCaption(input, p.id, lang) };
-  });
+  return fullCaption(input, platformId, langFor(post, platformId));
+}
+
+function captionsFor(post: OwnedPost): DistributionPlan["captions"] {
+  return PLATFORMS.map((p) => ({
+    platform: p.id,
+    lang: langFor(post, p.id),
+    caption: composedCaption(post, p.id),
+  }));
 }
 
 function planFrom(post: OwnedPost): DistributionPlan {
@@ -101,30 +116,33 @@ export async function distributePost(
     throw new ValidationError(undefined, "This post has no video to distribute.");
   }
 
-  const chosen = new Map<string, string>();
-  for (const { platform, lang } of targets) {
+  const chosen = new Map<string, { lang: string; caption: string | null }>();
+  for (const { platform, lang, caption } of targets) {
     if (!isPlatformId(platform)) continue;
-    const resolved = isLanguageCode(lang)
+    const resolvedLang = isLanguageCode(lang)
       ? lang
       : (getPlatform(platform)?.defaultLang ?? "en");
-    chosen.set(platform, resolved);
+    chosen.set(platform, {
+      lang: resolvedLang,
+      caption: caption?.trim() ? caption.trim().slice(0, 5000) : null,
+    });
   }
   if (chosen.size === 0) {
     throw new ValidationError(undefined, "Pick at least one platform.");
   }
 
-  for (const [id, lang] of chosen) {
+  for (const [id, { lang, caption }] of chosen) {
     const platform = getPlatform(id)!;
     const existing = post.publishTargets.find((t) => t.platform === id);
     if (existing?.status === "published") continue;
 
     if (id === "youtube" && platform.api) {
-      await runYouTube(userId, slug, post.id, lang);
+      await runYouTube(userId, slug, post.id, lang, caption);
     } else {
       await prisma.publishTarget.upsert({
         where: { postId_platform: { postId: post.id, platform: id } },
-        create: { postId: post.id, platform: id, lang, status: "manual" },
-        update: { lang, status: "manual", error: null },
+        create: { postId: post.id, platform: id, lang, caption, status: "manual" },
+        update: { lang, caption, status: "manual", error: null },
       });
     }
   }
@@ -137,14 +155,15 @@ async function runYouTube(
   slug: string,
   postId: string,
   lang: string,
+  caption: string | null,
 ) {
   await prisma.publishTarget.upsert({
     where: { postId_platform: { postId, platform: "youtube" } },
-    create: { postId, platform: "youtube", lang, status: "publishing" },
-    update: { lang, status: "publishing", error: null },
+    create: { postId, platform: "youtube", lang, caption, status: "publishing" },
+    update: { lang, caption, status: "publishing", error: null },
   });
   try {
-    const { url } = await publishPostToYouTube(userId, slug, lang);
+    const { url } = await publishPostToYouTube(userId, slug, lang, caption);
     await prisma.publishTarget.update({
       where: { postId_platform: { postId, platform: "youtube" } },
       data: {

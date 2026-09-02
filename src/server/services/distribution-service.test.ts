@@ -60,6 +60,17 @@ describe("distribution", () => {
     expect(byPlatform.douyin.lang).toBe("zh");
   });
 
+  it("stores a per-platform caption override and returns it in the plan", async () => {
+    const post = await videoPost();
+    const plan = await distributePost(author.id, post.slug, [
+      { platform: "tiktok", lang: "en", caption: "just my custom line #foo" },
+    ]);
+    const tiktok = plan.captions.find((c) => c.platform === "tiktok");
+    expect(tiktok?.caption).toBe("just my custom line #foo");
+    const target = plan.targets.find((t) => t.platform === "tiktok");
+    expect(target?.caption).toBe("just my custom line #foo");
+  });
+
   it("markTargetPublished records the URL and flips status", async () => {
     const post = await videoPost();
     await distributePost(author.id, post.slug, [

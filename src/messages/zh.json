@@ -85,7 +85,7 @@
     "proFeatures": [
       "包含免费版全部功能",
       "无限草稿",
-      "AI 生成任意语言的文案和标签",
+      "无限 AI 文案和标签(免费版每月 3 次)",
       "一处发布到所有平台"
     ],
     "currentPlan": "你当前的方案",
@@ -215,7 +215,9 @@
     "captionsEmpty": "还没有文案。在下面加一种语言,或用 AI 生成。",
     "captionPlaceholder": "该平台视频下方显示的文案(不用写 #标签,标签会自动加)。",
     "addLanguage": "+ 添加语言",
-    "removeLanguage": "移除"
+    "removeLanguage": "移除",
+    "aiCreditsLeft": "本月还剩 {n} 次免费 AI 生成",
+    "aiOutOfCredits": "本月免费 AI 次数用完了。升级 Pro 无限使用。"
   },
   "integrations": {
     "title": "集成",
@@ -261,7 +263,7 @@
   "distribute": {
     "open": "分发",
     "title": "把这条视频分发出去",
-    "hint": "YouTube 通过 API 直接发布。其他平台会生成好文案供你复制，发完手动标记。",
+    "hint": "YouTube 通过 API 直接发布,其他平台生成文案供你复制。发布前可以在下面单独改每个平台的文案。",
     "manual": "手动",
     "publishSelected": "发布所选平台",
     "loadFailed": "加载分发信息失败",

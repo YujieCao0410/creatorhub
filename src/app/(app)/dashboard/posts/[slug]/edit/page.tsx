@@ -33,7 +33,8 @@ export default async function EditPostPage({
       <PostEditor
         mode="edit"
         post={post}
-        aiEnabled={aiConfigured && user.membership === "PRO"}
+        aiEnabled={aiConfigured}
+        aiCreditsLeft={user.aiCreditsLeft}
       />
     </div>
   );

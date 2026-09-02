@@ -5,7 +5,7 @@ import type {
   PublicUser,
   SelfUser,
 } from "@/lib/dto";
-import { toMembership } from "@/lib/membership";
+import { aiCreditsLeft, toMembership } from "@/lib/membership";
 import { parseTags, serializeTags } from "@/lib/tags";
 import type { UpdateProfileInput } from "@/lib/validation/user";
 
@@ -38,6 +38,7 @@ export function toSelfUser(user: User): SelfUser {
     email: user.email,
     membership: toMembership(user.membership),
     defaultTags: parseTags(user.defaultTags),
+    aiCreditsLeft: aiCreditsLeft(user),
   };
 }
 

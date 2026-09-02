@@ -85,7 +85,7 @@
     "proFeatures": [
       "Everything in Free",
       "Unlimited drafts",
-      "AI captions & hashtags in any language",
+      "Unlimited AI captions & hashtags (free plan: 3/month)",
       "Publish to every platform from one place"
     ],
     "currentPlan": "Your current plan",
@@ -215,7 +215,9 @@
     "captionsEmpty": "No captions yet. Add a language below, or use AI.",
     "captionPlaceholder": "The caption shown under the video on that platform (no hashtag list — tags are added automatically).",
     "addLanguage": "+ Add a language",
-    "removeLanguage": "Remove"
+    "removeLanguage": "Remove",
+    "aiCreditsLeft": "{n} free AI generations left this month",
+    "aiOutOfCredits": "Out of free AI generations. Upgrade to Pro for unlimited."
   },
   "integrations": {
     "title": "Integrations",
@@ -261,7 +263,7 @@
   "distribute": {
     "open": "Distribute",
     "title": "Distribute this video",
-    "hint": "YouTube publishes over its API. Other platforms give you a ready caption to paste, then mark them done.",
+    "hint": "YouTube publishes over its API. Other platforms give you a caption to paste. Edit each platform's caption below before you publish.",
     "manual": "Manual",
     "publishSelected": "Publish selected",
     "loadFailed": "Could not load distribution info",

@@ -7,6 +7,25 @@ export const MEMBERSHIPS = ["FREE", "PRO"] as const;
 /** Draft cap for FREE accounts. PRO is unlimited (`null`). */
 export const FREE_DRAFT_LIMIT = 3;
 
+/** AI caption generations a FREE account gets each calendar month. */
+export const FREE_AI_MONTHLY = 3;
+
+/** Current month key, "YYYY-MM", for the AI usage counter. */
+export function currentMonthKey(date = new Date()): string {
+  return date.toISOString().slice(0, 7);
+}
+
+/** AI generations left this month: a number for FREE, `null` (unlimited) for PRO. */
+export function aiCreditsLeft(user: {
+  membership: string;
+  aiUsedCount: number;
+  aiUsedMonth: string;
+}): number | null {
+  if (toMembership(user.membership) === "PRO") return null;
+  const used = user.aiUsedMonth === currentMonthKey() ? user.aiUsedCount : 0;
+  return Math.max(0, FREE_AI_MONTHLY - used);
+}
+
 export function isMembership(value: string): value is Membership {
   return (MEMBERSHIPS as readonly string[]).includes(value);
 }

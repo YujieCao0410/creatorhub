@@ -29,6 +29,10 @@ model User {
   /// Space-separated default hashtags pre-filled into every new post
   /// (lowercase, no "#"). Empty string = none.
   defaultTags  String   @default("")
+  /// AI caption generations used in `aiUsedMonth` (YYYY-MM). FREE accounts are
+  /// capped per month; PRO is not counted here.
+  aiUsedCount  Int      @default(0)
+  aiUsedMonth  String   @default("")
   /// "FREE" | "PRO" — the effective plan. Kept denormalized on the user so
   /// authorization checks are a single read; Stripe webhooks keep it in sync
   /// with the Subscription row.
@@ -123,6 +127,8 @@ model PublishTarget {
   id          String    @id @default(cuid())
   platform    String
   lang        String    @default("en")
+  /// Per-platform caption override. Null = compose from the post's captions.
+  caption     String?
   status      String    @default("pending")
   externalUrl String?
   error       String?

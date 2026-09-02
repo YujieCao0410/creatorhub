@@ -15,7 +15,13 @@ type Ctx = { params: Promise<{ slug: string }> };
 
 const bodySchema = z.object({
   targets: z
-    .array(z.object({ platform: z.string(), lang: z.string() }))
+    .array(
+      z.object({
+        platform: z.string(),
+        lang: z.string(),
+        caption: z.string().max(5_000).optional(),
+      }),
+    )
     .min(1)
     .max(10),
 });

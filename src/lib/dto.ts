@@ -22,6 +22,8 @@ export type SelfUser = PublicUser & {
   membership: Membership;
   /** Default hashtags pre-filled into every new post. */
   defaultTags: string[];
+  /** AI caption generations left this month; `null` when PRO (unlimited). */
+  aiCreditsLeft: number | null;
 };
 
 export type MembershipInfo = {
@@ -52,6 +54,7 @@ export type PostAuthor = {
 export type PublishTargetDTO = {
   platform: string;
   lang: string;
+  caption: string | null;
   status: "pending" | "publishing" | "published" | "failed" | "manual";
   externalUrl: string | null;
   error: string | null;

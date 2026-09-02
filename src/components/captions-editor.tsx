@@ -14,6 +14,7 @@ export function CaptionsEditor({
   captions,
   onChange,
   aiEnabled,
+  aiCreditsLeft,
   aiBusy,
   aiNote,
   aiError,
@@ -22,6 +23,8 @@ export function CaptionsEditor({
   captions: Record<string, string>;
   onChange: (next: Record<string, string>) => void;
   aiEnabled: boolean;
+  /** AI runs left this month; null = unlimited (PRO). */
+  aiCreditsLeft: number | null;
   aiBusy: boolean;
   aiNote: string | null;
   aiError: string | null;
@@ -56,17 +59,25 @@ export function CaptionsEditor({
           <p className="mt-0.5 text-xs text-muted">{t("editor.captionsHint")}</p>
         </div>
         {aiEnabled && (
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            loading={aiBusy}
-            onClick={() =>
-              onAiSuggest(langs.length ? langs : ["en"])
-            }
-          >
-            {aiBusy ? t("editor.aiWorking") : t("editor.aiSuggest")}
-          </Button>
+          <div className="text-right">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              loading={aiBusy}
+              disabled={aiCreditsLeft === 0}
+              onClick={() => onAiSuggest(langs.length ? langs : ["en"])}
+            >
+              {aiBusy ? t("editor.aiWorking") : t("editor.aiSuggest")}
+            </Button>
+            {aiCreditsLeft !== null && (
+              <p className="mt-1 text-[11px] text-muted">
+                {aiCreditsLeft === 0
+                  ? t("editor.aiOutOfCredits")
+                  : t("editor.aiCreditsLeft", { n: aiCreditsLeft })}
+              </p>
+            )}
+          </div>
         )}
       </div>
 

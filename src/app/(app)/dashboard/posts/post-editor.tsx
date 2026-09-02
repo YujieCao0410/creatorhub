@@ -42,11 +42,14 @@ export function PostEditor({
   mode,
   post,
   aiEnabled = false,
+  aiCreditsLeft = null,
   defaultTags = [],
 }: {
   mode: "create" | "edit";
   post?: PostDetail;
   aiEnabled?: boolean;
+  /** AI generations left this month; null = unlimited (PRO). */
+  aiCreditsLeft?: number | null;
   /** Pre-filled into `tags` when creating a new post. */
   defaultTags?: string[];
 }) {
@@ -55,6 +58,7 @@ export function PostEditor({
   const [aiBusy, setAiBusy] = useState(false);
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [credits, setCredits] = useState<number | null>(aiCreditsLeft);
 
   async function suggestCaptions(languages: string[]) {
     if (!post) return;
@@ -72,6 +76,7 @@ export function PostEditor({
         tags: [...new Set([...v.tags, ...s.tags])].slice(0, 10),
       }));
       setAiNote(s.note || t("editor.aiDone"));
+      setCredits((c) => (c === null ? null : Math.max(0, c - 1)));
     } catch (err) {
       setAiError(
         err instanceof ApiError ? err.message : t("common.somethingWrongBody"),
@@ -239,6 +244,7 @@ export function PostEditor({
         captions={values.captions}
         onChange={(captions) => set("captions", captions)}
         aiEnabled={aiEnabled && mode === "edit"}
+        aiCreditsLeft={credits}
         aiBusy={aiBusy}
         aiNote={aiNote}
         aiError={aiError}
