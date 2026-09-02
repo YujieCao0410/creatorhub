@@ -14,6 +14,17 @@ import { PLATFORMS } from "@/lib/platforms";
 
 export const aiConfigured = Boolean(env.ANTHROPIC_API_KEY);
 
+/**
+ * Basic web search tool — supported on every model (including Haiku 4.5), so
+ * ANTHROPIC_MODEL can be swapped freely. Newer models also accept the
+ * dynamic-filtering variant, but this keeps the config model-agnostic.
+ */
+const WEB_SEARCH = {
+  type: "web_search_20250305",
+  name: "web_search",
+  max_uses: 5,
+} as const;
+
 export type CaptionSuggestion = {
   captionEn: string;
   captionZh: string;
@@ -107,7 +118,7 @@ export async function generateCaptions(
     model: env.ANTHROPIC_MODEL,
     max_tokens: 4000,
     system: SYSTEM,
-    tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 5 }],
+    tools: [WEB_SEARCH],
     messages,
   });
 
@@ -118,7 +129,7 @@ export async function generateCaptions(
       model: env.ANTHROPIC_MODEL,
       max_tokens: 4000,
       system: SYSTEM,
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 5 }],
+      tools: [WEB_SEARCH],
       messages,
     });
   }
