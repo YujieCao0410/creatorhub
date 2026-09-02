@@ -2,8 +2,21 @@ import { z } from "zod";
 import { paginationQuerySchema } from "./common";
 
 const title = z.string().trim().min(1, "Title is required").max(140);
-const content = z.string().trim().min(1, "Content is required").max(50_000);
+const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
+
+/** A post must carry *something*: body text, a video, or a cover image. */
+function hasBody(data: {
+  content?: string;
+  videoUrl?: string | null;
+  coverImageUrl?: string | null;
+}) {
+  return Boolean(
+    (data.content && data.content.trim()) ||
+      data.videoUrl ||
+      data.coverImageUrl,
+  );
+}
 
 /** An absolute http(s) URL or a local `/uploads/...` path. */
 const mediaRef = z
@@ -29,22 +42,27 @@ const tags = z
   .max(10, "At most 10 tags")
   .optional();
 
-export const createPostSchema = z.object({
-  title,
-  content,
-  excerpt,
-  coverImageUrl: mediaRef,
-  videoUrl: mediaRef,
-  tags,
-  /** When true the post is published immediately; otherwise saved as a draft. */
-  publish: z.boolean().optional().default(false),
-});
+export const createPostSchema = z
+  .object({
+    title,
+    content,
+    excerpt,
+    coverImageUrl: mediaRef,
+    videoUrl: mediaRef,
+    tags,
+    /** When true the post is published immediately; otherwise a draft. */
+    publish: z.boolean().optional().default(false),
+  })
+  .refine(hasBody, {
+    message: "Add some text, a video, or a cover image",
+    path: ["content"],
+  });
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 
 export const updatePostSchema = z
   .object({
     title: title.optional(),
-    content: content.optional(),
+    content: z.string().trim().max(50_000).optional(),
     excerpt,
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,

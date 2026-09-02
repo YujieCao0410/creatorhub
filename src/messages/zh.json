@@ -190,6 +190,7 @@
     "video": "视频",
     "coverImageUrl": "封面图链接",
     "content": "正文",
+    "contentHint": "有视频或封面图时可以不填",
     "tags": "标签",
     "tagsPlaceholder": "输入标签，按回车添加",
     "tagsHint": "最多 10 个，用于搜索和发现。",

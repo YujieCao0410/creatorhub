@@ -209,6 +209,7 @@ export function PostEditor({
       <Field
         label={t("editor.content")}
         htmlFor="content"
+        hint={t("editor.contentHint")}
         error={fieldErrors.content}
       >
         <Textarea

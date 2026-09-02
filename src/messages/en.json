@@ -190,6 +190,7 @@
     "video": "Video",
     "coverImageUrl": "Cover image URL",
     "content": "Content",
+    "contentHint": "Optional when you have a video or cover image",
     "tags": "Tags",
     "tagsPlaceholder": "Add a tag and press Enter",
     "tagsHint": "Up to 10. Used for search and discovery.",
