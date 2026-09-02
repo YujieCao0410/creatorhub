@@ -6,8 +6,8 @@ export const TAG_RE = /^[\p{L}\p{N}_-]{1,30}$/u;
 export const MAX_TAGS = 10;
 
 /** "design typography" → ["design", "typography"] */
-export function parseTags(stored: string): string[] {
-  return stored.split(" ").filter(Boolean);
+export function parseTags(stored: string | null | undefined): string[] {
+  return (stored ?? "").split(" ").filter(Boolean);
 }
 
 /** Normalizes and joins tags for storage: lowercase, trim, dedupe, cap. */
