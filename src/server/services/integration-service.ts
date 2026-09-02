@@ -9,6 +9,7 @@ import {
 } from "@/lib/errors";
 import {
   refreshAccessToken,
+  setThumbnail,
   type TokenSet,
   uploadVideo,
 } from "@/lib/youtube";
@@ -95,6 +96,14 @@ const VIDEO_MIME: Record<string, string> = {
   ".mov": "video/quicktime",
 };
 
+const IMAGE_MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+};
+
 /** Uploads a post's video to the author's connected YouTube channel. */
 export async function publishPostToYouTube(
   userId: string,
@@ -139,7 +148,7 @@ export async function publishPostToYouTube(
     .filter(Boolean)
     .join("\n\n");
 
-  const { url } = await uploadVideo({
+  const { videoId, url } = await uploadVideo({
     accessToken,
     bytes,
     contentType,
@@ -148,6 +157,23 @@ export async function publishPostToYouTube(
     tags,
     privacy: "public",
   });
+
+  // Best-effort: reuse the post's cover image as the YouTube thumbnail. Fails
+  // (and is ignored) if the channel has not completed phone verification.
+  if (post.coverImageUrl?.startsWith("/uploads/")) {
+    const ext = path.extname(post.coverImageUrl).toLowerCase();
+    const coverType = IMAGE_MIME[ext];
+    if (coverType) {
+      try {
+        const coverBytes = await readFile(
+          path.join(process.cwd(), "public", post.coverImageUrl),
+        );
+        await setThumbnail({ accessToken, videoId, bytes: coverBytes, contentType: coverType });
+      } catch (err) {
+        console.warn("YouTube thumbnail not set:", err);
+      }
+    }
+  }
 
   await prisma.post.update({
     where: { id: post.id },

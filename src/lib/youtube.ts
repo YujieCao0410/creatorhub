@@ -167,3 +167,30 @@ export async function uploadVideo(opts: {
   const videoId = result.id as string;
   return { videoId, url: `https://www.youtube.com/watch?v=${videoId}` };
 }
+
+/**
+ * Sets a custom thumbnail on a video. Requires the channel to have completed
+ * phone verification (youtube.com/verify); otherwise YouTube returns 403 and
+ * the caller should treat it as non-fatal (the video keeps an auto-thumbnail).
+ */
+export async function setThumbnail(opts: {
+  accessToken: string;
+  videoId: string;
+  bytes: Buffer;
+  contentType: string;
+}): Promise<void> {
+  const res = await fetch(
+    `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${encodeURIComponent(opts.videoId)}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${opts.accessToken}`,
+        "Content-Type": opts.contentType,
+      },
+      body: new Uint8Array(opts.bytes),
+    },
+  );
+  if (!res.ok) {
+    throw new Error(`YouTube thumbnail set failed: ${await res.text()}`);
+  }
+}
