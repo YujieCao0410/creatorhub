@@ -6,9 +6,9 @@ import { ServiceUnavailableError } from "./errors";
  * Minimal YouTube Data API v3 client (OAuth 2.0 + resumable video upload),
  * implemented with plain fetch to avoid the heavy `googleapis` dependency.
  *
- * Videos are uploaded as **private** — an unverified OAuth app can only create
- * private videos until Google audits it. The creator flips them public in
- * YouTube Studio.
+ * Uploads request `privacyStatus: "public"`, but Google overrides this to
+ * `private` for any API project that has not passed the YouTube API audit.
+ * Until then the creator flips the video public in YouTube Studio.
  */
 
 const SCOPES = [
@@ -110,6 +110,8 @@ export async function getChannelName(
   return data.items?.[0]?.snippet?.title ?? null;
 }
 
+export type YouTubePrivacy = "public" | "unlisted" | "private";
+
 export async function uploadVideo(opts: {
   accessToken: string;
   bytes: Buffer;
@@ -117,6 +119,7 @@ export async function uploadVideo(opts: {
   title: string;
   description: string;
   tags: string[];
+  privacy?: YouTubePrivacy;
 }): Promise<{ videoId: string; url: string }> {
   const metadata = {
     snippet: {
@@ -126,7 +129,9 @@ export async function uploadVideo(opts: {
       categoryId: "22", // People & Blogs
     },
     status: {
-      privacyStatus: "private",
+      // Note: Google forces videos from an unaudited API project to `private`
+      // regardless of this value until the project passes the YouTube API audit.
+      privacyStatus: opts.privacy ?? "public",
       selfDeclaredMadeForKids: false,
     },
   };

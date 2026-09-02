@@ -146,6 +146,7 @@ export async function publishPostToYouTube(
     title: post.title,
     description,
     tags,
+    privacy: "public",
   });
 
   await prisma.post.update({
