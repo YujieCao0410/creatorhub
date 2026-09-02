@@ -208,7 +208,10 @@
     "captionEn": "英文文案（YouTube / TikTok / Instagram）",
     "captionZh": "中文文案（抖音 / 哔哩哔哩 / 小红书）",
     "captionEnPlaceholder": "海外平台视频下方显示的文案",
-    "captionZhPlaceholder": "国内平台视频下方显示的文案"
+    "captionZhPlaceholder": "国内平台视频下方显示的文案",
+    "aiSuggest": "✨ AI 生成文案和标签",
+    "aiWorking": "搜索中…",
+    "aiDone": "已填入 AI 建议"
   },
   "integrations": {
     "title": "集成",

@@ -26,6 +26,10 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+  /** Anthropic API, for AI caption + hashtag generation. Optional. */
+  ANTHROPIC_API_KEY: z.string().optional(),
+  ANTHROPIC_MODEL: z.string().default("claude-opus-5"),
+
   /** Set to "1" to disable API rate limiting (e2e tests only). */
   RATE_LIMIT_DISABLED: z.enum(["0", "1"]).optional(),
 });

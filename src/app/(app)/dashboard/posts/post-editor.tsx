@@ -33,15 +33,52 @@ const EMPTY: Values = {
   captionZh: "",
 };
 
+type CaptionSuggestion = {
+  captionEn: string;
+  captionZh: string;
+  tags: string[];
+  note: string;
+};
+
 export function PostEditor({
   mode,
   post,
+  aiEnabled = false,
 }: {
   mode: "create" | "edit";
   post?: PostDetail;
+  aiEnabled?: boolean;
 }) {
   const router = useRouter();
   const t = useT();
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiNote, setAiNote] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  async function suggestCaptions() {
+    if (!post) return;
+    setAiBusy(true);
+    setAiNote(null);
+    setAiError(null);
+    try {
+      const s = await api.post<CaptionSuggestion>(
+        `/api/posts/${post.slug}/captions/suggest`,
+      );
+      setValues((v) => ({
+        ...v,
+        captionEn: s.captionEn || v.captionEn,
+        captionZh: s.captionZh || v.captionZh,
+        tags: [...new Set([...v.tags, ...s.tags])].slice(0, 10),
+      }));
+      setAiNote(s.note || t("editor.aiDone"));
+    } catch (err) {
+      setAiError(
+        err instanceof ApiError ? err.message : t("common.somethingWrongBody"),
+      );
+    } finally {
+      setAiBusy(false);
+    }
+  }
 
   const [values, setValues] = useState<Values>(
     post
@@ -202,8 +239,36 @@ export function PostEditor({
       </Field>
 
       <div className="rounded-lg border border-border bg-surface p-4">
-        <p className="text-sm font-medium">{t("editor.captionsTitle")}</p>
-        <p className="mt-0.5 text-xs text-muted">{t("editor.captionsHint")}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium">{t("editor.captionsTitle")}</p>
+            <p className="mt-0.5 text-xs text-muted">
+              {t("editor.captionsHint")}
+            </p>
+          </div>
+          {aiEnabled && mode === "edit" && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={suggestCaptions}
+              loading={aiBusy}
+              disabled={busy !== null}
+            >
+              {aiBusy ? t("editor.aiWorking") : t("editor.aiSuggest")}
+            </Button>
+          )}
+        </div>
+        {aiNote && (
+          <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-xs text-brand-700 dark:bg-brand-950 dark:text-brand-100">
+            {aiNote}
+          </p>
+        )}
+        {aiError && (
+          <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-950 dark:text-red-200">
+            {aiError}
+          </p>
+        )}
         <div className="mt-3 space-y-3">
           <Field label={t("editor.captionEn")} htmlFor="captionEn">
             <Textarea

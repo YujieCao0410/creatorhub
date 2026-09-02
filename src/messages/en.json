@@ -208,7 +208,10 @@
     "captionEn": "English caption (YouTube / TikTok / Instagram)",
     "captionZh": "Chinese caption (Douyin / Bilibili / Xiaohongshu)",
     "captionEnPlaceholder": "What people see under the video on international platforms",
-    "captionZhPlaceholder": "国内平台视频下方显示的文案"
+    "captionZhPlaceholder": "国内平台视频下方显示的文案",
+    "aiSuggest": "✨ AI captions & tags",
+    "aiWorking": "Searching…",
+    "aiDone": "Filled in AI suggestions"
   },
   "integrations": {
     "title": "Integrations",
