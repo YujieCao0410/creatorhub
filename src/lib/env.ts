@@ -22,6 +22,10 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   STRIPE_PRICE_PRO: z.string().optional(),
 
+  /** Google OAuth, for publishing videos to YouTube. Optional. */
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+
   /** Set to "1" to disable API rate limiting (e2e tests only). */
   RATE_LIMIT_DISABLED: z.enum(["0", "1"]).optional(),
 });

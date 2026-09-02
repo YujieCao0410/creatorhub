@@ -54,6 +54,7 @@ export type PostSummary = {
   excerpt: string | null;
   coverImageUrl: string | null;
   videoUrl: string | null;
+  youtubeUrl: string | null;
   tags: string[];
   published: boolean;
   publishedAt: string | null;

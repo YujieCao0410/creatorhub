@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { IntegrationsPanel } from "@/components/integrations-panel";
 import { Card } from "@/components/ui/misc";
 import { requireUserPage } from "@/lib/auth/page-guards";
 import { getLocale, getT } from "@/lib/i18n/server";
+import { youtubeConfigured } from "@/lib/youtube";
+import { getIntegration } from "@/server/services/integration-service";
 
 export default async function SettingsPage() {
   const [user, t, locale] = await Promise.all([
@@ -9,6 +13,7 @@ export default async function SettingsPage() {
     getT(),
     getLocale(),
   ]);
+  const youtube = await getIntegration(user.id, "youtube");
 
   return (
     <div className="max-w-lg space-y-6">
@@ -24,7 +29,9 @@ export default async function SettingsPage() {
         <Row
           label={t("dashboard.fieldPlan")}
           value={
-            user.membership === "PRO" ? t("membership.pro") : t("membership.free")
+            user.membership === "PRO"
+              ? t("membership.pro")
+              : t("membership.free")
           }
         />
         <Row
@@ -34,6 +41,13 @@ export default async function SettingsPage() {
           )}
         />
       </Card>
+
+      <Suspense fallback={null}>
+        <IntegrationsPanel
+          youtube={youtube ? { accountName: youtube.accountName } : null}
+          configured={youtubeConfigured}
+        />
+      </Suspense>
 
       <Card>
         <h2 className="font-medium">{t("membership.title")}</h2>

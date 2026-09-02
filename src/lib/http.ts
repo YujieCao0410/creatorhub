@@ -82,6 +82,18 @@ export async function readJsonBody(
   return req.json().catch(() => null);
 }
 
+/** Next.js signals redirect()/notFound() by throwing an error with this digest. */
+function isNextControlFlow(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    ((error as { digest: string }).digest === "NEXT_NOT_FOUND" ||
+      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT"))
+  );
+}
+
 /**
  * Wraps a route handler so any thrown error becomes a proper JSON response.
  * `Ctx` is the Next.js route context (e.g. `{ params: Promise<{ id: string }> }`).
@@ -93,6 +105,8 @@ export function withErrorHandling<Ctx>(
     try {
       return await handler(req, ctx);
     } catch (error) {
+      // Let redirect()/notFound() propagate to Next's own handling.
+      if (isNextControlFlow(error)) throw error;
       return handleApiError(error);
     }
   };

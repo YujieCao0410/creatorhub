@@ -10,5 +10,6 @@ export async function resetDb(): Promise<void> {
   await prisma.follow.deleteMany();
   await prisma.post.deleteMany();
   await prisma.subscription.deleteMany();
+  await prisma.integration.deleteMany();
   await prisma.user.deleteMany();
 }

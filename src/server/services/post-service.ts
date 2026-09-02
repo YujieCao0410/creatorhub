@@ -52,6 +52,7 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
     excerpt: row.excerpt,
     coverImageUrl: row.coverImageUrl,
     videoUrl: row.videoUrl,
+    youtubeUrl: row.youtubeUrl,
     tags: parseTags(row.tags),
     published: row.published,
     publishedAt: row.publishedAt?.toISOString() ?? null,

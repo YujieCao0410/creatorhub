@@ -36,9 +36,30 @@ model User {
   posts        Post[]
   likes        Like[]
   comments     Comment[]
-  following    Follow[]      @relation("follower")
-  followers    Follow[]      @relation("following")
+  following    Follow[]       @relation("follower")
+  followers    Follow[]       @relation("following")
   subscription Subscription?
+  integrations Integration[]
+}
+
+/// An OAuth connection to an external platform (currently just "youtube").
+/// One row per (user, provider).
+model Integration {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider           String
+  /// Human-readable account label from the provider (e.g. YouTube channel name).
+  accountName        String?
+  accessToken        String
+  refreshToken       String?
+  /// When the access token expires (epoch ms). Refreshed on demand.
+  expiresAt          DateTime?
+  scope              String   @default("")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([userId, provider])
 }
 
 /// Billing state mirrored from Stripe. One row per user (created lazily on first
@@ -70,6 +91,8 @@ model Post {
   videoUrl      String?
   /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
   tags          String    @default("")
+  /// Set once the video has been pushed to YouTube.
+  youtubeUrl    String?
   published     Boolean   @default(false)
   publishedAt   DateTime?
   createdAt     DateTime  @default(now())

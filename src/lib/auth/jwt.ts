@@ -33,3 +33,32 @@ export async function verifySessionToken(token: string): Promise<string | null> 
     return null;
   }
 }
+
+/**
+ * Short-lived signed token for OAuth `state` — proves a callback belongs to the
+ * user who started the flow (CSRF protection for the redirect).
+ */
+export async function signStateToken(
+  userId: string,
+  purpose: string,
+): Promise<string> {
+  return new SignJWT({ purpose })
+    .setProtectedHeader({ alg: ALG })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime("10m")
+    .sign(secret);
+}
+
+export async function verifyStateToken(
+  token: string,
+  purpose: string,
+): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, secret, { algorithms: [ALG] });
+    if (payload.purpose !== purpose) return null;
+    return typeof payload.sub === "string" ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
