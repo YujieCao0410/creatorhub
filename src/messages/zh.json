@@ -97,7 +97,7 @@
     "billingDisabled": "支付未配置。",
     "processedByStripe": "支付由 Stripe 处理。可随时在控制台取消。",
     "trialBadge": "首月免费",
-    "trialNote": "免费试用 30 天,之后 $9/月。试用结束前随时取消,不会扣费。"
+    "trialNote": "免费试用 30 天,之后 {price}/月。试用结束前随时取消,不会扣费。"
   },
   "feed": {
     "yourFeed": "你的动态",

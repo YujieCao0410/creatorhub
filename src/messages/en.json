@@ -97,7 +97,7 @@
     "billingDisabled": "Billing is not configured.",
     "processedByStripe": "Payments are processed by Stripe. Cancel anytime from your dashboard.",
     "trialBadge": "First month free",
-    "trialNote": "Free for 30 days, then $9/month. Cancel anytime before it ends and you won't be charged."
+    "trialNote": "Free for 30 days, then {price}/month. Cancel anytime before it ends and you won't be charged."
   },
   "feed": {
     "yourFeed": "Your feed",

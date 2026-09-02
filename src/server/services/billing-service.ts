@@ -3,7 +3,13 @@ import { prisma } from "@/lib/db";
 import type { SelfUser } from "@/lib/dto";
 import { env } from "@/lib/env";
 import { NotFoundError } from "@/lib/errors";
-import { getStripe, proPriceId, webhookSecret } from "@/lib/stripe";
+import { getLocale } from "@/lib/i18n/server";
+import {
+  getStripe,
+  priceRegionForLocale,
+  proPriceId,
+  webhookSecret,
+} from "@/lib/stripe";
 
 export { stripeConfigured } from "@/lib/stripe";
 
@@ -45,11 +51,12 @@ export async function createCheckoutSession(user: SelfUser): Promise<string> {
   // First-time subscribers get a 30-day free trial (card required up front,
   // auto-charged when it ends). Anyone who has subscribed before does not.
   const firstTime = !row.stripeSubscriptionId;
+  const region = priceRegionForLocale(await getLocale());
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: proPriceId(), quantity: 1 }],
+    line_items: [{ price: proPriceId(region), quantity: 1 }],
     client_reference_id: user.id,
     subscription_data: {
       metadata: { userId: user.id },

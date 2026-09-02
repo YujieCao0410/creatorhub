@@ -4,16 +4,21 @@ import { PricingActions } from "@/components/pricing-actions";
 import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/misc";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getT } from "@/lib/i18n/server";
+import { getLocale, getT } from "@/lib/i18n/server";
 import { FREE_DRAFT_LIMIT } from "@/lib/membership";
-import { stripeConfigured } from "@/lib/stripe";
+import { PRO_PRICING, priceRegionForLocale, stripeConfigured } from "@/lib/stripe";
 
 export const metadata: Metadata = { title: "Pricing" };
 export const dynamic = "force-dynamic";
 
 export default async function PricingPage() {
-  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
+  const [user, t, locale] = await Promise.all([
+    getCurrentUser(),
+    getT(),
+    getLocale(),
+  ]);
   const isPro = user?.membership === "PRO";
+  const price = PRO_PRICING[priceRegionForLocale(locale)].amount;
 
   const freeFeatures = [
     t("pricing.freeFeatures.0"),
@@ -80,12 +85,14 @@ export default async function PricingPage() {
             </span>
           </div>
           <p className="mt-1 text-3xl font-semibold">
-            $9
+            {price}
             <span className="text-base font-normal text-muted">
               {t("pricing.perMonth")}
             </span>
           </p>
-          <p className="mt-1 text-xs text-muted">{t("pricing.trialNote")}</p>
+          <p className="mt-1 text-xs text-muted">
+            {t("pricing.trialNote", { price })}
+          </p>
           <ul className="mt-4 flex-1 space-y-2 text-sm">
             {proFeatures.map((f) => (
               <li key={f} className="flex gap-2">

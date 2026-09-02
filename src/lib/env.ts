@@ -20,7 +20,10 @@ const envSchema = z.object({
 
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  /** Default Pro price (CAD). */
   STRIPE_PRICE_PRO: z.string().optional(),
+  /** Pro price in CNY, used for Chinese-locale checkout. Falls back to the default. */
+  STRIPE_PRICE_PRO_CNY: z.string().optional(),
 
   /** Google OAuth, for publishing videos to YouTube. Optional. */
   GOOGLE_CLIENT_ID: z.string().optional(),

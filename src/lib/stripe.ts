@@ -32,7 +32,26 @@ export function webhookSecret(): string {
   return env.STRIPE_WEBHOOK_SECRET;
 }
 
-export function proPriceId(): string {
+export type PriceRegion = "cny" | "default";
+
+/** The Pro plan's price and display string for a region. */
+export const PRO_PRICING: Record<
+  PriceRegion,
+  { amount: string; currency: string }
+> = {
+  cny: { amount: "¥29.9", currency: "CNY" },
+  default: { amount: "CAD $29.9", currency: "CAD" },
+};
+
+/** Maps a UI locale to a pricing region. */
+export function priceRegionForLocale(locale: string): PriceRegion {
+  return locale === "zh" ? "cny" : "default";
+}
+
+export function proPriceId(region: PriceRegion = "default"): string {
+  if (region === "cny" && env.STRIPE_PRICE_PRO_CNY) {
+    return env.STRIPE_PRICE_PRO_CNY;
+  }
   if (!env.STRIPE_PRICE_PRO) {
     throw new ServiceUnavailableError("Billing is not configured");
   }
