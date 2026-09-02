@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
 
 const TAG_RE = /^[\p{L}\p{N}_-]{1,30}$/u;
+const MAX_TAGS = 10;
 
 export function TagInput({
   value,
@@ -15,23 +16,25 @@ export function TagInput({
   const t = useT();
   const [draft, setDraft] = useState("");
 
-  function add(raw: string) {
-    const tag = raw.trim().toLowerCase().replace(/^#/, "");
-    if (
-      !tag ||
-      value.includes(tag) ||
-      value.length >= 10 ||
-      !TAG_RE.test(tag)
-    ) {
-      return;
+  /** Splits on spaces/commas so pasting or typing "#a #b #c" adds all of them. */
+  function commit(raw: string) {
+    const parts = raw
+      .split(/[\s,]+/)
+      .map((p) => p.trim().toLowerCase().replace(/^#+/, ""))
+      .filter(Boolean);
+
+    const next = [...value];
+    for (const part of parts) {
+      if (next.length >= MAX_TAGS) break;
+      if (!next.includes(part) && TAG_RE.test(part)) next.push(part);
     }
-    onChange([...value, tag]);
+    if (next.length !== value.length) onChange(next);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" || e.key === "," || e.key === " ") {
       e.preventDefault();
-      add(draft);
+      commit(draft);
       setDraft("");
     } else if (e.key === "Backspace" && !draft && value.length > 0) {
       onChange(value.slice(0, -1));
@@ -61,7 +64,7 @@ export function TagInput({
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={onKeyDown}
         onBlur={() => {
-          add(draft);
+          commit(draft);
           setDraft("");
         }}
         placeholder={value.length === 0 ? t("editor.tagsPlaceholder") : ""}
