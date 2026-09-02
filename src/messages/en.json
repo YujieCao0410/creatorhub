@@ -217,7 +217,9 @@
     "addLanguage": "+ Add a language",
     "removeLanguage": "Remove",
     "aiCreditsLeft": "{n} free AI generations left this month",
-    "aiOutOfCredits": "Out of free AI generations. Upgrade to Pro for unlimited."
+    "aiOutOfCredits": "Out of free AI generations. Upgrade to Pro for unlimited.",
+    "shareToCommunity": "Show in the CreatorHub community feed",
+    "shareToCommunityHint": "On by default. Turn off to publish and cross-post without adding this to the CreatorHub feed."
   },
   "integrations": {
     "title": "Integrations",

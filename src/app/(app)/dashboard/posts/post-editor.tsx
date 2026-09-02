@@ -20,6 +20,7 @@ type Values = {
   videoUrl: string | null;
   tags: string[];
   captions: Record<string, string>;
+  shareToCommunity: boolean;
 };
 
 const EMPTY: Values = {
@@ -30,6 +31,7 @@ const EMPTY: Values = {
   videoUrl: null,
   tags: [],
   captions: {},
+  shareToCommunity: true,
 };
 
 type CaptionSuggestion = {
@@ -96,6 +98,7 @@ export function PostEditor({
           videoUrl: post.videoUrl,
           tags: post.tags,
           captions: post.captions,
+          shareToCommunity: post.shareToCommunity,
         }
       : { ...EMPTY, tags: defaultTags },
   );
@@ -122,6 +125,7 @@ export function PostEditor({
       videoUrl: values.videoUrl,
       tags: values.tags,
       captions: values.captions,
+      shareToCommunity: values.shareToCommunity,
     };
   }
 
@@ -280,6 +284,21 @@ export function PostEditor({
           aria-invalid={Boolean(fieldErrors.content)}
         />
       </Field>
+
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={values.shareToCommunity}
+          onChange={(e) => set("shareToCommunity", e.target.checked)}
+          className="mt-0.5 size-4 accent-brand-600"
+        />
+        <span>
+          {t("editor.shareToCommunity")}
+          <span className="block text-xs text-muted">
+            {t("editor.shareToCommunityHint")}
+          </span>
+        </span>
+      </label>
 
       <div className="flex flex-wrap gap-2">
         {mode === "create" ? (

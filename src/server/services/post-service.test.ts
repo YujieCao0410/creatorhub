@@ -106,6 +106,17 @@ describe("listPosts", () => {
     expect(data.every((p) => p.published)).toBe(true);
   });
 
+  it("hides published posts not shared to the community feed", async () => {
+    await createPost(alice.id, {
+      title: "Cross-post only",
+      content: "…",
+      publish: true,
+      shareToCommunity: false,
+    });
+    const titles = (await listPosts({ limit: 20 })).data.map((p) => p.title);
+    expect(titles).not.toContain("Cross-post only");
+  });
+
   it("filters by authorHandle", async () => {
     const { data } = await listPosts({ limit: 20, authorHandle: "bob" });
     expect(data).toHaveLength(1);

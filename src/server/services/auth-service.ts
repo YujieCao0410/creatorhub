@@ -16,7 +16,10 @@ function getDummyHash(): Promise<string> {
   return dummyHash;
 }
 
-export async function registerUser(input: RegisterInput): Promise<SelfUser> {
+export async function registerUser(
+  input: RegisterInput,
+  locale = "",
+): Promise<SelfUser> {
   const clash = await prisma.user.findFirst({
     where: { OR: [{ email: input.email }, { handle: input.handle }] },
     select: { email: true, handle: true },
@@ -37,6 +40,7 @@ export async function registerUser(input: RegisterInput): Promise<SelfUser> {
         handle: input.handle,
         name: input.name,
         passwordHash,
+        locale,
       },
     });
     return toSelfUser(user);

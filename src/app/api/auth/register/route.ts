@@ -1,5 +1,6 @@
 import { createSession } from "@/lib/auth/session";
 import { created, readJsonBody, withErrorHandling } from "@/lib/http";
+import { getLocale } from "@/lib/i18n/server";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/request";
 import { registerSchema } from "@/lib/validation/auth";
@@ -11,7 +12,8 @@ export const POST = withErrorHandling(async (req: Request) => {
   const body = await readJsonBody(req);
   const input = registerSchema.parse(body);
 
-  const user = await registerUser(input);
+  // Carry the language they signed up in onto the account.
+  const user = await registerUser(input, await getLocale());
   await createSession(user.id);
 
   return created({ user });

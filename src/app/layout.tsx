@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [user, { locale, messages }] = await Promise.all([
+  const [user, { locale, messages, fallback }] = await Promise.all([
     getCurrentUser(),
     getMessages(),
   ]);
@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full">
-        <I18nProvider locale={locale} messages={messages}>
+        <I18nProvider locale={locale} messages={messages} fallback={fallback}>
           <SessionProvider initialUser={user}>{children}</SessionProvider>
         </I18nProvider>
       </body>

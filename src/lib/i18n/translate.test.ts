@@ -30,15 +30,33 @@ describe("makeTranslator", () => {
   });
 });
 
+describe("makeTranslator fallback", () => {
+  const es = { nav: { home: "Inicio" } };
+  const en = { nav: { home: "Home", feed: "Feed" }, brand: "CreatorHub" };
+
+  it("uses the locale string when present", () => {
+    expect(makeTranslator(es, en)("nav.home")).toBe("Inicio");
+  });
+
+  it("falls back to English for a missing key", () => {
+    expect(makeTranslator(es, en)("nav.feed")).toBe("Feed");
+    expect(makeTranslator(es, en)("brand")).toBe("CreatorHub");
+  });
+
+  it("returns the key when neither has it", () => {
+    expect(makeTranslator(es, en)("nav.nope")).toBe("nav.nope");
+  });
+});
+
 describe("matchLocale", () => {
   it("picks the first supported base tag", () => {
     expect(matchLocale("zh-CN,zh;q=0.9,en;q=0.8")).toBe("zh");
     expect(matchLocale("en-US,en;q=0.9")).toBe("en");
-    expect(matchLocale("fr-FR,fr;q=0.9,en;q=0.5")).toBe("en");
+    expect(matchLocale("de-DE,de;q=0.9,ja;q=0.5")).toBe("ja");
   });
 
-  it("defaults to en for missing or unknown", () => {
+  it("defaults to en for missing or unsupported", () => {
     expect(matchLocale(null)).toBe("en");
-    expect(matchLocale("de,ja")).toBe("en");
+    expect(matchLocale("de,ru")).toBe("en");
   });
 });

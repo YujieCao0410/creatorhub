@@ -20,18 +20,28 @@ const I18nContext = createContext<I18nValue | null>(null);
 export function I18nProvider({
   locale,
   messages,
+  fallback,
   children,
 }: {
   locale: Locale;
   messages: Messages;
+  /** English messages, used for keys missing from `messages`. */
+  fallback?: Messages;
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const t = useMemo(() => makeTranslator(messages), [messages]);
+  const t = useMemo(() => makeTranslator(messages, fallback), [messages, fallback]);
 
   const setLocale = useCallback(
     (next: Locale) => {
       document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+      // Persist to the account so the choice follows the user across devices.
+      // Ignore failure (e.g. logged out) — the cookie already took effect.
+      void fetch("/api/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale: next }),
+      }).catch(() => {});
       router.refresh();
     },
     [router],

@@ -60,6 +60,7 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
       }))
       .sort((a, b) => a.platform.localeCompare(b.platform)),
     published: row.published,
+    shareToCommunity: row.shareToCommunity,
     publishedAt: row.publishedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -121,6 +122,9 @@ export async function createPost(
           videoUrl: input.videoUrl ?? null,
           tags: serializeTags(input.tags),
           captions: input.captions ?? {},
+          // Default: a post published to CreatorHub shows in the community
+          // feed. Uncheck to publish/distribute without joining the feed.
+          shareToCommunity: input.shareToCommunity ?? input.publish,
           published: input.publish,
           publishedAt,
           authorId,
@@ -169,7 +173,7 @@ async function paginatePublishedPosts(
   viewerId?: string,
 ): Promise<PostList> {
   const rows = await prisma.post.findMany({
-    where: { published: true, ...where },
+    where: { published: true, shareToCommunity: true, ...where },
     include: postInclude,
     orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
     take: limit + 1,
@@ -248,6 +252,7 @@ export async function searchPosts(
   const rows = await prisma.post.findMany({
     where: {
       published: true,
+      shareToCommunity: true,
       OR: [
         { title: { contains: query } },
         { excerpt: { contains: query } },
@@ -297,6 +302,9 @@ export async function updatePost(
       videoUrl: input.videoUrl,
       ...(input.tags !== undefined ? { tags: serializeTags(input.tags) } : {}),
       ...(input.captions !== undefined ? { captions: input.captions } : {}),
+      ...(input.shareToCommunity !== undefined
+        ? { shareToCommunity: input.shareToCommunity }
+        : {}),
       published: input.published,
       ...(goingPublic ? { publishedAt: new Date() } : {}),
     },

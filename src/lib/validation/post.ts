@@ -54,6 +54,7 @@ export const createPostSchema = z
     videoUrl: mediaRef,
     tags,
     captions,
+    shareToCommunity: z.boolean().optional(),
     /** When true the post is published immediately; otherwise a draft. */
     publish: z.boolean().optional().default(false),
   })
@@ -72,6 +73,7 @@ export const updatePostSchema = z
     videoUrl: mediaRef,
     tags,
     captions,
+    shareToCommunity: z.boolean().optional(),
     published: z.boolean().optional(),
   })
   .strict()

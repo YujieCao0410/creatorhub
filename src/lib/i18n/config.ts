@@ -1,12 +1,21 @@
-export const LOCALES = ["en", "zh"] as const;
+/**
+ * UI languages CreatorHub is translated into. Add a locale here and drop a
+ * matching `src/messages/<code>.json` next to it — the picker and loader pick
+ * it up automatically. Untranslated keys fall back to English.
+ */
+export const LOCALES = ["en", "zh", "es", "ja", "pt"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
 export const LOCALE_COOKIE = "locale";
 
+/** Each language in its own name, for the picker. */
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
   zh: "中文",
+  es: "Español",
+  ja: "日本語",
+  pt: "Português",
 };
 
 export function isLocale(value: string): value is Locale {

@@ -20,6 +20,8 @@ export type Membership = "FREE" | "PRO";
 export type SelfUser = PublicUser & {
   email: string;
   membership: Membership;
+  /** Preferred UI language code, or "" to auto-detect. */
+  locale: string;
   /** Default hashtags pre-filled into every new post. */
   defaultTags: string[];
   /** AI caption generations left this month; `null` when PRO (unlimited). */
@@ -74,6 +76,8 @@ export type PostSummary = {
   captions: Record<string, string>;
   publishTargets: PublishTargetDTO[];
   published: boolean;
+  /** Whether the post also shows in the CreatorHub community feed. */
+  shareToCommunity: boolean;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;

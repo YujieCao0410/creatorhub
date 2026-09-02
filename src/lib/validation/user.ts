@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LOCALES } from "@/lib/i18n/config";
 import { tagArraySchema } from "@/lib/tags";
 
 /**
@@ -11,6 +12,7 @@ export const updateProfileSchema = z
     name: z.string().trim().min(1, "Name is required").max(80).optional(),
     bio: z.string().trim().max(280).nullable().optional(),
     avatarUrl: z.url("Must be a valid URL").max(2048).nullable().optional(),
+    locale: z.enum(LOCALES).optional(),
     defaultTags: tagArraySchema.optional(),
   })
   .strict()

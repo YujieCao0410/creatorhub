@@ -37,6 +37,7 @@ export function toSelfUser(user: User): SelfUser {
     ...toPublicUser(user),
     email: user.email,
     membership: toMembership(user.membership),
+    locale: user.locale ?? "",
     defaultTags: parseTags(user.defaultTags),
     aiCreditsLeft: aiCreditsLeft(user),
   };
@@ -152,6 +153,7 @@ export async function updateProfile(
       name: input.name,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
+      ...(input.locale !== undefined ? { locale: input.locale } : {}),
       ...(input.defaultTags !== undefined
         ? { defaultTags: serializeTags(input.defaultTags) }
         : {}),

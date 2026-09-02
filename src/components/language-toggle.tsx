@@ -4,34 +4,27 @@ import { useI18n } from "@/components/i18n-provider";
 import { LOCALES, LOCALE_LABELS } from "@/lib/i18n/config";
 import { cn } from "@/lib/cn";
 
+/** Language picker. Shows every locale CreatorHub is translated into. */
 export function LanguageToggle({ className }: { className?: string }) {
   const { locale, setLocale, t } = useI18n();
 
   return (
-    <div
-      className={cn(
-        "inline-flex overflow-hidden rounded-md border border-border text-xs",
-        className,
-      )}
-      role="group"
-      aria-label={t("nav.language")}
-    >
-      {LOCALES.map((code) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => setLocale(code)}
-          aria-pressed={locale === code}
-          className={cn(
-            "px-2 py-1 transition-colors",
-            locale === code
-              ? "bg-brand-600 text-white"
-              : "text-muted hover:text-foreground",
-          )}
-        >
-          {LOCALE_LABELS[code]}
-        </button>
-      ))}
-    </div>
+    <label className={cn("inline-flex items-center gap-1 text-xs", className)}>
+      <span aria-hidden className="text-muted">
+        🌐
+      </span>
+      <span className="sr-only">{t("nav.language")}</span>
+      <select
+        value={locale}
+        onChange={(e) => setLocale(e.target.value as (typeof LOCALES)[number])}
+        className="rounded-md border border-border bg-surface px-1.5 py-1 text-xs outline-none"
+      >
+        {LOCALES.map((code) => (
+          <option key={code} value={code}>
+            {LOCALE_LABELS[code]}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
