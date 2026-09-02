@@ -40,6 +40,22 @@ export const LANGUAGES: Language[] = [
   { code: "ms", endonym: "Bahasa Melayu", english: "Malay" },
   { code: "bn", endonym: "বাংলা", english: "Bengali" },
   { code: "fa", endonym: "فارسی", english: "Persian" },
+  { code: "sv", endonym: "Svenska", english: "Swedish" },
+  { code: "da", endonym: "Dansk", english: "Danish" },
+  { code: "fi", endonym: "Suomi", english: "Finnish" },
+  { code: "nb", endonym: "Norsk", english: "Norwegian" },
+  { code: "cs", endonym: "Čeština", english: "Czech" },
+  { code: "sk", endonym: "Slovenčina", english: "Slovak" },
+  { code: "ro", endonym: "Română", english: "Romanian" },
+  { code: "hu", endonym: "Magyar", english: "Hungarian" },
+  { code: "el", endonym: "Ελληνικά", english: "Greek" },
+  { code: "bg", endonym: "Български", english: "Bulgarian" },
+  { code: "hr", endonym: "Hrvatski", english: "Croatian" },
+  { code: "sr", endonym: "Српски", english: "Serbian" },
+  { code: "ca", endonym: "Català", english: "Catalan" },
+  { code: "he", endonym: "עברית", english: "Hebrew" },
+  { code: "ur", endonym: "اردو", english: "Urdu" },
+  { code: "sw", endonym: "Kiswahili", english: "Swahili" },
 ];
 
 const BY_CODE = new Map(LANGUAGES.map((l) => [l.code, l]));

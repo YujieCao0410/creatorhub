@@ -52,11 +52,11 @@ describe("matchLocale", () => {
   it("picks the first supported base tag", () => {
     expect(matchLocale("zh-CN,zh;q=0.9,en;q=0.8")).toBe("zh");
     expect(matchLocale("en-US,en;q=0.9")).toBe("en");
-    expect(matchLocale("sv-SE,sv;q=0.9,ja;q=0.5")).toBe("ja");
+    expect(matchLocale("is-IS,is;q=0.9,ja;q=0.5")).toBe("ja");
   });
 
   it("defaults to en for missing or unsupported", () => {
     expect(matchLocale(null)).toBe("en");
-    expect(matchLocale("sv,el")).toBe("en");
+    expect(matchLocale("is,cy")).toBe("en");
   });
 });

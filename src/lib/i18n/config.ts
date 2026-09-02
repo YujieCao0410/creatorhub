@@ -6,30 +6,10 @@ import { LANGUAGES } from "@/lib/languages";
  * To add a language: add a message file and list its code here.
  */
 export const LOCALES = [
-  "en",
-  "zh",
-  "zh-Hant",
-  "es",
-  "hi",
-  "ar",
-  "pt",
-  "fr",
-  "ja",
-  "ko",
-  "de",
-  "ru",
-  "id",
-  "it",
-  "tr",
-  "vi",
-  "th",
-  "pl",
-  "nl",
-  "uk",
-  "fil",
-  "ms",
-  "bn",
-  "fa",
+  "en", "zh", "zh-Hant", "es", "hi", "ar", "pt", "fr", "ja", "ko",
+  "de", "ru", "id", "it", "tr", "vi", "th", "pl", "nl", "uk",
+  "fil", "ms", "bn", "fa", "sv", "da", "fi", "nb", "cs", "sk",
+  "ro", "hu", "el", "bg", "hr", "sr", "ca", "he", "ur", "sw",
 ] as const;
 export type Locale = (typeof LOCALES)[number];
 
@@ -37,7 +17,7 @@ export const DEFAULT_LOCALE: Locale = "en";
 export const LOCALE_COOKIE = "locale";
 
 /** Right-to-left languages — the `<html dir>` flips for these. */
-export const RTL_LOCALES = new Set<Locale>(["ar", "fa"]);
+export const RTL_LOCALES = new Set<Locale>(["ar", "fa", "he", "ur"]);
 
 /** Each language in its own name, for the picker. */
 export const LOCALE_LABELS: Record<Locale, string> = Object.fromEntries(

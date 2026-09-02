@@ -25,6 +25,22 @@ const JUST_NOW: Partial<Record<Locale, string>> = {
   bn: "এইমাত্র",
   ar: "الآن",
   fa: "همین الان",
+  sv: "just nu",
+  da: "lige nu",
+  fi: "juuri nyt",
+  nb: "akkurat nå",
+  cs: "právě teď",
+  sk: "práve teraz",
+  ro: "chiar acum",
+  hu: "épp most",
+  el: "μόλις τώρα",
+  bg: "току-що",
+  hr: "upravo sad",
+  sr: "управо сада",
+  ca: "ara mateix",
+  he: "עכשיו",
+  ur: "ابھی ابھی",
+  sw: "sasa hivi",
 };
 
 /** Compact relative time, e.g. "3h", "2d", "Mar 4" / "刚刚". */
