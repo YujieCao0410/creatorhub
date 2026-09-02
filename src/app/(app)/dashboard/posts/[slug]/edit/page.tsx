@@ -30,7 +30,11 @@ export default async function EditPostPage({
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">{t("editor.editPost")}</h1>
-      <PostEditor mode="edit" post={post} aiEnabled={aiConfigured} />
+      <PostEditor
+        mode="edit"
+        post={post}
+        aiEnabled={aiConfigured && user.membership === "PRO"}
+      />
     </div>
   );
 }
