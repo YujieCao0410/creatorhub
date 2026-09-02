@@ -1,20 +1,30 @@
-import type { Locale } from "@/lib/i18n/config";
+import { intlLocale, type Locale } from "@/lib/i18n/config";
 
 const JUST_NOW: Partial<Record<Locale, string>> = {
   en: "just now",
   zh: "刚刚",
+  "zh-Hant": "剛剛",
   es: "ahora mismo",
   ja: "たった今",
   pt: "agora mesmo",
-};
-
-/** BCP-47 tag for `Intl` APIs. */
-const INTL_LOCALE: Record<Locale, string> = {
-  en: "en-US",
-  zh: "zh-CN",
-  es: "es-ES",
-  ja: "ja-JP",
-  pt: "pt-BR",
+  fr: "à l'instant",
+  de: "gerade eben",
+  ko: "방금",
+  ru: "только что",
+  it: "proprio ora",
+  id: "baru saja",
+  tr: "az önce",
+  vi: "vừa xong",
+  th: "เมื่อสักครู่",
+  pl: "przed chwilą",
+  nl: "zojuist",
+  uk: "щойно",
+  fil: "ngayon lang",
+  ms: "baru sahaja",
+  hi: "अभी अभी",
+  bn: "এইমাত্র",
+  ar: "الآن",
+  fa: "همین الان",
 };
 
 /** Compact relative time, e.g. "3h", "2d", "Mar 4" / "刚刚". */
@@ -32,7 +42,7 @@ export function formatRelativeDate(
   if (diffSeconds < 604_800) return `${Math.floor(diffSeconds / 86_400)}d`;
 
   const date = new Date(iso);
-  return date.toLocaleDateString(INTL_LOCALE[locale], {
+  return date.toLocaleDateString(intlLocale(locale), {
     month: "short",
     day: "numeric",
     year:

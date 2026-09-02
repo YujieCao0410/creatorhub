@@ -4,6 +4,7 @@ import { I18nProvider } from "@/components/i18n-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { getCurrentUser } from "@/lib/auth/session";
 import { env } from "@/lib/env";
+import { RTL_LOCALES } from "@/lib/i18n/config";
 import { getMessages } from "@/lib/i18n/server";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={locale}
+      dir={RTL_LOCALES.has(locale) ? "rtl" : "ltr"}
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full">
