@@ -49,7 +49,7 @@ export type PostAuthor = {
 
 export type PublishTargetDTO = {
   platform: string;
-  locale: string;
+  lang: string;
   status: "pending" | "publishing" | "published" | "failed" | "manual";
   externalUrl: string | null;
   error: string | null;
@@ -65,8 +65,8 @@ export type PostSummary = {
   videoUrl: string | null;
   youtubeUrl: string | null;
   tags: string[];
-  captionEn: string;
-  captionZh: string;
+  /** Per-language captions: `{ "<lang>": "<text>" }`. */
+  captions: Record<string, string>;
   publishTargets: PublishTargetDTO[];
   published: boolean;
   publishedAt: string | null;
@@ -83,7 +83,8 @@ export type PostDetail = PostSummary & { content: string };
 export type DistributionPlan = {
   slug: string;
   targets: PublishTargetDTO[];
-  captions: { platform: string; caption: string }[];
+  /** The composed caption for each platform at its chosen language. */
+  captions: { platform: string; lang: string; caption: string }[];
 };
 
 export type Comment = {

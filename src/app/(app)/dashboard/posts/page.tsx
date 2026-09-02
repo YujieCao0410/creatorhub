@@ -68,12 +68,7 @@ export default async function ContentPage() {
               </div>
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <PostRowActions slug={post.slug} published={post.published} />
-                {post.videoUrl && (
-                  <DistributePanel
-                    slug={post.slug}
-                    targets={post.publishTargets}
-                  />
-                )}
+                {post.videoUrl && <DistributePanel post={post} />}
               </div>
             </div>
           ))}

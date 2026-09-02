@@ -91,11 +91,10 @@ model Post {
   videoUrl      String?
   /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
   tags          String    @default("")
-  /// Platform caption for international platforms (YouTube/TikTok/Instagram).
-  /// Falls back to title + content when empty.
-  captionEn     String    @default("")
-  /// Platform caption for Chinese platforms (Douyin/Bilibili/Xiaohongshu).
-  captionZh     String    @default("")
+  /// Per-language platform captions as a JSON map `{ "<lang>": "<text>" }`
+  /// (e.g. `{ "en": "...", "zh": "...", "ja": "..." }`). Falls back to
+  /// title + content for a language that has no caption.
+  captions      Json      @default("{}")
   /// Set once the video has been pushed to YouTube.
   youtubeUrl    String?
   published     Boolean   @default(false)
@@ -120,7 +119,7 @@ model Post {
 model PublishTarget {
   id          String    @id @default(cuid())
   platform    String
-  locale      String    @default("en")
+  lang        String    @default("en")
   status      String    @default("pending")
   externalUrl String?
   error       String?

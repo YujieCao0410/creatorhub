@@ -14,7 +14,10 @@ export const maxDuration = 300;
 type Ctx = { params: Promise<{ slug: string }> };
 
 const bodySchema = z.object({
-  platforms: z.array(z.string()).min(1).max(10),
+  targets: z
+    .array(z.object({ platform: z.string(), lang: z.string() }))
+    .min(1)
+    .max(10),
 });
 
 export const GET = withErrorHandling(async (_req: Request, ctx: Ctx) => {
@@ -29,7 +32,7 @@ export const POST = withErrorHandling(async (req: Request, ctx: Ctx) => {
   const user = await requireUser();
   enforceRateLimit(`distribute:${user.id}`, { limit: 20, windowMs: 3_600_000 });
 
-  const { platforms } = bodySchema.parse(await readJsonBody(req));
-  const plan = await distributePost(user.id, slug, platforms);
+  const { targets } = bodySchema.parse(await readJsonBody(req));
+  const plan = await distributePost(user.id, slug, targets);
   return ok(plan);
 });

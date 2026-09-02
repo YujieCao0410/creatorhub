@@ -2,22 +2,21 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { env } from "@/lib/env";
-import { PLATFORMS } from "@/lib/platforms";
+import { getLanguage } from "@/lib/languages";
 
 /**
  * AI caption + hashtag generation.
  *
- * Given a video's title and description, Claude searches the web for currently
- * popular, relevant hashtags and writes platform-appropriate captions:
- * one for international platforms (English) and one for Chinese platforms.
+ * Given a video's title and description and a set of target languages, Claude
+ * searches the web for currently popular, relevant hashtags and writes a native
+ * caption in each language (not a literal translation).
  */
 
 export const aiConfigured = Boolean(env.ANTHROPIC_API_KEY);
 
 /**
  * Basic web search tool — supported on every model (including Haiku 4.5), so
- * ANTHROPIC_MODEL can be swapped freely. Newer models also accept the
- * dynamic-filtering variant, but this keeps the config model-agnostic.
+ * ANTHROPIC_MODEL can be swapped freely.
  */
 const WEB_SEARCH = {
   type: "web_search_20250305",
@@ -26,19 +25,16 @@ const WEB_SEARCH = {
 } as const;
 
 export type CaptionSuggestion = {
-  captionEn: string;
-  captionZh: string;
+  captions: Record<string, string>;
   tags: string[];
-  /** Short note on what the model found / did, shown to the creator. */
+  /** Short note (in Chinese) on what the model found. */
   note: string;
 };
 
 const TAG_RE = /^[\p{L}\p{N}_-]{1,30}$/u;
 
-/** The JSON we ask Claude to return. Kept small and strict. */
 const responseSchema = z.object({
-  captionEn: z.string().max(2200),
-  captionZh: z.string().max(1000),
+  captions: z.record(z.string(), z.string()),
   tags: z.array(z.string()).max(20),
   note: z.string().max(400).optional().default(""),
 });
@@ -47,39 +43,46 @@ export type CaptionInput = {
   title: string;
   content: string;
   existingTags: string[];
-  captionEn: string;
-  captionZh: string;
+  captions: Record<string, string>;
+  languages: string[];
 };
 
-const SYSTEM = `You help an individual video creator cross-post one short video to global and Chinese platforms.
+function languageList(codes: string[]): string {
+  return codes
+    .map((c) => {
+      const lang = getLanguage(c);
+      return lang ? `${c} (${lang.english})` : c;
+    })
+    .join(", ");
+}
 
-International platforms: ${PLATFORMS.filter((p) => p.locale === "en")
-  .map((p) => p.label)
-  .join(", ")}.
-Chinese platforms: ${PLATFORMS.filter((p) => p.locale === "zh")
-  .map((p) => p.label)
-  .join(", ")}.
+function buildSystem(languages: string[]): string {
+  return `You help an individual video creator cross-post one short video to platforms worldwide (YouTube, TikTok, Instagram, X, and the Chinese platforms 抖音 / 小红书 / 哔哩哔哩).
 
 Do this:
-1. Use web search to find hashtags that are BOTH currently popular AND genuinely relevant to this specific video's subject. Check what is trending for this niche on TikTok / YouTube Shorts / Instagram Reels and, separately, on 抖音 / 小红书 / 哔哩哔哩.
-2. Write "captionEn": a natural caption for international platforms in English (1-3 sentences, a hook first, no hashtag list inside it).
-3. Write "captionZh": the same idea rewritten natively in Simplified Chinese for Chinese platforms (not a literal translation).
-4. Return "tags": 8-14 hashtags WITHOUT the '#', lowercase, single words or joined words (no spaces), mixing broad-reach and niche. Include a few Chinese-language tags for the Chinese platforms. Order by how much reach you expect them to add.
-5. "note": one short line (in Chinese) on what you found, e.g. which tags are trending right now.
+1. Use web search to find hashtags that are BOTH currently popular AND genuinely relevant to this specific video's subject. Look at what is trending for this niche on short-video platforms right now.
+2. Write a caption for EACH of these languages, keyed by its code: ${languageList(languages)}. Each caption must be written natively in that language (a hook first, 1-3 sentences, NOT a literal translation of the others, NO hashtag list inside it).
+3. Return "tags": 8-14 hashtags WITHOUT the '#', lowercase, no spaces (join words), mixing broad-reach and niche, ordered by expected reach. Include tags in the scripts of the requested languages where it helps.
+4. "note": one short line in Chinese on what you found (e.g. which tags are trending).
 
-Respond with ONLY a JSON object: {"captionEn": string, "captionZh": string, "tags": string[], "note": string}. No markdown, no code fence.`;
+Respond with ONLY this JSON, no markdown/code fence:
+{"captions": {"<langCode>": "<caption>", ...}, "tags": ["tag1", ...], "note": "..."}`;
+}
 
 function buildUserPrompt(input: CaptionInput): string {
-  const lines = [
+  const drafts = Object.entries(input.captions)
+    .map(([code, text]) => `  - ${code}: ${text}`)
+    .join("\n");
+  return [
     `Video title: ${input.title || "(none)"}`,
     input.content ? `Description: ${input.content}` : null,
     input.existingTags.length
       ? `Creator's current tags: ${input.existingTags.join(", ")}`
       : null,
-    input.captionEn ? `Creator's draft English caption: ${input.captionEn}` : null,
-    input.captionZh ? `Creator's draft Chinese caption: ${input.captionZh}` : null,
-  ].filter(Boolean);
-  return lines.join("\n");
+    drafts ? `Creator's existing captions:\n${drafts}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 /** Pulls the first balanced JSON object out of a model response. */
@@ -105,11 +108,11 @@ export function normalizeTags(raw: string[]): string[] {
 export async function generateCaptions(
   input: CaptionInput,
 ): Promise<CaptionSuggestion> {
-  if (!aiConfigured) {
-    throw new Error("AI is not configured");
-  }
-  const client = new Anthropic();
+  if (!aiConfigured) throw new Error("AI is not configured");
+  if (input.languages.length === 0) throw new Error("No languages requested");
 
+  const client = new Anthropic();
+  const system = buildSystem(input.languages);
   const messages: Anthropic.MessageParam[] = [
     { role: "user", content: buildUserPrompt(input) },
   ];
@@ -117,7 +120,7 @@ export async function generateCaptions(
   let response = await client.messages.create({
     model: env.ANTHROPIC_MODEL,
     max_tokens: 4000,
-    system: SYSTEM,
+    system,
     tools: [WEB_SEARCH],
     messages,
   });
@@ -128,7 +131,7 @@ export async function generateCaptions(
     response = await client.messages.create({
       model: env.ANTHROPIC_MODEL,
       max_tokens: 4000,
-      system: SYSTEM,
+      system,
       tools: [WEB_SEARCH],
       messages,
     });
@@ -141,10 +144,11 @@ export async function generateCaptions(
     .trim();
 
   const parsed = responseSchema.parse(extractJson(text));
-  return {
-    captionEn: parsed.captionEn.trim(),
-    captionZh: parsed.captionZh.trim(),
-    tags: normalizeTags(parsed.tags),
-    note: parsed.note.trim(),
-  };
+  const captions: Record<string, string> = {};
+  for (const code of input.languages) {
+    const value = parsed.captions[code]?.trim();
+    if (value) captions[code] = value;
+  }
+
+  return { captions, tags: normalizeTags(parsed.tags), note: parsed.note.trim() };
 }

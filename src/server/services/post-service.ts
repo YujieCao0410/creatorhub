@@ -1,4 +1,5 @@
 import { Prisma } from "@/generated/prisma";
+import { toCaptionMap } from "@/lib/caption";
 import { prisma } from "@/lib/db";
 import type { PostDetail, PostList, PostSummary } from "@/lib/dto";
 import {
@@ -45,6 +46,7 @@ function serializeTags(tags: string[] | undefined): string {
     .join(" ");
 }
 
+
 function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
   return {
     id: row.id,
@@ -55,12 +57,11 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
     videoUrl: row.videoUrl,
     youtubeUrl: row.youtubeUrl,
     tags: parseTags(row.tags),
-    captionEn: row.captionEn,
-    captionZh: row.captionZh,
+    captions: toCaptionMap(row.captions),
     publishTargets: row.publishTargets
       .map((t) => ({
         platform: t.platform,
-        locale: t.locale,
+        lang: t.lang,
         status: t.status as PostSummary["publishTargets"][number]["status"],
         externalUrl: t.externalUrl,
         error: t.error,
@@ -128,8 +129,7 @@ export async function createPost(
           coverImageUrl: input.coverImageUrl ?? null,
           videoUrl: input.videoUrl ?? null,
           tags: serializeTags(input.tags),
-          captionEn: input.captionEn ?? "",
-          captionZh: input.captionZh ?? "",
+          captions: input.captions ?? {},
           published: input.publish,
           publishedAt,
           authorId,
@@ -305,8 +305,7 @@ export async function updatePost(
       coverImageUrl: input.coverImageUrl,
       videoUrl: input.videoUrl,
       ...(input.tags !== undefined ? { tags: serializeTags(input.tags) } : {}),
-      ...(input.captionEn !== undefined ? { captionEn: input.captionEn } : {}),
-      ...(input.captionZh !== undefined ? { captionZh: input.captionZh } : {}),
+      ...(input.captions !== undefined ? { captions: input.captions } : {}),
       published: input.published,
       ...(goingPublic ? { publishedAt: new Date() } : {}),
     },

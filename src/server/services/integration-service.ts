@@ -7,7 +7,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/lib/errors";
-import { fullCaption } from "@/lib/caption";
+import { fullCaption, toCaptionMap } from "@/lib/caption";
 import {
   refreshAccessToken,
   setThumbnail,
@@ -109,6 +109,7 @@ const IMAGE_MIME: Record<string, string> = {
 export async function publishPostToYouTube(
   userId: string,
   slug: string,
+  lang = "en",
 ): Promise<{ url: string }> {
   const post = await prisma.post.findUnique({ where: { slug } });
   if (!post) throw new NotFoundError("Post");
@@ -146,11 +147,11 @@ export async function publishPostToYouTube(
     {
       title: post.title,
       content: post.content,
-      captionEn: post.captionEn,
-      captionZh: post.captionZh,
+      captions: toCaptionMap(post.captions),
       tags,
     },
     "youtube",
+    lang,
   );
 
   const { videoId, url } = await uploadVideo({

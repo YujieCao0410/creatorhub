@@ -6,16 +6,15 @@
  *                so we generate a ready-to-paste caption package and the creator
  *                uploads by hand, then marks the target done.
  *
- * `locale` picks which caption a platform gets: `en` platforms are
- * international, `zh` platforms are the Chinese ones.
+ * `defaultLang` is the caption language a platform gets unless the creator picks
+ * another — it's only a default, every target's language is editable.
  */
-
-export type PlatformLocale = "en" | "zh";
 
 export type PlatformId =
   | "youtube"
   | "tiktok"
   | "instagram"
+  | "x"
   | "douyin"
   | "bilibili"
   | "xiaohongshu";
@@ -23,7 +22,7 @@ export type PlatformId =
 export type Platform = {
   id: PlatformId;
   label: string;
-  locale: PlatformLocale;
+  defaultLang: string;
   api: boolean;
   /** Soft caption length guidance shown in the UI. */
   captionLimit: number;
@@ -32,12 +31,13 @@ export type Platform = {
 };
 
 export const PLATFORMS: Platform[] = [
-  { id: "youtube", label: "YouTube", locale: "en", api: true, captionLimit: 4900, hashtagLimit: 15 },
-  { id: "tiktok", label: "TikTok", locale: "en", api: false, captionLimit: 2200, hashtagLimit: 10 },
-  { id: "instagram", label: "Instagram", locale: "en", api: false, captionLimit: 2200, hashtagLimit: 10 },
-  { id: "douyin", label: "抖音", locale: "zh", api: false, captionLimit: 1000, hashtagLimit: 6 },
-  { id: "bilibili", label: "哔哩哔哩", locale: "zh", api: false, captionLimit: 2000, hashtagLimit: 10 },
-  { id: "xiaohongshu", label: "小红书", locale: "zh", api: false, captionLimit: 1000, hashtagLimit: 10 },
+  { id: "youtube", label: "YouTube", defaultLang: "en", api: true, captionLimit: 4900, hashtagLimit: 15 },
+  { id: "tiktok", label: "TikTok", defaultLang: "en", api: false, captionLimit: 2200, hashtagLimit: 10 },
+  { id: "instagram", label: "Instagram", defaultLang: "en", api: false, captionLimit: 2200, hashtagLimit: 10 },
+  { id: "x", label: "X", defaultLang: "en", api: false, captionLimit: 280, hashtagLimit: 3 },
+  { id: "douyin", label: "抖音", defaultLang: "zh", api: false, captionLimit: 1000, hashtagLimit: 6 },
+  { id: "bilibili", label: "哔哩哔哩", defaultLang: "zh", api: false, captionLimit: 2000, hashtagLimit: 10 },
+  { id: "xiaohongshu", label: "小红书", defaultLang: "zh", api: false, captionLimit: 1000, hashtagLimit: 10 },
 ];
 
 const BY_ID = new Map(PLATFORMS.map((p) => [p.id, p]));

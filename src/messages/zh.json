@@ -204,14 +204,14 @@
     "publish": "发布",
     "unpublish": "取消发布",
     "captionsTitle": "平台文案",
-    "captionsHint": "可选。海外平台用英文文案，国内平台用中文文案。留空则用标题 + 正文。",
-    "captionEn": "英文文案（YouTube / TikTok / Instagram）",
-    "captionZh": "中文文案（抖音 / 哔哩哔哩 / 小红书）",
-    "captionEnPlaceholder": "海外平台视频下方显示的文案",
-    "captionZhPlaceholder": "国内平台视频下方显示的文案",
+    "captionsHint": "为你要发布的每种语言写一版文案。留空的语言会用标题+正文兜底。分发时每个平台单独选用哪种语言。",
     "aiSuggest": "✨ AI 生成文案和标签",
     "aiWorking": "搜索中…",
-    "aiDone": "已填入 AI 建议"
+    "aiDone": "已填入 AI 建议",
+    "captionsEmpty": "还没有文案。在下面加一种语言,或用 AI 生成。",
+    "captionPlaceholder": "该平台视频下方显示的文案(不用写 #标签,标签会自动加)。",
+    "addLanguage": "+ 添加语言",
+    "removeLanguage": "移除"
   },
   "integrations": {
     "title": "集成",
@@ -274,6 +274,7 @@
       "published": "已发布",
       "failed": "失败",
       "manual": "需手动上传"
-    }
+    },
+    "language": "文案语言"
   }
 }

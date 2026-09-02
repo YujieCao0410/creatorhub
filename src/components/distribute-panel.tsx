@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useT } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/misc";
 import { api, ApiError } from "@/lib/api-client";
-import type { DistributionPlan, PublishTargetDTO } from "@/lib/dto";
-import { PLATFORMS } from "@/lib/platforms";
+import { fullCaption } from "@/lib/caption";
+import type { DistributionPlan, PostSummary, PublishTargetDTO } from "@/lib/dto";
+import { languageLabel } from "@/lib/languages";
+import { getPlatform, PLATFORMS } from "@/lib/platforms";
 
 function statusTone(status: PublishTargetDTO["status"]) {
   if (status === "published") return "green" as const;
@@ -15,45 +17,58 @@ function statusTone(status: PublishTargetDTO["status"]) {
   return "brand" as const;
 }
 
-export function DistributePanel({
-  slug,
-  targets,
-}: {
-  slug: string;
-  targets: PublishTargetDTO[];
-}) {
+export function DistributePanel({ post }: { post: PostSummary }) {
   const t = useT();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [plan, setPlan] = useState<DistributionPlan | null>(null);
+  const [targets, setTargets] = useState<PublishTargetDTO[]>(post.publishTargets);
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [langByPlatform, setLangByPlatform] = useState<Record<string, string>>(
+    {},
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const publishedCount = targets.filter((x) => x.status === "published").length;
-
-  useEffect(() => {
-    if (!open || plan) return;
-    api
-      .get<DistributionPlan>(`/api/posts/${slug}/distribute`)
-      .then((p) => {
-        setPlan(p);
-        // Pre-check platforms that aren't published yet.
-        const done = new Set(
-          p.targets.filter((x) => x.status === "published").map((x) => x.platform),
-        );
-        setChecked(new Set(PLATFORMS.map((x) => x.id).filter((id) => !done.has(id))));
-      })
-      .catch((e) =>
-        setError(e instanceof ApiError ? e.message : t("distribute.loadFailed")),
-      );
-  }, [open, plan, slug, t]);
-
-  const currentTargets = plan?.targets ?? targets;
-  const targetByPlatform = new Map(currentTargets.map((x) => [x.platform, x]));
-  const captionByPlatform = new Map(
-    (plan?.captions ?? []).map((c) => [c.platform, c.caption]),
+  const targetByPlatform = useMemo(
+    () => new Map(targets.map((x) => [x.platform, x])),
+    [targets],
   );
+
+  // Languages the creator can send each platform: caption languages, or the
+  // platform default when the post has no captions yet.
+  const captionLangs = Object.keys(post.captions);
+
+  function langFor(platformId: string): string {
+    return (
+      langByPlatform[platformId] ??
+      targetByPlatform.get(platformId)?.lang ??
+      getPlatform(platformId)?.defaultLang ??
+      "en"
+    );
+  }
+
+  function captionFor(platformId: string): string {
+    return fullCaption(
+      {
+        title: post.title,
+        content: "",
+        captions: post.captions,
+        tags: post.tags,
+      },
+      platformId,
+      langFor(platformId),
+    );
+  }
+
+  function openPanel() {
+    const done = new Set(
+      targets.filter((x) => x.status === "published").map((x) => x.platform),
+    );
+    setChecked(new Set(PLATFORMS.map((p) => p.id).filter((id) => !done.has(id))));
+    setError(null);
+    setOpen(true);
+  }
 
   function toggle(id: string) {
     setChecked((prev) => {
@@ -68,11 +83,16 @@ export function DistributePanel({
     setBusy(true);
     setError(null);
     try {
-      const p = await api.post<DistributionPlan>(
-        `/api/posts/${slug}/distribute`,
-        { platforms: [...checked] },
+      const plan = await api.post<DistributionPlan>(
+        `/api/posts/${post.slug}/distribute`,
+        {
+          targets: [...checked].map((platform) => ({
+            platform,
+            lang: langFor(platform),
+          })),
+        },
       );
-      setPlan(p);
+      setTargets(plan.targets);
       router.refresh();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : t("distribute.failed"));
@@ -85,11 +105,11 @@ export function DistributePanel({
     setBusy(true);
     setError(null);
     try {
-      const p = await api.post<DistributionPlan>(
-        `/api/posts/${slug}/targets/${platform}`,
+      const plan = await api.post<DistributionPlan>(
+        `/api/posts/${post.slug}/targets/${platform}`,
         url.trim() ? { externalUrl: url.trim() } : {},
       );
-      setPlan(p);
+      setTargets(plan.targets);
       router.refresh();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : t("distribute.failed"));
@@ -100,7 +120,7 @@ export function DistributePanel({
 
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="secondary" size="sm" onClick={openPanel}>
         {t("distribute.open")}
         {publishedCount > 0 && (
           <span className="ml-1 text-xs text-muted">
@@ -147,13 +167,21 @@ export function DistributePanel({
                   <PlatformRow
                     key={platform.id}
                     label={platform.label}
-                    locale={platform.locale}
                     api={platform.api}
+                    lang={langFor(platform.id)}
+                    langOptions={
+                      captionLangs.length
+                        ? captionLangs
+                        : [platform.defaultLang]
+                    }
+                    onLangChange={(lang) =>
+                      setLangByPlatform((m) => ({ ...m, [platform.id]: lang }))
+                    }
                     checked={checked.has(platform.id)}
                     disabled={isPublished || busy}
                     onToggle={() => toggle(platform.id)}
                     target={target}
-                    caption={captionByPlatform.get(platform.id) ?? ""}
+                    caption={captionFor(platform.id)}
                     onMarkDone={(url) => markDone(platform.id, url)}
                     t={t}
                   />
@@ -183,8 +211,10 @@ export function DistributePanel({
 
 function PlatformRow({
   label,
-  locale,
   api: isApi,
+  lang,
+  langOptions,
+  onLangChange,
   checked,
   disabled,
   onToggle,
@@ -194,8 +224,10 @@ function PlatformRow({
   t,
 }: {
   label: string;
-  locale: "en" | "zh";
   api: boolean;
+  lang: string;
+  langOptions: string[];
+  onLangChange: (lang: string) => void;
   checked: boolean;
   disabled: boolean;
   onToggle: () => void;
@@ -225,7 +257,7 @@ function PlatformRow({
 
   return (
     <div className="rounded-lg border border-border p-2.5">
-      <div className="flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
         <input
           type="checkbox"
           checked={checked && !isPublished}
@@ -235,13 +267,25 @@ function PlatformRow({
           aria-label={label}
         />
         <span className="font-medium">{label}</span>
-        <span className="rounded bg-black/[0.06] px-1 text-[10px] uppercase text-muted dark:bg-white/10">
-          {locale === "zh" ? "中" : "EN"}
-        </span>
         {isApi ? (
           <Badge tone="brand">API</Badge>
         ) : (
           <Badge>{t("distribute.manual")}</Badge>
+        )}
+        {!isPublished && (
+          <select
+            value={lang}
+            disabled={disabled}
+            onChange={(e) => onLangChange(e.target.value)}
+            className="rounded border border-border bg-background px-1.5 py-0.5 text-xs outline-none"
+            aria-label={`${label} ${t("distribute.language")}`}
+          >
+            {langOptions.map((code) => (
+              <option key={code} value={code}>
+                {languageLabel(code)}
+              </option>
+            ))}
+          </select>
         )}
         <span className="ml-auto">
           {target && (

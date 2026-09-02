@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CaptionsEditor } from "@/components/captions-editor";
 import { useT } from "@/components/i18n-provider";
 import { MediaUpload } from "@/components/media-upload";
 import { TagInput } from "@/components/tag-input";
@@ -18,8 +19,7 @@ type Values = {
   coverImageUrl: string | null;
   videoUrl: string | null;
   tags: string[];
-  captionEn: string;
-  captionZh: string;
+  captions: Record<string, string>;
 };
 
 const EMPTY: Values = {
@@ -29,13 +29,11 @@ const EMPTY: Values = {
   coverImageUrl: null,
   videoUrl: null,
   tags: [],
-  captionEn: "",
-  captionZh: "",
+  captions: {},
 };
 
 type CaptionSuggestion = {
-  captionEn: string;
-  captionZh: string;
+  captions: Record<string, string>;
   tags: string[];
   note: string;
 };
@@ -55,7 +53,7 @@ export function PostEditor({
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  async function suggestCaptions() {
+  async function suggestCaptions(languages: string[]) {
     if (!post) return;
     setAiBusy(true);
     setAiNote(null);
@@ -63,11 +61,11 @@ export function PostEditor({
     try {
       const s = await api.post<CaptionSuggestion>(
         `/api/posts/${post.slug}/captions/suggest`,
+        { languages },
       );
       setValues((v) => ({
         ...v,
-        captionEn: s.captionEn || v.captionEn,
-        captionZh: s.captionZh || v.captionZh,
+        captions: { ...v.captions, ...s.captions },
         tags: [...new Set([...v.tags, ...s.tags])].slice(0, 10),
       }));
       setAiNote(s.note || t("editor.aiDone"));
@@ -89,8 +87,7 @@ export function PostEditor({
           coverImageUrl: post.coverImageUrl,
           videoUrl: post.videoUrl,
           tags: post.tags,
-          captionEn: post.captionEn,
-          captionZh: post.captionZh,
+          captions: post.captions,
         }
       : EMPTY,
   );
@@ -100,9 +97,7 @@ export function PostEditor({
     null | "draft" | "publish" | "save" | "toggle"
   >(null);
 
-  function updateText(
-    key: "title" | "excerpt" | "content" | "captionEn" | "captionZh",
-  ) {
+  function updateText(key: "title" | "excerpt" | "content") {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setValues((v) => ({ ...v, [key]: e.target.value }));
   }
@@ -118,8 +113,7 @@ export function PostEditor({
       coverImageUrl: values.coverImageUrl,
       videoUrl: values.videoUrl,
       tags: values.tags,
-      captionEn: values.captionEn,
-      captionZh: values.captionZh,
+      captions: values.captions,
     };
   }
 
@@ -238,58 +232,15 @@ export function PostEditor({
         />
       </Field>
 
-      <div className="rounded-lg border border-border bg-surface p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-medium">{t("editor.captionsTitle")}</p>
-            <p className="mt-0.5 text-xs text-muted">
-              {t("editor.captionsHint")}
-            </p>
-          </div>
-          {aiEnabled && mode === "edit" && (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={suggestCaptions}
-              loading={aiBusy}
-              disabled={busy !== null}
-            >
-              {aiBusy ? t("editor.aiWorking") : t("editor.aiSuggest")}
-            </Button>
-          )}
-        </div>
-        {aiNote && (
-          <p className="mt-2 rounded-md bg-brand-50 px-3 py-2 text-xs text-brand-700 dark:bg-brand-950 dark:text-brand-100">
-            {aiNote}
-          </p>
-        )}
-        {aiError && (
-          <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-950 dark:text-red-200">
-            {aiError}
-          </p>
-        )}
-        <div className="mt-3 space-y-3">
-          <Field label={t("editor.captionEn")} htmlFor="captionEn">
-            <Textarea
-              id="captionEn"
-              className="min-h-20"
-              value={values.captionEn}
-              onChange={updateText("captionEn")}
-              placeholder={t("editor.captionEnPlaceholder")}
-            />
-          </Field>
-          <Field label={t("editor.captionZh")} htmlFor="captionZh">
-            <Textarea
-              id="captionZh"
-              className="min-h-20"
-              value={values.captionZh}
-              onChange={updateText("captionZh")}
-              placeholder={t("editor.captionZhPlaceholder")}
-            />
-          </Field>
-        </div>
-      </div>
+      <CaptionsEditor
+        captions={values.captions}
+        onChange={(captions) => set("captions", captions)}
+        aiEnabled={aiEnabled && mode === "edit"}
+        aiBusy={aiBusy}
+        aiNote={aiNote}
+        aiError={aiError}
+        onAiSuggest={suggestCaptions}
+      />
 
       <Field
         label={t("editor.excerpt")}

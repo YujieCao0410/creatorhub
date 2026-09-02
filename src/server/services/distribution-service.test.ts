@@ -26,39 +26,45 @@ async function videoPost() {
     content: "watch this",
     videoUrl: "/uploads/abc.mp4",
     tags: ["dance", "fyp"],
-    captionZh: "看这个",
+    captions: { zh: "看这个", ja: "これ見て" },
     publish: true,
   });
 }
 
 describe("distribution", () => {
-  it("plan lists a caption for every platform", async () => {
+  it("composes each platform's caption in its default language", async () => {
     const post = await videoPost();
     const plan = await getDistributionPlan(author.id, post.slug);
-    expect(plan.captions.map((c) => c.platform)).toEqual(
-      expect.arrayContaining(["youtube", "tiktok", "douyin", "xiaohongshu"]),
-    );
+
     const douyin = plan.captions.find((c) => c.platform === "douyin");
+    expect(douyin?.lang).toBe("zh");
     expect(douyin?.caption).toContain("看这个");
     expect(douyin?.caption).toContain("#dance");
+
+    // No English caption on the post → YouTube falls back to another caption.
+    const youtube = plan.captions.find((c) => c.platform === "youtube");
+    expect(youtube?.lang).toBe("en");
   });
 
-  it("marks non-API platforms as manual", async () => {
+  it("marks non-API platforms as manual with the chosen language", async () => {
     const post = await videoPost();
     const plan = await distributePost(author.id, post.slug, [
-      "tiktok",
-      "douyin",
+      { platform: "tiktok", lang: "ja" },
+      { platform: "douyin", lang: "zh" },
     ]);
-    const statuses = Object.fromEntries(
-      plan.targets.map((t) => [t.platform, t.status]),
+    const byPlatform = Object.fromEntries(
+      plan.targets.map((t) => [t.platform, t]),
     );
-    expect(statuses.tiktok).toBe("manual");
-    expect(statuses.douyin).toBe("manual");
+    expect(byPlatform.tiktok.status).toBe("manual");
+    expect(byPlatform.tiktok.lang).toBe("ja");
+    expect(byPlatform.douyin.lang).toBe("zh");
   });
 
   it("markTargetPublished records the URL and flips status", async () => {
     const post = await videoPost();
-    await distributePost(author.id, post.slug, ["tiktok"]);
+    await distributePost(author.id, post.slug, [
+      { platform: "tiktok", lang: "en" },
+    ]);
     const plan = await markTargetPublished(
       author.id,
       post.slug,
@@ -80,7 +86,7 @@ describe("distribution", () => {
       password: "supersecret",
     });
     await expect(
-      distributePost(other.id, post.slug, ["tiktok"]),
+      distributePost(other.id, post.slug, [{ platform: "tiktok", lang: "en" }]),
     ).rejects.toThrow();
   });
 
@@ -91,7 +97,7 @@ describe("distribution", () => {
       publish: true,
     });
     await expect(
-      distributePost(author.id, post.slug, ["tiktok"]),
+      distributePost(author.id, post.slug, [{ platform: "tiktok", lang: "en" }]),
     ).rejects.toThrow(/no video/i);
   });
 });

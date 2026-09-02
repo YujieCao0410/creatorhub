@@ -4,23 +4,33 @@ import { captionBody, fullCaption, hashtagLine } from "./caption";
 const post = {
   title: "Bloom at your own pace",
   content: "A short body.",
-  captionEn: "",
-  captionZh: "",
+  captions: {} as Record<string, string>,
   tags: ["dance", "fyp", "foxc"],
 };
 
 describe("captionBody", () => {
-  it("falls back to title + content when the locale caption is empty", () => {
-    expect(captionBody(post, "en")).toBe("Bloom at your own pace\n\nA short body.");
+  it("falls back to title + content when no caption exists", () => {
+    expect(captionBody(post, "en")).toBe(
+      "Bloom at your own pace\n\nA short body.",
+    );
   });
 
-  it("prefers the matching-locale caption when set", () => {
+  it("prefers the exact-language caption", () => {
     expect(
-      captionBody({ ...post, captionEn: "Custom EN" }, "en"),
+      captionBody({ ...post, captions: { en: "Custom EN", zh: "中文" } }, "en"),
     ).toBe("Custom EN");
+  });
+
+  it("falls back to a base-language match (zh for zh-Hant)", () => {
     expect(
-      captionBody({ ...post, captionZh: "中文文案" }, "zh"),
-    ).toBe("中文文案");
+      captionBody({ ...post, captions: { zh: "简体" } }, "zh-Hant"),
+    ).toBe("简体");
+  });
+
+  it("falls back to any available caption before title+content", () => {
+    expect(captionBody({ ...post, captions: { ja: "日本語" } }, "es")).toBe(
+      "日本語",
+    );
   });
 });
 
@@ -33,15 +43,15 @@ describe("hashtagLine", () => {
 });
 
 describe("fullCaption", () => {
-  it("joins body and hashtags for a platform", () => {
-    expect(fullCaption(post, "tiktok")).toBe(
+  it("joins body and hashtags for a platform + language", () => {
+    expect(fullCaption(post, "tiktok", "en")).toBe(
       "Bloom at your own pace\n\nA short body.\n\n#dance #fyp #foxc",
     );
   });
 
-  it("uses the Chinese caption for Chinese platforms", () => {
-    expect(fullCaption({ ...post, captionZh: "跳舞" }, "xiaohongshu")).toBe(
-      "跳舞\n\n#dance #fyp #foxc",
-    );
+  it("uses the requested language's caption", () => {
+    expect(
+      fullCaption({ ...post, captions: { zh: "跳舞" } }, "xiaohongshu", "zh"),
+    ).toBe("跳舞\n\n#dance #fyp #foxc");
   });
 });

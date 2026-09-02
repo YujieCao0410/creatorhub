@@ -4,8 +4,18 @@ import { paginationQuerySchema } from "./common";
 const title = z.string().trim().min(1, "Title is required").max(140);
 const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
-/** Platform caption (international / Chinese). Empty falls back to title+body. */
-const caption = z.string().trim().max(5_000).optional();
+
+/**
+ * Per-language platform captions: `{ "<lang>": "<text>" }`. Language keys are
+ * short tags (BCP-47-ish); an empty value clears that language.
+ */
+const captions = z
+  .record(
+    z.string().regex(/^[a-z]{2,3}(-[A-Za-z]{2,8})?$/, "Invalid language code"),
+    z.string().max(5_000),
+  )
+  .refine((map) => Object.keys(map).length <= 30, "Too many languages")
+  .optional();
 
 /** A post must carry *something*: body text, a video, or a cover image. */
 function hasBody(data: {
@@ -52,8 +62,7 @@ export const createPostSchema = z
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
-    captionEn: caption,
-    captionZh: caption,
+    captions,
     /** When true the post is published immediately; otherwise a draft. */
     publish: z.boolean().optional().default(false),
   })
@@ -71,8 +80,7 @@ export const updatePostSchema = z
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
-    captionEn: caption,
-    captionZh: caption,
+    captions,
     published: z.boolean().optional(),
   })
   .strict()

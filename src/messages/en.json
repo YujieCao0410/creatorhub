@@ -204,14 +204,14 @@
     "publish": "Publish",
     "unpublish": "Unpublish",
     "captionsTitle": "Platform captions",
-    "captionsHint": "Optional. International platforms get the English caption, Chinese platforms get the Chinese one. Empty falls back to the title + content.",
-    "captionEn": "English caption (YouTube / TikTok / Instagram)",
-    "captionZh": "Chinese caption (Douyin / Bilibili / Xiaohongshu)",
-    "captionEnPlaceholder": "What people see under the video on international platforms",
-    "captionZhPlaceholder": "国内平台视频下方显示的文案",
+    "captionsHint": "Write a caption in each language you post in. Empty languages fall back to the title + content. Each platform picks its language when you distribute.",
     "aiSuggest": "✨ AI captions & tags",
     "aiWorking": "Searching…",
-    "aiDone": "Filled in AI suggestions"
+    "aiDone": "Filled in AI suggestions",
+    "captionsEmpty": "No captions yet. Add a language below, or use AI.",
+    "captionPlaceholder": "The caption shown under the video on that platform (no hashtag list — tags are added automatically).",
+    "addLanguage": "+ Add a language",
+    "removeLanguage": "Remove"
   },
   "integrations": {
     "title": "Integrations",
@@ -274,6 +274,7 @@
       "published": "Published",
       "failed": "Failed",
       "manual": "Needs manual upload"
-    }
+    },
+    "language": "caption language"
   }
 }
