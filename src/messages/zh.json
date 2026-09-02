@@ -85,8 +85,8 @@
     "proFeatures": [
       "包含免费版全部功能",
       "无限草稿",
-      "新功能优先体验",
-      "支持 CreatorHub 的开发"
+      "AI 生成任意语言的文案和标签",
+      "一处发布到所有平台"
     ],
     "currentPlan": "你当前的方案",
     "includedWithPro": "Pro 已包含",
@@ -95,7 +95,9 @@
     "upgrade": "升级到 Pro",
     "manageBilling": "管理账单",
     "billingDisabled": "支付未配置。",
-    "processedByStripe": "支付由 Stripe 处理。可随时在控制台取消。"
+    "processedByStripe": "支付由 Stripe 处理。可随时在控制台取消。",
+    "trialBadge": "首月免费",
+    "trialNote": "免费试用 30 天,之后 $9/月。试用结束前随时取消,不会扣费。"
   },
   "feed": {
     "yourFeed": "你的动态",
@@ -177,7 +179,9 @@
     "fieldHandle": "用户名",
     "fieldEmail": "邮箱",
     "fieldPlan": "方案",
-    "memberSince": "注册时间"
+    "memberSince": "注册时间",
+    "defaultTags": "默认标签",
+    "defaultTagsHint": "每次新建帖子自动带上。设一次就行,想改某条再单独改。"
   },
   "editor": {
     "newPost": "新帖子",

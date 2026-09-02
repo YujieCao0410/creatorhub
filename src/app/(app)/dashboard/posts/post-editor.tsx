@@ -42,10 +42,13 @@ export function PostEditor({
   mode,
   post,
   aiEnabled = false,
+  defaultTags = [],
 }: {
   mode: "create" | "edit";
   post?: PostDetail;
   aiEnabled?: boolean;
+  /** Pre-filled into `tags` when creating a new post. */
+  defaultTags?: string[];
 }) {
   const router = useRouter();
   const t = useT();
@@ -89,7 +92,7 @@ export function PostEditor({
           tags: post.tags,
           captions: post.captions,
         }
-      : EMPTY,
+      : { ...EMPTY, tags: defaultTags },
   );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);

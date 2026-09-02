@@ -31,6 +31,14 @@ describe("updateProfile", () => {
     const cleared = await updateProfile(user.id, { bio: null });
     expect(cleared.bio).toBeNull();
   });
+
+  it("normalizes and stores default tags", async () => {
+    const user = await makeUser("carol");
+    const updated = await updateProfile(user.id, {
+      defaultTags: ["FYP", "fyp", "  Dance ", "#foxc"],
+    });
+    expect(updated.defaultTags).toEqual(["fyp", "dance", "foxc"]);
+  });
 });
 
 describe("getCreatorProfile", () => {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tagArraySchema } from "@/lib/tags";
 
 /**
  * Profile update. Every field is optional (PATCH semantics) but at least one
@@ -10,6 +11,7 @@ export const updateProfileSchema = z
     name: z.string().trim().min(1, "Name is required").max(80).optional(),
     bio: z.string().trim().max(280).nullable().optional(),
     avatarUrl: z.url("Must be a valid URL").max(2048).nullable().optional(),
+    defaultTags: tagArraySchema.optional(),
   })
   .strict()
   .refine((data) => Object.keys(data).length > 0, {

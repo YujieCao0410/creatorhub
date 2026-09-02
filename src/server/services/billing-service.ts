@@ -12,6 +12,9 @@ const PRO_STATUSES = new Set<Stripe.Subscription.Status>([
   "trialing",
 ]);
 
+/** Free trial length for first-time subscribers. */
+export const TRIAL_DAYS = 30;
+
 async function ensureSubscriptionRow(userId: string) {
   return prisma.subscription.upsert({
     where: { userId },
@@ -39,12 +42,27 @@ export async function createCheckoutSession(user: SelfUser): Promise<string> {
     });
   }
 
+  // First-time subscribers get a 30-day free trial (card required up front,
+  // auto-charged when it ends). Anyone who has subscribed before does not.
+  const firstTime = !row.stripeSubscriptionId;
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
     line_items: [{ price: proPriceId(), quantity: 1 }],
     client_reference_id: user.id,
-    subscription_data: { metadata: { userId: user.id } },
+    subscription_data: {
+      metadata: { userId: user.id },
+      ...(firstTime
+        ? {
+            trial_period_days: TRIAL_DAYS,
+            trial_settings: {
+              end_behavior: { missing_payment_method: "cancel" },
+            },
+          }
+        : {}),
+    },
+    payment_method_collection: "always",
     success_url: `${env.APP_URL}/dashboard/membership?checkout=success`,
     cancel_url: `${env.APP_URL}/dashboard/membership?checkout=cancelled`,
     allow_promotion_codes: true,

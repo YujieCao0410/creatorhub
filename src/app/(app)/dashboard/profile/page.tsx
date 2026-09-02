@@ -16,6 +16,7 @@ export default async function ProfilePage() {
           name: user.name,
           bio: user.bio ?? "",
           avatarUrl: user.avatarUrl ?? "",
+          defaultTags: user.defaultTags,
         }}
       />
     </div>

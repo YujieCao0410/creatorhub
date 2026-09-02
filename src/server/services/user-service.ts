@@ -6,6 +6,7 @@ import type {
   SelfUser,
 } from "@/lib/dto";
 import { toMembership } from "@/lib/membership";
+import { parseTags, serializeTags } from "@/lib/tags";
 import type { UpdateProfileInput } from "@/lib/validation/user";
 
 export type { CreatorProfile, PublicUser, SelfUser } from "@/lib/dto";
@@ -36,6 +37,7 @@ export function toSelfUser(user: User): SelfUser {
     ...toPublicUser(user),
     email: user.email,
     membership: toMembership(user.membership),
+    defaultTags: parseTags(user.defaultTags),
   };
 }
 
@@ -149,6 +151,9 @@ export async function updateProfile(
       name: input.name,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
+      ...(input.defaultTags !== undefined
+        ? { defaultTags: serializeTags(input.defaultTags) }
+        : {}),
     },
   });
   return toSelfUser(user);

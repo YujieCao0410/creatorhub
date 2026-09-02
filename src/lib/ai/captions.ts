@@ -57,13 +57,15 @@ function languageList(codes: string[]): string {
 }
 
 function buildSystem(languages: string[]): string {
-  return `You help an individual video creator cross-post one short video to platforms worldwide (YouTube, TikTok, Instagram, X, and the Chinese platforms 抖音 / 小红书 / 哔哩哔哩).
+  return `You help an individual video creator (think dancer / musician / lifestyle) cross-post one short video worldwide (YouTube, TikTok, Instagram, X, and the Chinese platforms 抖音 / 小红书 / 哔哩哔哩).
 
 Do this:
-1. Use web search to find hashtags that are BOTH currently popular AND genuinely relevant to this specific video's subject. Look at what is trending for this niche on short-video platforms right now.
-2. Write a caption for EACH of these languages, keyed by its code: ${languageList(languages)}. Each caption must be written natively in that language (a hook first, 1-3 sentences, NOT a literal translation of the others, NO hashtag list inside it).
-3. Return "tags": 8-14 hashtags WITHOUT the '#', lowercase, no spaces (join words), mixing broad-reach and niche, ordered by expected reach. Include tags in the scripts of the requested languages where it helps.
-4. "note": one short line in Chinese on what you found (e.g. which tags are trending).
+1. Use web search to check what hashtags are currently popular for this kind of video, if it helps — but the creator usually has their own fixed tags, so keep suggestions light.
+2. Write ONE caption for EACH of these languages, keyed by its code: ${languageList(languages)}. Style: SHORT and casual — one line, like texting a friend, at most ~15 words, an emoji or two is fine. Match the vibe (excited, chill, funny). Write it natively in that language — NOT a literal translation of the others. No hashtag list inside the caption.
+   Example vibe (English): "obsessed with Tyla's new song 😭 had to dance to it"
+   Example vibe (Chinese): "哇 Tyla 的新歌太好听了吧～忍不住跳了一段"
+3. Return "tags": 6-10 hashtags WITHOUT the '#', lowercase, no spaces, ordered by expected reach.
+4. "note": one short line in Chinese on what you did.
 
 Respond with ONLY this JSON, no markdown/code fence:
 {"captions": {"<langCode>": "<caption>", ...}, "tags": ["tag1", ...], "note": "..."}`;

@@ -4,13 +4,19 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
 import { useSession } from "@/components/session-provider";
+import { TagInput } from "@/components/tag-input";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { Alert } from "@/components/ui/misc";
 import { api, ApiError } from "@/lib/api-client";
 import type { SelfUser } from "@/lib/dto";
 
-type Values = { name: string; bio: string; avatarUrl: string };
+type Values = {
+  name: string;
+  bio: string;
+  avatarUrl: string;
+  defaultTags: string[];
+};
 
 export function ProfileForm({ initial }: { initial: Values }) {
   const router = useRouter();
@@ -43,6 +49,7 @@ export function ProfileForm({ initial }: { initial: Values }) {
         name: values.name,
         bio: values.bio.trim() === "" ? null : values.bio,
         avatarUrl: values.avatarUrl.trim() === "" ? null : values.avatarUrl,
+        defaultTags: values.defaultTags,
       });
       setUser(user);
       setSaved(true);
@@ -101,6 +108,21 @@ export function ProfileForm({ initial }: { initial: Values }) {
           value={values.avatarUrl}
           onChange={update("avatarUrl")}
           aria-invalid={Boolean(fieldErrors.avatarUrl)}
+        />
+      </Field>
+
+      <Field
+        label={t("dashboard.defaultTags")}
+        htmlFor="defaultTags"
+        hint={t("dashboard.defaultTagsHint")}
+        error={fieldErrors.defaultTags}
+      >
+        <TagInput
+          value={values.defaultTags}
+          onChange={(defaultTags) => {
+            setValues((v) => ({ ...v, defaultTags }));
+            setSaved(false);
+          }}
         />
       </Field>
 

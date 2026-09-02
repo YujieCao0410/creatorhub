@@ -20,6 +20,8 @@ export type Membership = "FREE" | "PRO";
 export type SelfUser = PublicUser & {
   email: string;
   membership: Membership;
+  /** Default hashtags pre-filled into every new post. */
+  defaultTags: string[];
 };
 
 export type MembershipInfo = {

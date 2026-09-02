@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma";
 import { toCaptionMap } from "@/lib/caption";
 import { prisma } from "@/lib/db";
+import { parseTags, serializeTags } from "@/lib/tags";
 import type { PostDetail, PostList, PostSummary } from "@/lib/dto";
 import {
   AuthorizationError,
@@ -34,17 +35,6 @@ const postInclude = {
 } satisfies Prisma.PostInclude;
 
 type PostRow = Prisma.PostGetPayload<{ include: typeof postInclude }>;
-
-/** "design typography" <-> ["design","typography"] */
-function parseTags(stored: string): string[] {
-  return stored.split(" ").filter(Boolean);
-}
-function serializeTags(tags: string[] | undefined): string {
-  if (!tags) return "";
-  return [...new Set(tags.map((tag) => tag.trim().toLowerCase()).filter(Boolean))]
-    .slice(0, 10)
-    .join(" ");
-}
 
 
 function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tagArraySchema } from "@/lib/tags";
 import { paginationQuerySchema } from "./common";
 
 const title = z.string().trim().min(1, "Title is required").max(140);
@@ -42,17 +43,7 @@ const mediaRef = z
   .nullable()
   .optional();
 
-/** Up to 10 tags; letters (any script), digits, `_` and `-`, 1–30 chars each. */
-const tags = z
-  .array(
-    z
-      .string()
-      .trim()
-      .toLowerCase()
-      .regex(/^[\p{L}\p{N}_-]{1,30}$/u, "Tags can only contain letters, numbers, - and _"),
-  )
-  .max(10, "At most 10 tags")
-  .optional();
+const tags = tagArraySchema.optional();
 
 export const createPostSchema = z
   .object({

@@ -73,13 +73,19 @@ export default async function PricingPage() {
         </Card>
 
         <Card className="flex flex-col border-brand-500">
-          <h2 className="text-lg font-semibold">{t("pricing.pro")}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold">{t("pricing.pro")}</h2>
+            <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-950 dark:text-brand-100">
+              {t("pricing.trialBadge")}
+            </span>
+          </div>
           <p className="mt-1 text-3xl font-semibold">
             $9
             <span className="text-base font-normal text-muted">
               {t("pricing.perMonth")}
             </span>
           </p>
+          <p className="mt-1 text-xs text-muted">{t("pricing.trialNote")}</p>
           <ul className="mt-4 flex-1 space-y-2 text-sm">
             {proFeatures.map((f) => (
               <li key={f} className="flex gap-2">
