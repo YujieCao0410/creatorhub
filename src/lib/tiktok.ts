@@ -8,8 +8,9 @@ import type { TokenSet } from "./youtube";
  * FILE_UPLOAD), plain fetch.
  *
  * Unaudited apps: the app runs in sandbox, only added test users can connect,
- * and every post is forced to `SELF_ONLY` (private) regardless of the value we
- * send. The creator makes the video public in the TikTok app afterwards.
+ * the creator's TikTok account must be set to private at the time of posting,
+ * and every post lands as `SELF_ONLY`. The creator flips the account (and each
+ * video) back to public in the TikTok app afterwards.
  */
 
 const AUTH_BASE = "https://www.tiktok.com/v2/auth/authorize/";
@@ -112,6 +113,33 @@ export async function publishVideo(opts: {
 }): Promise<{ url: string | null }> {
   const size = opts.bytes.length;
 
+  // Direct Post requires querying the creator's allowed settings first — TikTok
+  // rejects init with a "content-sharing-guidelines" error if this UX step is
+  // skipped. Unaudited apps only ever get SELF_ONLY back here.
+  const ci = await fetch(`${API}/v2/post/publish/creator_info/query/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${opts.accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+  });
+  const ciData = await ci.json();
+  if (!ci.ok || ciData.error?.code !== "ok") {
+    throw new Error(
+      `TikTok creator info failed: ${ciData.error?.message ?? ci.status}`,
+    );
+  }
+  const info = ciData.data as {
+    privacy_level_options?: string[];
+    comment_disabled?: boolean;
+    duet_disabled?: boolean;
+    stitch_disabled?: boolean;
+  };
+  const options = info.privacy_level_options ?? [];
+  const privacyLevel = options.includes("SELF_ONLY")
+    ? "SELF_ONLY"
+    : (options[0] ?? "SELF_ONLY");
+
   const init = await fetch(`${API}/v2/post/publish/video/init/`, {
     method: "POST",
     headers: {
@@ -121,10 +149,12 @@ export async function publishVideo(opts: {
     body: JSON.stringify({
       post_info: {
         title: opts.caption.slice(0, 2200),
-        privacy_level: "SELF_ONLY",
-        disable_comment: false,
-        disable_duet: false,
-        disable_stitch: false,
+        privacy_level: privacyLevel,
+        disable_comment: Boolean(info.comment_disabled),
+        disable_duet: Boolean(info.duet_disabled),
+        disable_stitch: Boolean(info.stitch_disabled),
+        brand_content_toggle: false,
+        brand_organic_toggle: false,
       },
       source_info: {
         source: "FILE_UPLOAD",
@@ -136,6 +166,13 @@ export async function publishVideo(opts: {
   });
   const initData = await init.json();
   if (!init.ok || initData.error?.code !== "ok") {
+    const code = initData.error?.code;
+    if (code === "unaudited_client_can_only_post_to_private_accounts") {
+      throw new Error(
+        "TikTok rejected the post: while this app is unaudited, the target " +
+          "TikTok account must be set to private at the time of posting.",
+      );
+    }
     throw new Error(
       `TikTok init failed: ${initData.error?.message ?? init.status}`,
     );

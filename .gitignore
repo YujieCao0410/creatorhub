@@ -55,6 +55,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local screen recordings / notes
+# Local screen recordings / notes / design assets
 /项目记录/
+/app 图标/
 *.mov
