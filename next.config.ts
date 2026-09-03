@@ -46,6 +46,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Self-contained server bundle for Docker / container deploys.
   output: "standalone",
+  // Allow tunnels (ngrok / cloudflared) to reach the dev server — needed to
+  // test OAuth callbacks from TikTok/Instagram, which require an HTTPS URL.
+  allowedDevOrigins: [
+    "*.ngrok-free.app",
+    "*.ngrok.app",
+    "*.ngrok.io",
+    "*.trycloudflare.com",
+  ],
   // Keep Prisma's engine out of the server bundle; it's loaded at runtime.
   serverExternalPackages: ["@prisma/client", "prisma"],
   poweredByHeader: false,
