@@ -4,7 +4,7 @@ import { IntegrationsPanel } from "@/components/integrations-panel";
 import { Card } from "@/components/ui/misc";
 import { requireUserPage } from "@/lib/auth/page-guards";
 import { getLocale, getT } from "@/lib/i18n/server";
-import { youtubeConfigured } from "@/lib/youtube";
+import { PROVIDERS, type ProviderId } from "@/lib/integrations";
 import { getIntegration } from "@/server/services/integration-service";
 
 export default async function SettingsPage() {
@@ -13,7 +13,19 @@ export default async function SettingsPage() {
     getT(),
     getLocale(),
   ]);
-  const youtube = await getIntegration(user.id, "youtube");
+  const providerIds = Object.keys(PROVIDERS) as ProviderId[];
+  const rows = await Promise.all(
+    providerIds.map(async (id) => {
+      const row = await getIntegration(user.id, id);
+      return {
+        id,
+        label: PROVIDERS[id].label,
+        configured: PROVIDERS[id].configured,
+        accountName: row?.accountName ?? null,
+        connected: Boolean(row),
+      };
+    }),
+  );
 
   return (
     <div className="max-w-lg space-y-6">
@@ -43,10 +55,7 @@ export default async function SettingsPage() {
       </Card>
 
       <Suspense fallback={null}>
-        <IntegrationsPanel
-          youtube={youtube ? { accountName: youtube.accountName } : null}
-          configured={youtubeConfigured}
-        />
+        <IntegrationsPanel providers={rows} />
       </Suspense>
 
       <Card>

@@ -8,7 +8,11 @@ import {
 } from "@/lib/errors";
 import { isLanguageCode } from "@/lib/languages";
 import { getPlatform, isPlatformId, PLATFORMS } from "@/lib/platforms";
-import { publishPostToYouTube } from "./integration-service";
+import {
+  publishPostToInstagram,
+  publishPostToTikTok,
+  publishPostToYouTube,
+} from "./integration-service";
 
 export type { DistributionPlan } from "@/lib/dto";
 
@@ -131,13 +135,19 @@ export async function distributePost(
     throw new ValidationError(undefined, "Pick at least one platform.");
   }
 
+  let firstError: unknown = null;
   for (const [id, { lang, caption }] of chosen) {
     const platform = getPlatform(id)!;
     const existing = post.publishTargets.find((t) => t.platform === id);
     if (existing?.status === "published") continue;
 
-    if (id === "youtube" && platform.api) {
-      await runYouTube(userId, slug, post.id, lang, caption);
+    if (platform.api) {
+      // Publish each API platform; a failure on one doesn't block the others.
+      try {
+        await runApiPlatform(id, userId, slug, post.id, lang, caption);
+      } catch (err) {
+        firstError ??= err;
+      }
     } else {
       await prisma.publishTarget.upsert({
         where: { postId_platform: { postId: post.id, platform: id } },
@@ -147,25 +157,48 @@ export async function distributePost(
     }
   }
 
-  return planFrom(await loadOwnedPost(slug, userId));
+  const plan = planFrom(await loadOwnedPost(slug, userId));
+  // If every chosen platform failed and nothing landed, surface the error.
+  if (firstError && !plan.targets.some((t) => t.status === "published")) {
+    throw firstError;
+  }
+  return plan;
 }
 
-async function runYouTube(
+const API_PUBLISHERS: Record<
+  string,
+  (
+    userId: string,
+    slug: string,
+    lang: string,
+    caption: string | null,
+  ) => Promise<{ url: string | null }>
+> = {
+  youtube: publishPostToYouTube,
+  tiktok: publishPostToTikTok,
+  instagram: publishPostToInstagram,
+};
+
+async function runApiPlatform(
+  id: string,
   userId: string,
   slug: string,
   postId: string,
   lang: string,
   caption: string | null,
 ) {
+  const publisher = API_PUBLISHERS[id];
+  if (!publisher) return;
+
   await prisma.publishTarget.upsert({
-    where: { postId_platform: { postId, platform: "youtube" } },
-    create: { postId, platform: "youtube", lang, caption, status: "publishing" },
+    where: { postId_platform: { postId, platform: id } },
+    create: { postId, platform: id, lang, caption, status: "publishing" },
     update: { lang, caption, status: "publishing", error: null },
   });
   try {
-    const { url } = await publishPostToYouTube(userId, slug, lang, caption);
+    const { url } = await publisher(userId, slug, lang, caption);
     await prisma.publishTarget.update({
-      where: { postId_platform: { postId, platform: "youtube" } },
+      where: { postId_platform: { postId, platform: id } },
       data: {
         status: "published",
         externalUrl: url,
@@ -174,9 +207,9 @@ async function runYouTube(
       },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Upload failed";
+    const message = err instanceof Error ? err.message : "Publish failed";
     await prisma.publishTarget.update({
-      where: { postId_platform: { postId, platform: "youtube" } },
+      where: { postId_platform: { postId, platform: id } },
       data: { status: "failed", error: message.slice(0, 500) },
     });
     throw err;

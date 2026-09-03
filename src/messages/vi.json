@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Bật theo mặc định. Tắt để xuất bản và đăng chéo mà không thêm vào bảng tin CreatorHub."
   },
   "integrations": {
-    "title": "Tích hợp",
-    "youtube": "YouTube",
-    "connect": "Kết nối",
-    "disconnect": "Ngắt kết nối",
-    "connectedAs": "Đã kết nối với tên {name}",
-    "connected": "Đã kết nối",
-    "notConfigured": "Xuất bản lên YouTube chưa được cấu hình trên máy chủ này.",
-    "connectHint": "Kết nối một kênh để xuất bản video đã tải lên của bạn lên YouTube.",
-    "statusConnected": "Đã kết nối YouTube.",
-    "statusDenied": "Kết nối YouTube đã bị hủy.",
-    "statusExpired": "Liên kết đó đã hết hạn — thử kết nối lại.",
-    "statusFailed": "Không thể kết nối YouTube. Vui lòng thử lại.",
-    "publishYouTube": "Xuất bản lên YouTube",
-    "publishing": "Đang xuất bản lên YouTube…",
-    "onYouTube": "Trên YouTube ↗",
-    "privateNote": "Đã tải lên ở chế độ riêng tư. Đặt công khai trong YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Gói thành viên",

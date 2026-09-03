@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Увімкнено за замовчуванням. Вимкніть, щоб публікувати й крос-постити, не додаючи це до стрічки CreatorHub."
   },
   "integrations": {
-    "title": "Інтеграції",
-    "youtube": "YouTube",
-    "connect": "Підключити",
-    "disconnect": "Відключити",
-    "connectedAs": "Підключено як {name}",
-    "connected": "Підключено",
-    "notConfigured": "Публікацію на YouTube не налаштовано на цьому сервері.",
-    "connectHint": "Підключіть канал, щоб публікувати завантажені відео на YouTube.",
-    "statusConnected": "YouTube підключено.",
-    "statusDenied": "Підключення до YouTube скасовано.",
-    "statusExpired": "Це посилання застаріло — спробуйте підключитися знову.",
-    "statusFailed": "Не вдалося підключити YouTube. Спробуйте ще раз.",
-    "publishYouTube": "Опублікувати на YouTube",
-    "publishing": "Публікація на YouTube…",
-    "onYouTube": "На YouTube ↗",
-    "privateNote": "Завантажено як приватне. Зробіть публічним у YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Підписка",

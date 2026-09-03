@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Naka-on bilang default. I-off para mag-publish at mag-cross-post nang hindi idinaragdag ito sa CreatorHub feed."
   },
   "integrations": {
-    "title": "Mga integrasyon",
-    "youtube": "YouTube",
-    "connect": "Ikonekta",
-    "disconnect": "Idiskonekta",
-    "connectedAs": "Nakakonekta bilang {name}",
-    "connected": "Nakakonekta",
-    "notConfigured": "Hindi naka-configure sa server na ito ang pag-publish sa YouTube.",
-    "connectHint": "Ikonekta ang isang channel para i-publish ang mga na-upload mong video sa YouTube.",
-    "statusConnected": "Nakakonekta ang YouTube.",
-    "statusDenied": "Kinansela ang koneksyon sa YouTube.",
-    "statusExpired": "Nag-expire ang link na iyon — subukang kumonekta ulit.",
-    "statusFailed": "Hindi maikonekta ang YouTube. Pakisubukang muli.",
-    "publishYouTube": "I-publish sa YouTube",
-    "publishing": "Ipina-publish sa YouTube…",
-    "onYouTube": "Nasa YouTube ↗",
-    "privateNote": "Na-upload bilang pribado. Gawing pampubliko sa YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Membership",

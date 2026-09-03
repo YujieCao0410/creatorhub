@@ -222,22 +222,20 @@
     "shareToCommunityHint": "เปิดใช้งานตามค่าเริ่มต้น ปิดเพื่อเผยแพร่และโพสต์ข้ามแพลตฟอร์มโดยไม่เพิ่มลงในฟีด CreatorHub"
   },
   "integrations": {
-    "title": "การเชื่อมต่อ",
-    "youtube": "YouTube",
-    "connect": "เชื่อมต่อ",
-    "disconnect": "ยกเลิกการเชื่อมต่อ",
-    "connectedAs": "เชื่อมต่อในชื่อ {name}",
-    "connected": "เชื่อมต่อแล้ว",
-    "notConfigured": "ยังไม่ได้ตั้งค่าการเผยแพร่ไปยัง YouTube บนเซิร์ฟเวอร์นี้",
-    "connectHint": "เชื่อมต่อช่องเพื่อเผยแพร่วิดีโอที่อัปโหลดของคุณไปยัง YouTube",
-    "statusConnected": "เชื่อมต่อ YouTube แล้ว",
-    "statusDenied": "ยกเลิกการเชื่อมต่อ YouTube แล้ว",
-    "statusExpired": "ลิงก์นั้นหมดอายุแล้ว — ลองเชื่อมต่ออีกครั้ง",
-    "statusFailed": "ไม่สามารถเชื่อมต่อ YouTube ได้ โปรดลองอีกครั้ง",
-    "publishYouTube": "เผยแพร่ไปยัง YouTube",
-    "publishing": "กำลังเผยแพร่ไปยัง YouTube…",
-    "onYouTube": "บน YouTube ↗",
-    "privateNote": "อัปโหลดเป็นส่วนตัว ทำให้เป็นสาธารณะใน YouTube Studio"
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "สมาชิก",

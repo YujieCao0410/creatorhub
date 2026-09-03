@@ -222,22 +222,20 @@
     "shareToCommunityHint": "डिफ़ॉल्ट रूप से चालू। इसे CreatorHub फ़ीड में जोड़े बिना पब्लिश और क्रॉस-पोस्ट करने के लिए बंद करें।"
   },
   "integrations": {
-    "title": "इंटीग्रेशन",
-    "youtube": "YouTube",
-    "connect": "कनेक्ट करें",
-    "disconnect": "डिस्कनेक्ट करें",
-    "connectedAs": "{name} के रूप में कनेक्ट किया गया",
-    "connected": "कनेक्ट किया गया",
-    "notConfigured": "इस सर्वर पर YouTube पब्लिशिंग कॉन्फ़िगर नहीं है।",
-    "connectHint": "अपने अपलोड किए गए वीडियो YouTube पर पब्लिश करने के लिए एक चैनल कनेक्ट करें।",
-    "statusConnected": "YouTube कनेक्ट हो गया।",
-    "statusDenied": "YouTube कनेक्शन रद्द कर दिया गया।",
-    "statusExpired": "वह लिंक समाप्त हो गया — फिर से कनेक्ट करने की कोशिश करें।",
-    "statusFailed": "YouTube कनेक्ट नहीं हो सका। कृपया फिर से कोशिश करें।",
-    "publishYouTube": "YouTube पर पब्लिश करें",
-    "publishing": "YouTube पर पब्लिश हो रहा है…",
-    "onYouTube": "YouTube पर ↗",
-    "privateNote": "निजी के रूप में अपलोड किया गया। YouTube Studio में इसे सार्वजनिक करें।"
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "सदस्यता",

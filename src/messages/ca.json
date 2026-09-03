@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Activat per defecte. Desactiva-ho per publicar i publicar de forma creuada sense afegir-ho al feed de CreatorHub."
   },
   "integrations": {
-    "title": "Integracions",
-    "youtube": "YouTube",
-    "connect": "Connecta",
-    "disconnect": "Desconnecta",
-    "connectedAs": "Connectat com a {name}",
-    "connected": "Connectat",
-    "notConfigured": "La publicació a YouTube no està configurada en aquest servidor.",
-    "connectHint": "Connecta un canal per publicar els teus vídeos pujats a YouTube.",
-    "statusConnected": "YouTube connectat.",
-    "statusDenied": "S'ha cancel·lat la connexió amb YouTube.",
-    "statusExpired": "Aquell enllaç ha caducat — prova de connectar-te de nou.",
-    "statusFailed": "No s'ha pogut connectar YouTube. Torna-ho a provar.",
-    "publishYouTube": "Publica a YouTube",
-    "publishing": "S'està publicant a YouTube…",
-    "onYouTube": "A YouTube ↗",
-    "privateNote": "Pujat com a privat. Fes-lo públic a YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Subscripció",

@@ -222,22 +222,20 @@
     "shareToCommunityHint": "기본값은 켜짐. 끄면 CreatorHub 피드에 추가하지 않고 발행 및 크로스포스트합니다."
   },
   "integrations": {
-    "title": "연동",
-    "youtube": "YouTube",
-    "connect": "연결",
-    "disconnect": "연결 해제",
-    "connectedAs": "{name}(으)로 연결됨",
-    "connected": "연결됨",
-    "notConfigured": "이 서버에서는 YouTube 발행이 설정되지 않았습니다.",
-    "connectHint": "채널을 연결하면 업로드한 영상을 YouTube에 발행할 수 있습니다.",
-    "statusConnected": "YouTube가 연결되었습니다.",
-    "statusDenied": "YouTube 연결이 취소되었습니다.",
-    "statusExpired": "링크가 만료되었습니다 — 다시 연결해 보세요.",
-    "statusFailed": "YouTube를 연결할 수 없습니다. 다시 시도해 주세요.",
-    "publishYouTube": "YouTube에 발행",
-    "publishing": "YouTube에 발행 중…",
-    "onYouTube": "YouTube에서 보기 ↗",
-    "privateNote": "비공개로 업로드되었습니다. YouTube 스튜디오에서 공개로 전환하세요."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "멤버십",

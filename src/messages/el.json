@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Ενεργό από προεπιλογή. Απενεργοποιήστε το για δημοσίευση και διασταυρούμενη ανάρτηση χωρίς να προστεθεί στη ροή CreatorHub."
   },
   "integrations": {
-    "title": "Ενσωματώσεις",
-    "youtube": "YouTube",
-    "connect": "Σύνδεση",
-    "disconnect": "Αποσύνδεση",
-    "connectedAs": "Συνδεδεμένο ως {name}",
-    "connected": "Συνδεδεμένο",
-    "notConfigured": "Η δημοσίευση στο YouTube δεν έχει ρυθμιστεί σε αυτόν τον διακομιστή.",
-    "connectHint": "Συνδέστε ένα κανάλι για να δημοσιεύετε τα μεταφορτωμένα βίντεό σας στο YouTube.",
-    "statusConnected": "Το YouTube συνδέθηκε.",
-    "statusDenied": "Η σύνδεση με το YouTube ακυρώθηκε.",
-    "statusExpired": "Αυτός ο σύνδεσμος έληξε — δοκιμάστε να συνδεθείτε ξανά.",
-    "statusFailed": "Δεν ήταν δυνατή η σύνδεση με το YouTube. Δοκιμάστε ξανά.",
-    "publishYouTube": "Δημοσίευση στο YouTube",
-    "publishing": "Δημοσίευση στο YouTube…",
-    "onYouTube": "Στο YouTube ↗",
-    "privateNote": "Μεταφορτώθηκε ως ιδιωτικό. Κάντε το δημόσιο στο YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Συνδρομή",

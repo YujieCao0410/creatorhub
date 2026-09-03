@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Aktif secara default. Nonaktifkan untuk publikasi dan cross-post tanpa menambahkannya ke feed CreatorHub."
   },
   "integrations": {
-    "title": "Integrasi",
-    "youtube": "YouTube",
-    "connect": "Hubungkan",
-    "disconnect": "Putuskan",
-    "connectedAs": "Terhubung sebagai {name}",
-    "connected": "Terhubung",
-    "notConfigured": "Publikasi ke YouTube belum dikonfigurasi di server ini.",
-    "connectHint": "Hubungkan channel untuk memublikasikan video unggahanmu ke YouTube.",
-    "statusConnected": "YouTube terhubung.",
-    "statusDenied": "Koneksi YouTube dibatalkan.",
-    "statusExpired": "Tautan itu kedaluwarsa — coba hubungkan lagi.",
-    "statusFailed": "Gagal menghubungkan YouTube. Silakan coba lagi.",
-    "publishYouTube": "Publikasikan ke YouTube",
-    "publishing": "Memublikasikan ke YouTube…",
-    "onYouTube": "Di YouTube ↗",
-    "privateNote": "Diunggah sebagai privat. Jadikan publik di YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Keanggotaan",

@@ -8,12 +8,11 @@ import {
   ValidationError,
 } from "@/lib/errors";
 import { fullCaption, toCaptionMap } from "@/lib/caption";
-import {
-  refreshAccessToken,
-  setThumbnail,
-  type TokenSet,
-  uploadVideo,
-} from "@/lib/youtube";
+import { env } from "@/lib/env";
+import { publishReel } from "@/lib/instagram";
+import { PROVIDERS, type ProviderId } from "@/lib/integrations";
+import { publishVideo as publishTikTokVideo } from "@/lib/tiktok";
+import { setThumbnail, type TokenSet, uploadVideo } from "@/lib/youtube";
 
 export type IntegrationSummary = {
   provider: string;
@@ -68,7 +67,10 @@ export async function disconnectIntegration(
 }
 
 /** A valid access token, refreshed if it's within a minute of expiry. */
-async function validAccessToken(integration: Integration): Promise<string> {
+async function validAccessToken(
+  integration: Integration,
+  provider: ProviderId,
+): Promise<string> {
   const fresh =
     integration.expiresAt &&
     integration.expiresAt.getTime() - 60_000 > Date.now();
@@ -77,18 +79,72 @@ async function validAccessToken(integration: Integration): Promise<string> {
   if (!integration.refreshToken) {
     throw new ValidationError(
       undefined,
-      "Your YouTube connection expired — reconnect it.",
+      `Your ${PROVIDERS[provider].label} connection expired — reconnect it.`,
     );
   }
-  const refreshed = await refreshAccessToken(integration.refreshToken);
+  const refreshed = await PROVIDERS[provider].refreshToken(
+    integration.refreshToken,
+  );
   await prisma.integration.update({
     where: { id: integration.id },
     data: {
       accessToken: refreshed.accessToken,
       expiresAt: refreshed.expiresAt,
+      ...(refreshed.refreshToken
+        ? { refreshToken: refreshed.refreshToken }
+        : {}),
     },
   });
   return refreshed.accessToken;
+}
+
+/** Loads a post the user owns that has an uploaded video, or throws. */
+async function loadVideoPost(userId: string, slug: string) {
+  const post = await prisma.post.findUnique({ where: { slug } });
+  if (!post) throw new NotFoundError("Post");
+  if (post.authorId !== userId) {
+    throw new AuthorizationError("You can only publish your own posts");
+  }
+  if (!post.videoUrl?.startsWith("/uploads/")) {
+    throw new ValidationError(
+      undefined,
+      "Only uploaded videos can be published to platforms.",
+    );
+  }
+  return post;
+}
+
+function composedCaption(
+  post: { title: string; content: string; captions: unknown; tags: string },
+  platform: string,
+  lang: string,
+  override: string | null,
+): string {
+  const tags = post.tags.split(" ").filter(Boolean);
+  return (
+    override?.trim() ||
+    fullCaption(
+      {
+        title: post.title,
+        content: post.content,
+        captions: toCaptionMap(post.captions),
+        tags,
+      },
+      platform,
+      lang,
+    )
+  );
+}
+
+async function connectedIntegration(userId: string, provider: ProviderId) {
+  const integration = await getIntegration(userId, provider);
+  if (!integration) {
+    throw new ValidationError(
+      undefined,
+      `Connect your ${PROVIDERS[provider].label} account first.`,
+    );
+  }
+  return integration;
 }
 
 const VIDEO_MIME: Record<string, string> = {
@@ -128,15 +184,8 @@ export async function publishPostToYouTube(
     );
   }
 
-  const integration = await getIntegration(userId, "youtube");
-  if (!integration) {
-    throw new ValidationError(
-      undefined,
-      "Connect your YouTube account first.",
-    );
-  }
-
-  const accessToken = await validAccessToken(integration);
+  const integration = await connectedIntegration(userId, "youtube");
+  const accessToken = await validAccessToken(integration, "youtube");
   const bytes = await readFile(
     path.join(process.cwd(), "public", post.videoUrl),
   );
@@ -144,18 +193,7 @@ export async function publishPostToYouTube(
     VIDEO_MIME[path.extname(post.videoUrl).toLowerCase()] ?? "video/mp4";
 
   const tags = post.tags.split(" ").filter(Boolean);
-  const description =
-    captionOverride?.trim() ||
-    fullCaption(
-      {
-        title: post.title,
-        content: post.content,
-        captions: toCaptionMap(post.captions),
-        tags,
-      },
-      "youtube",
-      lang,
-    );
+  const description = composedCaption(post, "youtube", lang, captionOverride);
 
   const { videoId, url } = await uploadVideo({
     accessToken,
@@ -204,4 +242,47 @@ export async function publishPostToYouTube(
     data: { youtubeUrl: url },
   });
   return { url };
+}
+
+/** Publishes a post's video to the author's connected TikTok account. */
+export async function publishPostToTikTok(
+  userId: string,
+  slug: string,
+  lang = "en",
+  captionOverride: string | null = null,
+): Promise<{ url: string | null }> {
+  const post = await loadVideoPost(userId, slug);
+  const integration = await connectedIntegration(userId, "tiktok");
+  const accessToken = await validAccessToken(integration, "tiktok");
+
+  const bytes = await readFile(
+    path.join(process.cwd(), "public", post.videoUrl!),
+  );
+  const contentType =
+    VIDEO_MIME[path.extname(post.videoUrl!).toLowerCase()] ?? "video/mp4";
+
+  return publishTikTokVideo({
+    accessToken,
+    bytes,
+    contentType,
+    caption: composedCaption(post, "tiktok", lang, captionOverride),
+  });
+}
+
+/** Publishes a post's video as an Instagram Reel (needs a public APP_URL). */
+export async function publishPostToInstagram(
+  userId: string,
+  slug: string,
+  lang = "en",
+  captionOverride: string | null = null,
+): Promise<{ url: string }> {
+  const post = await loadVideoPost(userId, slug);
+  const integration = await connectedIntegration(userId, "instagram");
+  const accessToken = await validAccessToken(integration, "instagram");
+
+  return publishReel({
+    accessToken,
+    videoUrl: `${env.APP_URL}${post.videoUrl}`,
+    caption: composedCaption(post, "instagram", lang, captionOverride),
+  });
 }

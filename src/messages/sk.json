@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Predvolene zapnuté. Vypnite pre publikovanie a krížové zdieľanie bez pridania do kanála CreatorHub."
   },
   "integrations": {
-    "title": "Integrácie",
-    "youtube": "YouTube",
-    "connect": "Pripojiť",
-    "disconnect": "Odpojiť",
-    "connectedAs": "Pripojené ako {name}",
-    "connected": "Pripojené",
-    "notConfigured": "Publikovanie na YouTube nie je na tomto serveri nakonfigurované.",
-    "connectHint": "Pripojte kanál, aby ste mohli publikovať nahrané videá na YouTube.",
-    "statusConnected": "YouTube pripojený.",
-    "statusDenied": "Pripojenie k YouTube bolo zrušené.",
-    "statusExpired": "Odkaz vypršal — skúste sa pripojiť znova.",
-    "statusFailed": "Nepodarilo sa pripojiť k YouTube. Skúste to znova.",
-    "publishYouTube": "Publikovať na YouTube",
-    "publishing": "Publikuje sa na YouTube…",
-    "onYouTube": "Na YouTube ↗",
-    "privateNote": "Nahrané ako súkromné. Nastavte na verejné v YouTube Studiu."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Členstvo",

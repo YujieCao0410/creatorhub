@@ -222,22 +222,20 @@
     "shareToCommunityHint": "مُفعَّل افتراضيًا. أوقفه للنشر والنشر المتقاطع دون إضافته إلى موجز CreatorHub."
   },
   "integrations": {
-    "title": "التكاملات",
-    "youtube": "YouTube",
-    "connect": "ربط",
-    "disconnect": "إلغاء الربط",
-    "connectedAs": "متصل باسم {name}",
-    "connected": "متصل",
-    "notConfigured": "النشر على YouTube غير مُهيأ على هذا الخادم.",
-    "connectHint": "اربط قناة لنشر مقاطع الفيديو التي رفعتها على YouTube.",
-    "statusConnected": "تم ربط YouTube.",
-    "statusDenied": "تم إلغاء ربط YouTube.",
-    "statusExpired": "انتهت صلاحية هذا الرابط — حاول الربط مجددًا.",
-    "statusFailed": "تعذّر ربط YouTube. يرجى المحاولة مرة أخرى.",
-    "publishYouTube": "النشر على YouTube",
-    "publishing": "جارٍ النشر على YouTube…",
-    "onYouTube": "على YouTube ↗",
-    "privateNote": "تم الرفع كخاص. اجعله عامًا في YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "العضوية",

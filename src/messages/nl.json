@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Standaard aan. Zet uit om te publiceren en cross-posten zonder dit aan de CreatorHub-feed toe te voegen."
   },
   "integrations": {
-    "title": "Integraties",
-    "youtube": "YouTube",
-    "connect": "Verbinden",
-    "disconnect": "Verbinding verbreken",
-    "connectedAs": "Verbonden als {name}",
-    "connected": "Verbonden",
-    "notConfigured": "Publiceren op YouTube is niet geconfigureerd op deze server.",
-    "connectHint": "Verbind een kanaal om je geüploade video's op YouTube te publiceren.",
-    "statusConnected": "YouTube verbonden.",
-    "statusDenied": "De YouTube-verbinding is geannuleerd.",
-    "statusExpired": "Die link is verlopen — probeer opnieuw te verbinden.",
-    "statusFailed": "Kon geen verbinding maken met YouTube. Probeer het opnieuw.",
-    "publishYouTube": "Publiceren op YouTube",
-    "publishing": "Publiceren op YouTube…",
-    "onYouTube": "Op YouTube ↗",
-    "privateNote": "Geüpload als privé. Maak het openbaar in YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Lidmaatschap",

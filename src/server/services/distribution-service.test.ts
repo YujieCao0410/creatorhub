@@ -49,43 +49,45 @@ describe("distribution", () => {
   it("marks non-API platforms as manual with the chosen language", async () => {
     const post = await videoPost();
     const plan = await distributePost(author.id, post.slug, [
-      { platform: "tiktok", lang: "ja" },
+      { platform: "bilibili", lang: "ja" },
       { platform: "douyin", lang: "zh" },
     ]);
     const byPlatform = Object.fromEntries(
       plan.targets.map((t) => [t.platform, t]),
     );
-    expect(byPlatform.tiktok.status).toBe("manual");
-    expect(byPlatform.tiktok.lang).toBe("ja");
+    expect(byPlatform.bilibili.status).toBe("manual");
+    expect(byPlatform.bilibili.lang).toBe("ja");
     expect(byPlatform.douyin.lang).toBe("zh");
   });
 
   it("stores a per-platform caption override and returns it in the plan", async () => {
     const post = await videoPost();
     const plan = await distributePost(author.id, post.slug, [
-      { platform: "tiktok", lang: "en", caption: "just my custom line #foo" },
+      { platform: "douyin", lang: "zh", caption: "我的自定义文案 #foo" },
     ]);
-    const tiktok = plan.captions.find((c) => c.platform === "tiktok");
-    expect(tiktok?.caption).toBe("just my custom line #foo");
-    const target = plan.targets.find((t) => t.platform === "tiktok");
-    expect(target?.caption).toBe("just my custom line #foo");
+    const douyin = plan.captions.find((c) => c.platform === "douyin");
+    expect(douyin?.caption).toBe("我的自定义文案 #foo");
+    const target = plan.targets.find((t) => t.platform === "douyin");
+    expect(target?.caption).toBe("我的自定义文案 #foo");
   });
 
   it("markTargetPublished records the URL and flips status", async () => {
     const post = await videoPost();
     await distributePost(author.id, post.slug, [
-      { platform: "tiktok", lang: "en" },
+      { platform: "xiaohongshu", lang: "zh" },
     ]);
     const plan = await markTargetPublished(
       author.id,
       post.slug,
-      "tiktok",
-      "https://www.tiktok.com/@me/video/123",
+      "xiaohongshu",
+      "https://www.xiaohongshu.com/explore/123",
     );
-    const tiktok = plan.targets.find((t) => t.platform === "tiktok");
-    expect(tiktok?.status).toBe("published");
-    expect(tiktok?.externalUrl).toBe("https://www.tiktok.com/@me/video/123");
-    expect(tiktok?.publishedAt).not.toBeNull();
+    const target = plan.targets.find((t) => t.platform === "xiaohongshu");
+    expect(target?.status).toBe("published");
+    expect(target?.externalUrl).toBe(
+      "https://www.xiaohongshu.com/explore/123",
+    );
+    expect(target?.publishedAt).not.toBeNull();
   });
 
   it("rejects distribution of another user's post", async () => {
@@ -99,6 +101,18 @@ describe("distribution", () => {
     await expect(
       distributePost(other.id, post.slug, [{ platform: "tiktok", lang: "en" }]),
     ).rejects.toThrow();
+  });
+
+  it("records an API platform as failed when the account isn't connected", async () => {
+    const post = await videoPost();
+    await expect(
+      distributePost(author.id, post.slug, [{ platform: "tiktok", lang: "en" }]),
+    ).rejects.toThrow(/connect your tiktok/i);
+    // The target row still exists, marked failed with the reason.
+    const plan = await getDistributionPlan(author.id, post.slug);
+    const tiktok = plan.targets.find((t) => t.platform === "tiktok");
+    expect(tiktok?.status).toBe("failed");
+    expect(tiktok?.error).toMatch(/connect your tiktok/i);
   });
 
   it("rejects a post with no video", async () => {

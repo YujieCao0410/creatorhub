@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Включено по подразбиране. Изключете, за да публикувате и споделяте на няколко платформи, без да добавяте това в емисията на CreatorHub."
   },
   "integrations": {
-    "title": "Интеграции",
-    "youtube": "YouTube",
-    "connect": "Свържи",
-    "disconnect": "Прекъсни връзката",
-    "connectedAs": "Свързано като {name}",
-    "connected": "Свързано",
-    "notConfigured": "Публикуването в YouTube не е конфигурирано на този сървър.",
-    "connectHint": "Свържете канал, за да публикувате качените си видеа в YouTube.",
-    "statusConnected": "YouTube е свързан.",
-    "statusDenied": "Връзката с YouTube беше отменена.",
-    "statusExpired": "Тази връзка изтече — опитайте да се свържете отново.",
-    "statusFailed": "Неуспешно свързване с YouTube. Опитайте отново.",
-    "publishYouTube": "Публикувай в YouTube",
-    "publishing": "Публикуване в YouTube…",
-    "onYouTube": "В YouTube ↗",
-    "privateNote": "Качено като частно. Направете го публично в YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Членство",

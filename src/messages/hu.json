@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Alapértelmezés szerint be van kapcsolva. Kapcsold ki, hogy közzétedd és több platformra megoszd anélkül, hogy hozzáadnád a CreatorHub hírfolyamához."
   },
   "integrations": {
-    "title": "Integrációk",
-    "youtube": "YouTube",
-    "connect": "Csatlakozás",
-    "disconnect": "Kapcsolat bontása",
-    "connectedAs": "Csatlakozva mint {name}",
-    "connected": "Csatlakozva",
-    "notConfigured": "A YouTube-ra való közzététel nincs beállítva ezen a szerveren.",
-    "connectHint": "Csatlakoztass egy csatornát, hogy a feltöltött videóidat közzétedd a YouTube-on.",
-    "statusConnected": "YouTube csatlakoztatva.",
-    "statusDenied": "A YouTube-kapcsolat megszakadt.",
-    "statusExpired": "Ez a link lejárt — próbálj újra csatlakozni.",
-    "statusFailed": "A YouTube nem csatlakoztatható. Kérlek, próbáld újra.",
-    "publishYouTube": "Közzététel a YouTube-on",
-    "publishing": "Közzététel a YouTube-on…",
-    "onYouTube": "A YouTube-on ↗",
-    "privateNote": "Privátként feltöltve. Tedd nyilvánossá a YouTube Studióban."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Tagság",

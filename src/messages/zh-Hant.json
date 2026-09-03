@@ -222,22 +222,20 @@
     "shareToCommunityHint": "預設開啟。關掉則只發布和跨平台分發，不進 CreatorHub 社群動態。"
   },
   "integrations": {
-    "title": "整合",
-    "youtube": "YouTube",
-    "connect": "連接",
-    "disconnect": "中斷連接",
-    "connectedAs": "已連接：{name}",
-    "connected": "已連接",
-    "notConfigured": "此伺服器未設定 YouTube 發布。",
-    "connectHint": "連接一個頻道後，就能把上傳的影片發布到 YouTube。",
-    "statusConnected": "YouTube 已連接。",
-    "statusDenied": "已取消連接 YouTube。",
-    "statusExpired": "連結已過期，請重新連接。",
-    "statusFailed": "連接 YouTube 失敗，請重試。",
-    "publishYouTube": "發布到 YouTube",
-    "publishing": "正在發布到 YouTube…",
-    "onYouTube": "已在 YouTube ↗",
-    "privateNote": "以不公開方式上傳，去 YouTube Studio 改成公開。"
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "會員",

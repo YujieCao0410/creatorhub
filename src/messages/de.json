@@ -222,22 +222,20 @@
     "shareToCommunityHint": "Standardmäßig an. Deaktivieren, um zu veröffentlichen und cross-zu-posten, ohne dies in den CreatorHub-Feed aufzunehmen."
   },
   "integrations": {
-    "title": "Integrationen",
-    "youtube": "YouTube",
-    "connect": "Verbinden",
-    "disconnect": "Trennen",
-    "connectedAs": "Verbunden als {name}",
-    "connected": "Verbunden",
-    "notConfigured": "Das Veröffentlichen auf YouTube ist auf diesem Server nicht konfiguriert.",
-    "connectHint": "Verbinde einen Kanal, um deine hochgeladenen Videos auf YouTube zu veröffentlichen.",
-    "statusConnected": "YouTube verbunden.",
-    "statusDenied": "Die YouTube-Verbindung wurde abgebrochen.",
-    "statusExpired": "Dieser Link ist abgelaufen – versuche es erneut.",
-    "statusFailed": "YouTube konnte nicht verbunden werden. Bitte versuche es erneut.",
-    "publishYouTube": "Auf YouTube veröffentlichen",
-    "publishing": "Wird auf YouTube veröffentlicht…",
-    "onYouTube": "Auf YouTube ↗",
-    "privateNote": "Als privat hochgeladen. Mach es im YouTube Studio öffentlich."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Mitgliedschaft",

@@ -222,22 +222,20 @@
     "shareToCommunityHint": "På som standard. Slå av for å publisere og krysspublisere uten å legge dette til i CreatorHub-feeden."
   },
   "integrations": {
-    "title": "Integrasjoner",
-    "youtube": "YouTube",
-    "connect": "Koble til",
-    "disconnect": "Koble fra",
-    "connectedAs": "Koblet til som {name}",
-    "connected": "Koblet til",
-    "notConfigured": "Publisering til YouTube er ikke konfigurert på denne serveren.",
-    "connectHint": "Koble til en kanal for å publisere de opplastede videoene dine til YouTube.",
-    "statusConnected": "YouTube koblet til.",
-    "statusDenied": "YouTube-tilkoblingen ble avbrutt.",
-    "statusExpired": "Den lenken utløp — prøv å koble til igjen.",
-    "statusFailed": "Kunne ikke koble til YouTube. Prøv igjen.",
-    "publishYouTube": "Publiser til YouTube",
-    "publishing": "Publiserer til YouTube…",
-    "onYouTube": "På YouTube ↗",
-    "privateNote": "Lastet opp som privat. Gjør den offentlig i YouTube Studio."
+    "title": "Connected accounts",
+    "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connectedAs": "Connected as {name}",
+    "connected": "Connected",
+    "notConfigured": "{provider} publishing isn't configured on this server.",
+    "connectHint": "Connect your {provider} account to publish uploaded videos there.",
+    "status": {
+      "connected": "{provider} connected.",
+      "denied": "{provider} connection was cancelled.",
+      "expired": "That link expired — try connecting again.",
+      "failed": "Couldn't connect {provider}. Please try again."
+    }
   },
   "membership": {
     "title": "Medlemskap",
