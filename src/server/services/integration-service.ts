@@ -283,6 +283,9 @@ export async function publishPostToInstagram(
   return publishReel({
     accessToken,
     videoUrl: `${env.APP_URL}${post.videoUrl}`,
+    coverUrl: post.coverImageUrl?.startsWith("/uploads/")
+      ? `${env.APP_URL}${post.coverImageUrl}`
+      : null,
     caption: composedCaption(post, "instagram", lang, captionOverride),
   });
 }

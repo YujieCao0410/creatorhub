@@ -133,6 +133,8 @@ export async function publishReel(opts: {
   accessToken: string;
   videoUrl: string;
   caption: string;
+  /** Public HTTPS image URL to use as the Reel cover. Optional. */
+  coverUrl?: string | null;
 }): Promise<{ url: string }> {
   if (opts.videoUrl.includes("localhost") || opts.videoUrl.startsWith("http://")) {
     throw new Error(
@@ -141,15 +143,21 @@ export async function publishReel(opts: {
   }
   const { id: igUserId } = await me(opts.accessToken);
 
+  const params = new URLSearchParams({
+    media_type: "REELS",
+    video_url: opts.videoUrl,
+    caption: opts.caption.slice(0, 2200),
+    access_token: opts.accessToken,
+  });
+  // Instagram fetches the cover image itself, so it must be a public HTTPS URL.
+  if (opts.coverUrl && opts.coverUrl.startsWith("https://")) {
+    params.set("cover_url", opts.coverUrl);
+  }
+
   const create = await fetch(`${GRAPH}/${igUserId}/media`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      media_type: "REELS",
-      video_url: opts.videoUrl,
-      caption: opts.caption.slice(0, 2200),
-      access_token: opts.accessToken,
-    }),
+    body: params,
   });
   const createData = await create.json();
   if (!create.ok || !createData.id) {
