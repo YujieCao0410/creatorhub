@@ -3,8 +3,12 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 3100;
 const BASE_URL = `http://localhost:${PORT}`;
 
+const E2E_DATABASE_URL =
+  process.env.E2E_DATABASE_URL ??
+  "postgresql://creatorhub:creatorhub@localhost:5432/creatorhub_e2e?schema=public";
+
 const TEST_ENV = {
-  DATABASE_URL: "file:./e2e.db",
+  DATABASE_URL: E2E_DATABASE_URL,
   JWT_SECRET: "e2e-secret-that-is-at-least-thirty-two-chars",
   APP_URL: BASE_URL,
   RATE_LIMIT_DISABLED: "1",
@@ -12,7 +16,7 @@ const TEST_ENV = {
 
 /**
  * End-to-end tests run a production build of the app against a dedicated
- * SQLite database (prisma/e2e.db), reset and seeded by e2e/global-setup.ts.
+ * Postgres database, reset and seeded by e2e/global-setup.ts.
  */
 export default defineConfig({
   testDir: "./e2e",

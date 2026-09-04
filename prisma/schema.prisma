@@ -1,7 +1,6 @@
 // CreatorHub data model.
-// Provider is SQLite for zero-setup local development. The schema avoids
-// SQLite-only features so it can move to PostgreSQL by changing `provider`
-// and the DATABASE_URL (see docker-compose.yml and README).
+// PostgreSQL in every environment. Local dev runs it from docker-compose.yml
+// (`docker compose up -d`); production uses a managed Postgres (Neon).
 
 generator client {
   provider = "prisma-client-js"
@@ -12,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

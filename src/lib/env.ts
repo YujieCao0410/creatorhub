@@ -41,6 +41,12 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-opus-5"),
 
+  /**
+   * Vercel Blob token. When set, uploads go to Blob object storage (required
+   * on serverless — the filesystem is ephemeral). Unset → local `public/uploads`.
+   */
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
+
   /** Set to "1" to disable API rate limiting (e2e tests only). */
   RATE_LIMIT_DISABLED: z.enum(["0", "1"]).optional(),
 });

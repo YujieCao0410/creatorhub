@@ -131,9 +131,9 @@ export async function searchCreators(
   const users = await prisma.user.findMany({
     where: {
       OR: [
-        { handle: { contains: query } },
-        { name: { contains: query } },
-        { bio: { contains: query } },
+        { handle: { contains: query, mode: "insensitive" } },
+        { name: { contains: query, mode: "insensitive" } },
+        { bio: { contains: query, mode: "insensitive" } },
       ],
     },
     orderBy: { createdAt: "desc" },

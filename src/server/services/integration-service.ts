@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Integration } from "@/generated/prisma";
 import { prisma } from "@/lib/db";
@@ -8,7 +7,7 @@ import {
   ValidationError,
 } from "@/lib/errors";
 import { fullCaption, toCaptionMap } from "@/lib/caption";
-import { env } from "@/lib/env";
+import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
 import { publishReel } from "@/lib/instagram";
 import { PROVIDERS, type ProviderId } from "@/lib/integrations";
 import { publishVideo as publishTikTokVideo } from "@/lib/tiktok";
@@ -105,7 +104,7 @@ async function loadVideoPost(userId: string, slug: string) {
   if (post.authorId !== userId) {
     throw new AuthorizationError("You can only publish your own posts");
   }
-  if (!post.videoUrl?.startsWith("/uploads/")) {
+  if (!isOwnMedia(post.videoUrl)) {
     throw new ValidationError(
       undefined,
       "Only uploaded videos can be published to platforms.",
@@ -177,7 +176,7 @@ export async function publishPostToYouTube(
   if (!post.videoUrl) {
     throw new ValidationError(undefined, "This post has no video to publish.");
   }
-  if (!post.videoUrl.startsWith("/uploads/")) {
+  if (!isOwnMedia(post.videoUrl)) {
     throw new ValidationError(
       undefined,
       "Only uploaded videos can be published to YouTube.",
@@ -186,9 +185,7 @@ export async function publishPostToYouTube(
 
   const integration = await connectedIntegration(userId, "youtube");
   const accessToken = await validAccessToken(integration, "youtube");
-  const bytes = await readFile(
-    path.join(process.cwd(), "public", post.videoUrl),
-  );
+  const bytes = await readMediaBytes(post.videoUrl);
   const contentType =
     VIDEO_MIME[path.extname(post.videoUrl).toLowerCase()] ?? "video/mp4";
 
@@ -209,14 +206,12 @@ export async function publishPostToYouTube(
   // YouTube rejects thumbnails.set while the freshly-uploaded video is still
   // transcoding, so retry a few times with a delay. Failure is non-fatal
   // (unverified channel, persistent processing) — the video keeps publishing.
-  if (post.coverImageUrl?.startsWith("/uploads/")) {
-    const ext = path.extname(post.coverImageUrl).toLowerCase();
+  if (isOwnMedia(post.coverImageUrl)) {
+    const ext = path.extname(post.coverImageUrl!).toLowerCase();
     const coverType = IMAGE_MIME[ext];
     if (coverType) {
       try {
-        const coverBytes = await readFile(
-          path.join(process.cwd(), "public", post.coverImageUrl),
-        );
+        const coverBytes = await readMediaBytes(post.coverImageUrl!);
         for (let attempt = 1; attempt <= 5; attempt++) {
           try {
             await setThumbnail({
@@ -255,9 +250,7 @@ export async function publishPostToTikTok(
   const integration = await connectedIntegration(userId, "tiktok");
   const accessToken = await validAccessToken(integration, "tiktok");
 
-  const bytes = await readFile(
-    path.join(process.cwd(), "public", post.videoUrl!),
-  );
+  const bytes = await readMediaBytes(post.videoUrl!);
   const contentType =
     VIDEO_MIME[path.extname(post.videoUrl!).toLowerCase()] ?? "video/mp4";
 
@@ -282,9 +275,9 @@ export async function publishPostToInstagram(
 
   return publishReel({
     accessToken,
-    videoUrl: `${env.APP_URL}${post.videoUrl}`,
-    coverUrl: post.coverImageUrl?.startsWith("/uploads/")
-      ? `${env.APP_URL}${post.coverImageUrl}`
+    videoUrl: publicMediaUrl(post.videoUrl!),
+    coverUrl: isOwnMedia(post.coverImageUrl)
+      ? publicMediaUrl(post.coverImageUrl!)
       : null,
     caption: composedCaption(post, "instagram", lang, captionOverride),
   });

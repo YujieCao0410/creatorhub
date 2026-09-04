@@ -1,11 +1,13 @@
-# Optional: a local PostgreSQL for developing against a production-like database.
+# Local PostgreSQL for development. CreatorHub uses Postgres in every
+# environment.
 #
 #   docker compose up -d
-#   # then in prisma/schema.prisma set  provider = "postgresql"
-#   # and in .env set the postgresql DATABASE_URL from .env.example
-#   npm run db:migrate
+#   # .env: DATABASE_URL from .env.example
+#   npm run db:deploy
 #
-# SQLite remains the zero-setup default; this file is not required to run the app.
+# The test suites use their own databases on this instance — create them once:
+#   docker compose exec -T db psql -U creatorhub -c "CREATE DATABASE creatorhub_test;"
+#   docker compose exec -T db psql -U creatorhub -c "CREATE DATABASE creatorhub_e2e;"
 
 services:
   db:

@@ -1,19 +1,15 @@
 import { execSync } from "node:child_process";
-import { rmSync } from "node:fs";
+import { TEST_DATABASE_URL } from "./db-url";
 
 /**
- * Runs once before the whole test suite: rebuilds a throwaway SQLite database
- * from the migrations so every run starts from a known, up-to-date schema.
- *
- * The `file:` URL is resolved relative to prisma/schema.prisma, so this is
- * prisma/test.db.
+ * Runs once before the whole test suite: applies the migrations to the
+ * dedicated Postgres test database so the schema is up to date. Per-test
+ * cleanup is `resetDb()` (see src/test/helpers.ts), so no destructive reset
+ * is needed here.
  */
-const TEST_DB_URL = "file:./test.db";
-
 export default function setup() {
-  rmSync("prisma/test.db", { force: true });
   execSync("npx prisma migrate deploy", {
     stdio: "inherit",
-    env: { ...process.env, DATABASE_URL: TEST_DB_URL },
+    env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
   });
 }

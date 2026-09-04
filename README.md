@@ -26,12 +26,12 @@ Live demo: _deploy your own — see [DEPLOYMENT.md](./DEPLOYMENT.md)_
 
 - **Next.js 16** (App Router, Server Components, Route Handlers, `proxy.ts`)
 - **TypeScript**, strict
-- **Prisma 6** ORM — **SQLite** for local dev, **PostgreSQL** for production
+- **Prisma 6** ORM — **PostgreSQL** (local via docker-compose)
 - **Zod** for every request boundary
 - **jose** (JWT) + **bcryptjs** for auth
 - **Stripe** for subscriptions
 - **Tailwind CSS v4**
-- **Vitest** (99 unit/integration tests) + **Playwright** (19 end-to-end tests)
+- **Vitest** (142 unit/integration tests) + **Playwright** (20 end-to-end tests)
 
 ## Architecture
 
@@ -69,7 +69,8 @@ Requires Node 22+.
 ```bash
 npm install
 cp .env.example .env          # fill in JWT_SECRET (>= 32 chars)
-npm run db:migrate            # creates prisma/dev.db and applies migrations
+docker compose up -d          # PostgreSQL on :5432
+npm run db:deploy             # apply migrations
 npm run db:seed               # 2 users (alice = PRO), a few posts
 npm run dev                   # http://localhost:3000
 ```
@@ -95,7 +96,7 @@ See [.env.example](./.env.example). Summary:
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `DATABASE_URL` | yes | `file:./dev.db` (SQLite) or a `postgresql://` URL |
+| `DATABASE_URL` | yes | a `postgresql://` connection string |
 | `JWT_SECRET` | yes | >= 32 chars; `openssl rand -base64 48` |
 | `APP_URL` | prod | Public origin, for Stripe redirect URLs and metadata |
 | `STRIPE_SECRET_KEY` | for billing | Test key `sk_test_…` |
@@ -138,5 +139,4 @@ of the Prisma **CLI** only — not in the runtime bundle.
 
 ## Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel and Docker, plus the
-SQLite → PostgreSQL switch.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel and Docker.

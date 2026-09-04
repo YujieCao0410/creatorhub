@@ -254,9 +254,9 @@ export async function searchPosts(
       published: true,
       shareToCommunity: true,
       OR: [
-        { title: { contains: query } },
-        { excerpt: { contains: query } },
-        { content: { contains: query } },
+        { title: { contains: query, mode: "insensitive" } },
+        { excerpt: { contains: query, mode: "insensitive" } },
+        { content: { contains: query, mode: "insensitive" } },
         { tags: { contains: query.toLowerCase() } },
       ],
     },

@@ -2,16 +2,17 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { put } from "@vercel/blob";
+import { env } from "./env";
 import { ValidationError } from "./errors";
 
 /**
- * Local filesystem storage for uploaded media.
+ * Storage for uploaded media.
  *
- * Files are written under `public/uploads/` and served by Next's static
- * handler at `/uploads/<name>`. This is a development / demo store: on a
- * serverless or container platform the filesystem is ephemeral, so production
- * should swap this module for object storage (S3 / R2 / Vercel Blob). Keeping
- * the surface small — `saveUpload()` — makes that a one-file change.
+ * With `BLOB_READ_WRITE_TOKEN` set, files go to Vercel Blob object storage and
+ * `saveUpload()` returns an absolute `https://…` URL. Without it (local dev),
+ * files are written under `public/uploads/` and served by Next at
+ * `/uploads/<name>`. `src/lib/media.ts` resolves both forms.
  */
 
 export type UploadKind = "image" | "video";
@@ -62,10 +63,20 @@ export async function saveUpload(
     throw new ValidationError(undefined, `${kind} must be ${mb} MB or smaller`);
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
   const name = `${randomUUID()}.${ext}`;
   const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(UPLOAD_DIR, name), bytes);
 
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(`uploads/${name}`, bytes, {
+      access: "public",
+      contentType: file.type,
+      addRandomSuffix: false,
+      token: env.BLOB_READ_WRITE_TOKEN,
+    });
+    return { url: blob.url, type: file.type };
+  }
+
+  await mkdir(UPLOAD_DIR, { recursive: true });
+  await writeFile(path.join(UPLOAD_DIR, name), bytes);
   return { url: `/uploads/${name}`, type: file.type };
 }

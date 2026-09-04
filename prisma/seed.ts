@@ -75,6 +75,7 @@ async function main() {
       create: {
         ...data,
         published: true,
+        shareToCommunity: true,
         publishedAt: new Date(Date.now() - i * 3_600_000),
       },
     });

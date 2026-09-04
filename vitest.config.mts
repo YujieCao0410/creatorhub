@@ -1,9 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
-// SQLite file: URLs are resolved relative to prisma/schema.prisma, so this
-// points at prisma/test.db.
-const TEST_DATABASE_URL = "file:./test.db";
+import { TEST_DATABASE_URL } from "./src/test/db-url";
 
 export default defineConfig({
   test: {
@@ -16,8 +14,8 @@ export default defineConfig({
       JWT_SECRET: "test-secret-that-is-at-least-thirty-two-chars",
     },
     globalSetup: ["./src/test/global-setup.ts"],
-    // Test files share one SQLite database and reset it between tests, so they
-    // must not run in parallel.
+    // Test files share one database and reset it between tests, so they must
+    // not run in parallel.
     fileParallelism: false,
   },
   resolve: {
