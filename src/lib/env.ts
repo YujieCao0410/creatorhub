@@ -37,6 +37,10 @@ const envSchema = z.object({
   INSTAGRAM_APP_ID: z.string().optional(),
   INSTAGRAM_APP_SECRET: z.string().optional(),
 
+  /** Douyin (抖音) Open Platform app, video.create scope. Optional. */
+  DOUYIN_CLIENT_KEY: z.string().optional(),
+  DOUYIN_CLIENT_SECRET: z.string().optional(),
+
   /** Anthropic API, for AI caption + hashtag generation. Optional. */
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-opus-5"),

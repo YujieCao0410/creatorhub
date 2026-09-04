@@ -1,4 +1,5 @@
 import "server-only";
+import * as douyin from "./douyin";
 import * as instagram from "./instagram";
 import * as tiktok from "./tiktok";
 import type { TokenSet } from "./youtube";
@@ -9,7 +10,7 @@ import * as youtube from "./youtube";
  * wraps its platform's OAuth flow so the `/api/integrations/[provider]/*`
  * routes stay provider-agnostic.
  */
-export type ProviderId = "youtube" | "tiktok" | "instagram";
+export type ProviderId = "youtube" | "tiktok" | "instagram" | "douyin";
 
 export type ProviderAuth = {
   id: ProviderId;
@@ -49,8 +50,22 @@ export const PROVIDERS: Record<ProviderId, ProviderAuth> = {
     refreshToken: instagram.refreshAccessToken,
     fetchAccountName: instagram.getUsername,
   },
+  douyin: {
+    id: "douyin",
+    label: "抖音",
+    configured: douyin.douyinConfigured,
+    buildAuthUrl: douyin.buildAuthUrl,
+    exchangeCode: douyin.exchangeCode,
+    refreshToken: douyin.refreshAccessToken,
+    fetchAccountName: douyin.getDisplayName,
+  },
 };
 
 export function isProviderId(value: string): value is ProviderId {
-  return value === "youtube" || value === "tiktok" || value === "instagram";
+  return (
+    value === "youtube" ||
+    value === "tiktok" ||
+    value === "instagram" ||
+    value === "douyin"
+  );
 }

@@ -50,24 +50,24 @@ describe("distribution", () => {
     const post = await videoPost();
     const plan = await distributePost(author.id, post.slug, [
       { platform: "bilibili", lang: "ja" },
-      { platform: "douyin", lang: "zh" },
+      { platform: "xiaohongshu", lang: "zh" },
     ]);
     const byPlatform = Object.fromEntries(
       plan.targets.map((t) => [t.platform, t]),
     );
     expect(byPlatform.bilibili.status).toBe("manual");
     expect(byPlatform.bilibili.lang).toBe("ja");
-    expect(byPlatform.douyin.lang).toBe("zh");
+    expect(byPlatform.xiaohongshu.lang).toBe("zh");
   });
 
   it("stores a per-platform caption override and returns it in the plan", async () => {
     const post = await videoPost();
     const plan = await distributePost(author.id, post.slug, [
-      { platform: "douyin", lang: "zh", caption: "我的自定义文案 #foo" },
+      { platform: "xiaohongshu", lang: "zh", caption: "我的自定义文案 #foo" },
     ]);
-    const douyin = plan.captions.find((c) => c.platform === "douyin");
-    expect(douyin?.caption).toBe("我的自定义文案 #foo");
-    const target = plan.targets.find((t) => t.platform === "douyin");
+    const xhs = plan.captions.find((c) => c.platform === "xiaohongshu");
+    expect(xhs?.caption).toBe("我的自定义文案 #foo");
+    const target = plan.targets.find((t) => t.platform === "xiaohongshu");
     expect(target?.caption).toBe("我的自定义文案 #foo");
   });
 

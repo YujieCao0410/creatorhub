@@ -9,6 +9,7 @@ import {
 import { isLanguageCode } from "@/lib/languages";
 import { getPlatform, isPlatformId, PLATFORMS } from "@/lib/platforms";
 import {
+  publishPostToDouyin,
   publishPostToInstagram,
   publishPostToTikTok,
   publishPostToYouTube,
@@ -177,6 +178,7 @@ const API_PUBLISHERS: Record<
   youtube: publishPostToYouTube,
   tiktok: publishPostToTikTok,
   instagram: publishPostToInstagram,
+  douyin: publishPostToDouyin,
 };
 
 async function runApiPlatform(

@@ -35,7 +35,7 @@ export const PLATFORMS: Platform[] = [
   { id: "tiktok", label: "TikTok", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "instagram", label: "Instagram", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "x", label: "X", defaultLang: "en", api: false, captionLimit: 280, hashtagLimit: 3 },
-  { id: "douyin", label: "抖音", defaultLang: "zh", api: false, captionLimit: 1000, hashtagLimit: 6 },
+  { id: "douyin", label: "抖音", defaultLang: "zh", api: true, captionLimit: 1000, hashtagLimit: 6 },
   { id: "bilibili", label: "哔哩哔哩", defaultLang: "zh", api: false, captionLimit: 2000, hashtagLimit: 10 },
   { id: "xiaohongshu", label: "小红书", defaultLang: "zh", api: false, captionLimit: 1000, hashtagLimit: 10 },
 ];
