@@ -155,6 +155,10 @@ export async function publishVideo(opts: {
         disable_stitch: Boolean(info.stitch_disabled),
         brand_content_toggle: false,
         brand_organic_toggle: false,
+        // TikTok has no separate cover-image upload — it picks a frame from
+        // the video itself. Pin it to frame 0 so a cover baked into the start
+        // of the clip (the creator's own editing trick) is what shows.
+        video_cover_timestamp_ms: 0,
       },
       source_info: {
         source: "FILE_UPLOAD",
