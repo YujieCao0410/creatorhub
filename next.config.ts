@@ -44,8 +44,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Self-contained server bundle for Docker / container deploys.
-  output: "standalone",
+  // Self-contained server bundle for Docker / container deploys. Vercel does its
+  // own output tracing, and `standalone` breaks its post-build step
+  // (`.next/next-server.js.nft.json` ENOENT), so skip it there.
+  output: process.env.VERCEL ? undefined : "standalone",
   // Allow tunnels (ngrok / cloudflared) to reach the dev server — needed to
   // test OAuth callbacks from TikTok/Instagram, which require an HTTPS URL.
   allowedDevOrigins: [
