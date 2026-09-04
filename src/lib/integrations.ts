@@ -1,6 +1,7 @@
 import "server-only";
 import * as douyin from "./douyin";
 import * as instagram from "./instagram";
+import * as threads from "./threads";
 import * as tiktok from "./tiktok";
 import type { TokenSet } from "./youtube";
 import * as youtube from "./youtube";
@@ -10,7 +11,12 @@ import * as youtube from "./youtube";
  * wraps its platform's OAuth flow so the `/api/integrations/[provider]/*`
  * routes stay provider-agnostic.
  */
-export type ProviderId = "youtube" | "tiktok" | "instagram" | "douyin";
+export type ProviderId =
+  | "youtube"
+  | "tiktok"
+  | "instagram"
+  | "douyin"
+  | "threads";
 
 export type ProviderAuth = {
   id: ProviderId;
@@ -59,13 +65,19 @@ export const PROVIDERS: Record<ProviderId, ProviderAuth> = {
     refreshToken: douyin.refreshAccessToken,
     fetchAccountName: douyin.getDisplayName,
   },
+  threads: {
+    id: "threads",
+    label: "Threads",
+    configured: threads.threadsConfigured,
+    buildAuthUrl: threads.buildAuthUrl,
+    exchangeCode: threads.exchangeCode,
+    refreshToken: threads.refreshAccessToken,
+    fetchAccountName: threads.getUsername,
+  },
 };
 
+const PROVIDER_IDS = new Set(Object.keys(PROVIDERS));
+
 export function isProviderId(value: string): value is ProviderId {
-  return (
-    value === "youtube" ||
-    value === "tiktok" ||
-    value === "instagram" ||
-    value === "douyin"
-  );
+  return PROVIDER_IDS.has(value);
 }

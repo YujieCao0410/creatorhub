@@ -41,6 +41,10 @@ const envSchema = z.object({
   DOUYIN_CLIENT_KEY: z.string().optional(),
   DOUYIN_CLIENT_SECRET: z.string().optional(),
 
+  /** Threads API — same Meta app as Instagram, "Access Threads API" product. */
+  THREADS_APP_ID: z.string().optional(),
+  THREADS_APP_SECRET: z.string().optional(),
+
   /** Anthropic API, for AI caption + hashtag generation. Optional. */
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-opus-5"),

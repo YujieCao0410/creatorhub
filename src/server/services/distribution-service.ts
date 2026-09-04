@@ -11,6 +11,7 @@ import { getPlatform, isPlatformId, PLATFORMS } from "@/lib/platforms";
 import {
   publishPostToDouyin,
   publishPostToInstagram,
+  publishPostToThreads,
   publishPostToTikTok,
   publishPostToYouTube,
 } from "./integration-service";
@@ -178,6 +179,7 @@ const API_PUBLISHERS: Record<
   youtube: publishPostToYouTube,
   tiktok: publishPostToTikTok,
   instagram: publishPostToInstagram,
+  threads: publishPostToThreads,
   douyin: publishPostToDouyin,
 };
 

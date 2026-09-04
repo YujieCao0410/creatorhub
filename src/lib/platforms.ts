@@ -14,6 +14,7 @@ export type PlatformId =
   | "youtube"
   | "tiktok"
   | "instagram"
+  | "threads"
   | "x"
   | "douyin"
   | "bilibili"
@@ -34,6 +35,7 @@ export const PLATFORMS: Platform[] = [
   { id: "youtube", label: "YouTube", defaultLang: "en", api: true, captionLimit: 4900, hashtagLimit: 15 },
   { id: "tiktok", label: "TikTok", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "instagram", label: "Instagram", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
+  { id: "threads", label: "Threads", defaultLang: "en", api: true, captionLimit: 500, hashtagLimit: 5 },
   { id: "x", label: "X", defaultLang: "en", api: false, captionLimit: 280, hashtagLimit: 3 },
   { id: "douyin", label: "抖音", defaultLang: "zh", api: true, captionLimit: 1000, hashtagLimit: 6 },
   { id: "bilibili", label: "哔哩哔哩", defaultLang: "zh", api: false, captionLimit: 2000, hashtagLimit: 10 },

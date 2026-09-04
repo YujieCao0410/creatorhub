@@ -11,6 +11,7 @@ import { publishVideo as publishDouyinVideo } from "@/lib/douyin";
 import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
 import { publishReel } from "@/lib/instagram";
 import { PROVIDERS, type ProviderId } from "@/lib/integrations";
+import { publishVideo as publishThreadsVideo } from "@/lib/threads";
 import { publishVideo as publishTikTokVideo } from "@/lib/tiktok";
 import { setThumbnail, type TokenSet, uploadVideo } from "@/lib/youtube";
 
@@ -281,6 +282,24 @@ export async function publishPostToInstagram(
       ? publicMediaUrl(post.coverImageUrl!)
       : null,
     caption: composedCaption(post, "instagram", lang, captionOverride),
+  });
+}
+
+/** Publishes a post's video to Threads (needs a public APP_URL). */
+export async function publishPostToThreads(
+  userId: string,
+  slug: string,
+  lang = "en",
+  captionOverride: string | null = null,
+): Promise<{ url: string }> {
+  const post = await loadVideoPost(userId, slug);
+  const integration = await connectedIntegration(userId, "threads");
+  const accessToken = await validAccessToken(integration, "threads");
+
+  return publishThreadsVideo({
+    accessToken,
+    videoUrl: publicMediaUrl(post.videoUrl!),
+    caption: composedCaption(post, "threads", lang, captionOverride),
   });
 }
 
