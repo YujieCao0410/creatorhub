@@ -19,7 +19,7 @@ export type { CaptionSuggestion } from "@/lib/ai/captions";
 
 /**
  * Generates AI caption + hashtag suggestions for a post in the given languages.
- * FREE accounts get {@link FREE_AI_MONTHLY} runs per month; PRO is unlimited.
+ * PRO-only ({@link FREE_AI_MONTHLY} is 0) — FREE accounts type their own captions.
  * Does NOT save the captions — the creator applies them in the editor.
  */
 export async function suggestCaptions(
@@ -49,7 +49,7 @@ export async function suggestCaptions(
   const isPro = toMembership(user.membership) === "PRO";
   if (!isPro && usedThisMonth >= FREE_AI_MONTHLY) {
     throw new PaymentRequiredError(
-      `You've used your ${FREE_AI_MONTHLY} free AI generations this month. Upgrade to Pro for unlimited.`,
+      "AI captions are a Pro feature. Upgrade to Pro for unlimited AI generations.",
     );
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiCreditsLeft, currentMonthKey, FREE_AI_MONTHLY } from "./membership";
+import { aiCreditsLeft, currentMonthKey } from "./membership";
 
 describe("aiCreditsLeft", () => {
   const month = currentMonthKey();
@@ -10,29 +10,15 @@ describe("aiCreditsLeft", () => {
     ).toBeNull();
   });
 
-  it("counts down from the monthly allowance for FREE", () => {
+  it("is 0 for FREE — AI captions require Pro", () => {
     expect(
-      aiCreditsLeft({ membership: "FREE", aiUsedCount: 1, aiUsedMonth: month }),
-    ).toBe(FREE_AI_MONTHLY - 1);
+      aiCreditsLeft({ membership: "FREE", aiUsedCount: 0, aiUsedMonth: month }),
+    ).toBe(0);
   });
 
-  it("resets when the stored month is stale", () => {
+  it("never goes negative regardless of stored usage", () => {
     expect(
-      aiCreditsLeft({
-        membership: "FREE",
-        aiUsedCount: FREE_AI_MONTHLY,
-        aiUsedMonth: "2000-01",
-      }),
-    ).toBe(FREE_AI_MONTHLY);
-  });
-
-  it("never goes negative", () => {
-    expect(
-      aiCreditsLeft({
-        membership: "FREE",
-        aiUsedCount: FREE_AI_MONTHLY + 5,
-        aiUsedMonth: month,
-      }),
+      aiCreditsLeft({ membership: "FREE", aiUsedCount: 50, aiUsedMonth: "2000-01" }),
     ).toBe(0);
   });
 });

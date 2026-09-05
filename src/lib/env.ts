@@ -45,6 +45,10 @@ const envSchema = z.object({
   THREADS_APP_ID: z.string().optional(),
   THREADS_APP_SECRET: z.string().optional(),
 
+  /** Facebook Page publishing — same Meta app, classic Facebook Login. */
+  FACEBOOK_APP_ID: z.string().optional(),
+  FACEBOOK_APP_SECRET: z.string().optional(),
+
   /** Anthropic API, for AI caption + hashtag generation. Optional. */
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-opus-5"),

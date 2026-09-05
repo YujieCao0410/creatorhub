@@ -10,6 +10,7 @@ import { isLanguageCode } from "@/lib/languages";
 import { getPlatform, isPlatformId, PLATFORMS } from "@/lib/platforms";
 import {
   publishPostToDouyin,
+  publishPostToFacebook,
   publishPostToInstagram,
   publishPostToThreads,
   publishPostToTikTok,
@@ -180,6 +181,7 @@ const API_PUBLISHERS: Record<
   tiktok: publishPostToTikTok,
   instagram: publishPostToInstagram,
   threads: publishPostToThreads,
+  facebook: publishPostToFacebook,
   douyin: publishPostToDouyin,
 };
 

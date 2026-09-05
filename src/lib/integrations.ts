@@ -1,5 +1,6 @@
 import "server-only";
 import * as douyin from "./douyin";
+import * as facebook from "./facebook";
 import * as instagram from "./instagram";
 import * as threads from "./threads";
 import * as tiktok from "./tiktok";
@@ -16,7 +17,8 @@ export type ProviderId =
   | "tiktok"
   | "instagram"
   | "douyin"
-  | "threads";
+  | "threads"
+  | "facebook";
 
 export type ProviderAuth = {
   id: ProviderId;
@@ -73,6 +75,15 @@ export const PROVIDERS: Record<ProviderId, ProviderAuth> = {
     exchangeCode: threads.exchangeCode,
     refreshToken: threads.refreshAccessToken,
     fetchAccountName: threads.getUsername,
+  },
+  facebook: {
+    id: "facebook",
+    label: "Facebook",
+    configured: facebook.facebookConfigured,
+    buildAuthUrl: facebook.buildAuthUrl,
+    exchangeCode: facebook.exchangeCode,
+    refreshToken: facebook.refreshAccessToken,
+    fetchAccountName: facebook.getPageName,
   },
 };
 
