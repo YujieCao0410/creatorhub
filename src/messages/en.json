@@ -187,7 +187,7 @@
     "newPost": "New post",
     "editPost": "Edit post",
     "title": "Title",
-    "titleHint": "The caption for your video or post",
+    "titleHint": "Optional — for your own reference only. Write the actual caption below, per language.",
     "excerpt": "Excerpt",
     "excerptHint": "Optional one-line summary shown in lists",
     "cover": "Cover image",

@@ -58,8 +58,9 @@ export async function exchangeCode(code: string): Promise<TokenSet> {
   });
   const shortData = await shortRes.json();
   if (!shortRes.ok || !shortData.access_token) {
+    console.error("[threads] token exchange response:", JSON.stringify(shortData));
     throw new Error(
-      `Threads token exchange failed: ${shortData.error_message ?? shortRes.status}`,
+      `Threads token exchange failed: ${shortData.error_message ?? shortData.error?.message ?? shortRes.status}`,
     );
   }
 

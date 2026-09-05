@@ -187,7 +187,7 @@
     "newPost": "新帖子",
     "editPost": "编辑帖子",
     "title": "标题",
-    "titleHint": "视频或帖子的文案",
+    "titleHint": "选填,只是给你自己看的备注。真正发布的文案在下面按语言分别填。",
     "excerpt": "摘要",
     "excerptHint": "可选，列表里显示的一行简介",
     "cover": "封面图",
