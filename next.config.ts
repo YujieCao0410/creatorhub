@@ -30,7 +30,9 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
       // Direct browser -> Vercel Blob uploads (bypasses the serverless body-size cap).
-      "connect-src 'self' https://*.public.blob.vercel-storage.com",
+      // The client SDK resolves the actual storage endpoint via vercel.com first,
+      // then PUTs the file straight to the *.public.blob.vercel-storage.com host.
+      "connect-src 'self' https://vercel.com https://*.public.blob.vercel-storage.com",
       "frame-src https://js.stripe.com https://checkout.stripe.com",
     ].join("; "),
   },
@@ -60,6 +62,17 @@ const nextConfig: NextConfig = {
   // Keep Prisma's engine out of the server bundle; it's loaded at runtime.
   serverExternalPackages: ["@prisma/client", "prisma"],
   poweredByHeader: false,
+  turbopack: {
+    resolveAlias: {
+      // @vercel/blob/client (used by MediaUpload for direct browser->Blob
+      // uploads) imports the Node-only `undici` package and relies on
+      // bundlers honoring package.json's legacy `browser` field to swap in
+      // a `globalThis.fetch` shim instead. Webpack does this automatically;
+      // Turbopack doesn't, so without this alias the real `undici` ends up
+      // in the browser bundle and uploads hang silently instead of failing.
+      undici: { browser: "@vercel/blob/dist/undici-browser.js" },
+    },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

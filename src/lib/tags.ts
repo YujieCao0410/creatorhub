@@ -3,7 +3,10 @@ import { z } from "zod";
 /** Hashtag rules: letters (any script), digits, `_`, `-`; 1–30 chars. */
 export const TAG_RE = /^[\p{L}\p{N}_-]{1,30}$/u;
 
-export const MAX_TAGS = 10;
+// 5, not the 10-15 some platforms allow — Threads caps at 5 hashtags and we'd
+// rather a creator's tag list already fit everywhere than get silently
+// truncated per platform (see hashtagLine() in caption.ts).
+export const MAX_TAGS = 5;
 
 /** "design typography" → ["design", "typography"] */
 export function parseTags(stored: string | null | undefined): string[] {

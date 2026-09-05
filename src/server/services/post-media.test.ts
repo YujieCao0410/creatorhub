@@ -34,14 +34,14 @@ describe("post video + tags", () => {
     expect(post.tags).toEqual(["design", "workflow", "typography"]);
   });
 
-  it("caps tags at 10", async () => {
+  it("caps tags at 5", async () => {
     const post = await createPost(author.id, {
       title: "Many tags",
       content: "…",
       tags: Array.from({ length: 15 }, (_, i) => `tag${i}`),
       publish: false,
     });
-    expect(post.tags).toHaveLength(10);
+    expect(post.tags).toHaveLength(5);
   });
 
   it("round-trips through getPostBySlug", async () => {

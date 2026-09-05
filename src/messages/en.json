@@ -199,7 +199,7 @@
     "contentHint": "Optional when you have a video or cover image",
     "tags": "Tags",
     "tagsPlaceholder": "Add a tag and press Enter",
-    "tagsHint": "Up to 10. Used for search and discovery.",
+    "tagsHint": "Up to 5 — some platforms cap hashtags there. Used for search and discovery.",
     "uploadImage": "Upload image",
     "uploadVideo": "Upload video",
     "replace": "Replace",

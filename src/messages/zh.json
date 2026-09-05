@@ -199,7 +199,7 @@
     "contentHint": "有视频或封面图时可以不填",
     "tags": "标签",
     "tagsPlaceholder": "输入标签，按回车添加",
-    "tagsHint": "最多 10 个，用于搜索和发现。",
+    "tagsHint": "最多 5 个(有的平台标签数上限就是 5),用于搜索和发现。",
     "uploadImage": "上传图片",
     "uploadVideo": "上传视频",
     "replace": "替换",
