@@ -29,7 +29,8 @@ const securityHeaders = [
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
       `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
-      "connect-src 'self'",
+      // Direct browser -> Vercel Blob uploads (bypasses the serverless body-size cap).
+      "connect-src 'self' https://*.public.blob.vercel-storage.com",
       "frame-src https://js.stripe.com https://checkout.stripe.com",
     ].join("; "),
   },

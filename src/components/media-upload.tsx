@@ -1,10 +1,46 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useRef, useState } from "react";
 import { useT } from "@/components/i18n-provider";
 import { Button } from "@/components/ui/button";
 
 type UploadResponse = { url: string; type: string };
+
+/**
+ * Uploads straight from the browser to Vercel Blob (bypassing the ~4.5 MB
+ * request-body cap on Vercel's serverless routes — most video clips exceed
+ * it). Falls back to the legacy same-origin multipart route when Blob isn't
+ * configured (local dev without `BLOB_READ_WRITE_TOKEN`, or any error
+ * standing up the direct upload) — that route still works for small files.
+ */
+async function uploadFile(
+  file: File,
+  kind: "image" | "video",
+): Promise<UploadResponse> {
+  try {
+    const blob = await upload(file.name, file, {
+      access: "public",
+      handleUploadUrl: "/api/uploads/blob-token",
+      clientPayload: JSON.stringify({ kind }),
+    });
+    return { url: blob.url, type: file.type };
+  } catch {
+    const form = new FormData();
+    form.set("file", file);
+    form.set("kind", kind);
+    const res = await fetch("/api/uploads", { method: "POST", body: form });
+    const body = (await res.json().catch(() => null)) as
+      | UploadResponse
+      | { error?: { message?: string } }
+      | null;
+    if (!res.ok || !body || !("url" in body)) {
+      const message = (body && "error" in body && body.error?.message) || null;
+      throw new Error(message ?? "Upload failed");
+    }
+    return body;
+  }
+}
 
 export function MediaUpload({
   kind,
@@ -28,23 +64,10 @@ export function MediaUpload({
     setUploading(true);
     setError(null);
     try {
-      const form = new FormData();
-      form.set("file", file);
-      form.set("kind", kind);
-      const res = await fetch("/api/uploads", { method: "POST", body: form });
-      const body = (await res.json().catch(() => null)) as
-        | UploadResponse
-        | { error?: { message?: string } }
-        | null;
-      if (!res.ok || !body || !("url" in body)) {
-        const message =
-          (body && "error" in body && body.error?.message) ||
-          t("editor.uploadFailed");
-        throw new Error(message);
-      }
-      onChange(body.url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("editor.uploadFailed"));
+      const { url } = await uploadFile(file, kind);
+      onChange(url);
+    } catch {
+      setError(t("editor.uploadFailed"));
     } finally {
       setUploading(false);
     }
