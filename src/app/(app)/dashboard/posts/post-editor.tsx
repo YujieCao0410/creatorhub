@@ -234,19 +234,7 @@ export function PostEditor({
           onChange={(url) => set("videoUrl", url)}
         />
       </Field>
-
-      <Field
-        label={t("editor.cover")}
-        htmlFor="cover"
-        hint={t("editor.coverHint")}
-        error={fieldErrors.coverImageUrl}
-      >
-        <MediaUpload
-          kind="image"
-          value={values.coverImageUrl}
-          onChange={(url) => set("coverImageUrl", url)}
-        />
-      </Field>
+      <p className="-mt-3 text-xs text-muted">{t("editor.coverIsFirstFrame")}</p>
 
       <CaptionsEditor
         captions={values.captions}
