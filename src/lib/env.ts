@@ -37,10 +37,6 @@ const envSchema = z.object({
   INSTAGRAM_APP_ID: z.string().optional(),
   INSTAGRAM_APP_SECRET: z.string().optional(),
 
-  /** Douyin (抖音) Open Platform app, video.create scope. Optional. */
-  DOUYIN_CLIENT_KEY: z.string().optional(),
-  DOUYIN_CLIENT_SECRET: z.string().optional(),
-
   /** Threads API — same Meta app as Instagram, "Access Threads API" product. */
   THREADS_APP_ID: z.string().optional(),
   THREADS_APP_SECRET: z.string().optional(),

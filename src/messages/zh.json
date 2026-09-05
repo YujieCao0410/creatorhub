@@ -269,7 +269,7 @@
   "distribute": {
     "open": "分发",
     "title": "把这条视频分发出去",
-    "hint": "YouTube 通过 API 直接发布,其他平台生成文案供你复制。发布前可以在下面单独改每个平台的文案。",
+    "hint": "CreatorHub 通过各平台 API 直接发布到已连接的账号。发布前可以在下面单独改每个平台的文案。",
     "manual": "手动",
     "publishSelected": "发布所选平台",
     "loadFailed": "加载分发信息失败",

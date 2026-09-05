@@ -1,5 +1,4 @@
 import "server-only";
-import * as douyin from "./douyin";
 import * as facebook from "./facebook";
 import * as instagram from "./instagram";
 import * as threads from "./threads";
@@ -16,7 +15,6 @@ export type ProviderId =
   | "youtube"
   | "tiktok"
   | "instagram"
-  | "douyin"
   | "threads"
   | "facebook";
 
@@ -57,15 +55,6 @@ export const PROVIDERS: Record<ProviderId, ProviderAuth> = {
     exchangeCode: instagram.exchangeCode,
     refreshToken: instagram.refreshAccessToken,
     fetchAccountName: instagram.getUsername,
-  },
-  douyin: {
-    id: "douyin",
-    label: "抖音",
-    configured: douyin.douyinConfigured,
-    buildAuthUrl: douyin.buildAuthUrl,
-    exchangeCode: douyin.exchangeCode,
-    refreshToken: douyin.refreshAccessToken,
-    fetchAccountName: douyin.getDisplayName,
   },
   threads: {
     id: "threads",

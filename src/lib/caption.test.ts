@@ -37,7 +37,7 @@ describe("captionBody", () => {
 describe("hashtagLine", () => {
   it("prefixes # and respects the platform's hashtag limit", () => {
     const many = Array.from({ length: 20 }, (_, i) => `t${i}`);
-    expect(hashtagLine(many, "douyin").split(" ")).toHaveLength(6);
+    expect(hashtagLine(many, "threads").split(" ")).toHaveLength(5);
     expect(hashtagLine(["a", "b"], "youtube")).toBe("#a #b");
   });
 });
@@ -51,7 +51,7 @@ describe("fullCaption", () => {
 
   it("uses the requested language's caption", () => {
     expect(
-      fullCaption({ ...post, captions: { zh: "跳舞" } }, "xiaohongshu", "zh"),
+      fullCaption({ ...post, captions: { zh: "跳舞" } }, "instagram", "zh"),
     ).toBe("跳舞\n\n#dance #fyp #foxc");
   });
 });

@@ -9,7 +9,6 @@ import {
 import { isLanguageCode } from "@/lib/languages";
 import { getPlatform, isPlatformId, PLATFORMS } from "@/lib/platforms";
 import {
-  publishPostToDouyin,
   publishPostToFacebook,
   publishPostToInstagram,
   publishPostToThreads,
@@ -110,8 +109,9 @@ export async function getDistributionPlan(
 
 /**
  * Sends a post's video to the chosen platforms, each in a chosen language.
- * YouTube goes through its API; every other platform is recorded as `manual` —
- * the creator uploads by hand and calls {@link markTargetPublished} once done.
+ * Every platform publishes through its official API; a failure on one doesn't
+ * block the others. The `manual` branch below is dead today but kept so a
+ * future non-API destination still records a target.
  */
 export async function distributePost(
   userId: string,
@@ -182,7 +182,6 @@ const API_PUBLISHERS: Record<
   instagram: publishPostToInstagram,
   threads: publishPostToThreads,
   facebook: publishPostToFacebook,
-  douyin: publishPostToDouyin,
 };
 
 async function runApiPlatform(

@@ -1,10 +1,10 @@
 /**
  * The publishing destinations CreatorHub can distribute a video to.
  *
- * `api: true`  — we push the video through the platform's official API.
- * `api: false` — no usable public upload API (or it needs an approved dev app),
- *                so we generate a ready-to-paste caption package and the creator
- *                uploads by hand, then marks the target done.
+ * Every platform here publishes through its official API — CreatorHub only
+ * lists a destination it can post to automatically. Platforms without a usable
+ * public upload API (X, Bilibili, Xiaohongshu, Douyin for individual devs, …)
+ * are deliberately left out.
  *
  * `defaultLang` is the caption language a platform gets unless the creator picks
  * another — it's only a default, every target's language is editable.
@@ -15,16 +15,13 @@ export type PlatformId =
   | "tiktok"
   | "instagram"
   | "threads"
-  | "facebook"
-  | "x"
-  | "douyin"
-  | "bilibili"
-  | "xiaohongshu";
+  | "facebook";
 
 export type Platform = {
   id: PlatformId;
   label: string;
   defaultLang: string;
+  /** Always true today — kept so the distribute flow can branch on it. */
   api: boolean;
   /** Soft caption length guidance shown in the UI. */
   captionLimit: number;
@@ -38,10 +35,6 @@ export const PLATFORMS: Platform[] = [
   { id: "instagram", label: "Instagram", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "threads", label: "Threads", defaultLang: "en", api: true, captionLimit: 500, hashtagLimit: 5 },
   { id: "facebook", label: "Facebook", defaultLang: "en", api: true, captionLimit: 5000, hashtagLimit: 10 },
-  { id: "x", label: "X", defaultLang: "en", api: false, captionLimit: 280, hashtagLimit: 3 },
-  { id: "douyin", label: "抖音", defaultLang: "zh", api: true, captionLimit: 1000, hashtagLimit: 6 },
-  { id: "bilibili", label: "哔哩哔哩", defaultLang: "zh", api: false, captionLimit: 2000, hashtagLimit: 10 },
-  { id: "xiaohongshu", label: "小红书", defaultLang: "zh", api: false, captionLimit: 1000, hashtagLimit: 10 },
 ];
 
 const BY_ID = new Map(PLATFORMS.map((p) => [p.id, p]));

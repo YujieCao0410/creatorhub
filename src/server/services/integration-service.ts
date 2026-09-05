@@ -7,7 +7,6 @@ import {
   ValidationError,
 } from "@/lib/errors";
 import { fullCaption, toCaptionMap } from "@/lib/caption";
-import { publishVideo as publishDouyinVideo } from "@/lib/douyin";
 import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
 import { publishVideo as publishFacebookVideo } from "@/lib/facebook";
 import { publishReel } from "@/lib/instagram";
@@ -319,24 +318,5 @@ export async function publishPostToFacebook(
     accessToken,
     videoUrl: publicMediaUrl(post.videoUrl!),
     caption: composedCaption(post, "facebook", lang, captionOverride),
-  });
-}
-
-/** Publishes a post's video to Douyin (video.create scope). */
-export async function publishPostToDouyin(
-  userId: string,
-  slug: string,
-  lang = "zh",
-  captionOverride: string | null = null,
-): Promise<{ url: string | null }> {
-  const post = await loadVideoPost(userId, slug);
-  const integration = await connectedIntegration(userId, "douyin");
-  const accessToken = await validAccessToken(integration, "douyin");
-  const bytes = await readMediaBytes(post.videoUrl!);
-
-  return publishDouyinVideo({
-    accessToken,
-    bytes,
-    caption: composedCaption(post, "douyin", lang, captionOverride),
   });
 }

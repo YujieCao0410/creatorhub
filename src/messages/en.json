@@ -269,7 +269,7 @@
   "distribute": {
     "open": "Distribute",
     "title": "Distribute this video",
-    "hint": "YouTube publishes over its API. Other platforms give you a caption to paste. Edit each platform's caption below before you publish.",
+    "hint": "CreatorHub publishes to each connected platform through its API. Edit any platform's caption below before you publish.",
     "manual": "Manual",
     "publishSelected": "Publish selected",
     "loadFailed": "Could not load distribution info",

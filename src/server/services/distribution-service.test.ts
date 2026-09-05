@@ -36,57 +36,44 @@ describe("distribution", () => {
     const post = await videoPost();
     const plan = await getDistributionPlan(author.id, post.slug);
 
-    const douyin = plan.captions.find((c) => c.platform === "douyin");
-    expect(douyin?.lang).toBe("zh");
-    expect(douyin?.caption).toContain("看这个");
-    expect(douyin?.caption).toContain("#dance");
+    // Every platform defaults to English; with no English caption on the post
+    // the body falls back to another available caption, hashtags still appended.
+    const tiktok = plan.captions.find((c) => c.platform === "tiktok");
+    expect(tiktok?.lang).toBe("en");
+    expect(tiktok?.caption).toContain("#dance");
 
-    // No English caption on the post → YouTube falls back to another caption.
     const youtube = plan.captions.find((c) => c.platform === "youtube");
     expect(youtube?.lang).toBe("en");
   });
 
-  it("marks non-API platforms as manual with the chosen language", async () => {
+  it("stores a per-platform caption override on the recorded target", async () => {
     const post = await videoPost();
-    const plan = await distributePost(author.id, post.slug, [
-      { platform: "bilibili", lang: "ja" },
-      { platform: "xiaohongshu", lang: "zh" },
-    ]);
-    const byPlatform = Object.fromEntries(
-      plan.targets.map((t) => [t.platform, t]),
-    );
-    expect(byPlatform.bilibili.status).toBe("manual");
-    expect(byPlatform.bilibili.lang).toBe("ja");
-    expect(byPlatform.xiaohongshu.lang).toBe("zh");
-  });
-
-  it("stores a per-platform caption override and returns it in the plan", async () => {
-    const post = await videoPost();
-    const plan = await distributePost(author.id, post.slug, [
-      { platform: "xiaohongshu", lang: "zh", caption: "我的自定义文案 #foo" },
-    ]);
-    const xhs = plan.captions.find((c) => c.platform === "xiaohongshu");
-    expect(xhs?.caption).toBe("我的自定义文案 #foo");
-    const target = plan.targets.find((t) => t.platform === "xiaohongshu");
-    expect(target?.caption).toBe("我的自定义文案 #foo");
+    // The account isn't connected so the publish fails, but the target row is
+    // still written with the override caption we passed in.
+    await expect(
+      distributePost(author.id, post.slug, [
+        { platform: "tiktok", lang: "en", caption: "my custom caption #foo" },
+      ]),
+    ).rejects.toThrow();
+    const plan = await getDistributionPlan(author.id, post.slug);
+    const target = plan.targets.find((t) => t.platform === "tiktok");
+    expect(target?.caption).toBe("my custom caption #foo");
   });
 
   it("markTargetPublished records the URL and flips status", async () => {
     const post = await videoPost();
-    await distributePost(author.id, post.slug, [
-      { platform: "xiaohongshu", lang: "zh" },
-    ]);
+    await expect(
+      distributePost(author.id, post.slug, [{ platform: "tiktok", lang: "en" }]),
+    ).rejects.toThrow();
     const plan = await markTargetPublished(
       author.id,
       post.slug,
-      "xiaohongshu",
-      "https://www.xiaohongshu.com/explore/123",
+      "tiktok",
+      "https://www.tiktok.com/@a/video/123",
     );
-    const target = plan.targets.find((t) => t.platform === "xiaohongshu");
+    const target = plan.targets.find((t) => t.platform === "tiktok");
     expect(target?.status).toBe("published");
-    expect(target?.externalUrl).toBe(
-      "https://www.xiaohongshu.com/explore/123",
-    );
+    expect(target?.externalUrl).toBe("https://www.tiktok.com/@a/video/123");
     expect(target?.publishedAt).not.toBeNull();
   });
 
