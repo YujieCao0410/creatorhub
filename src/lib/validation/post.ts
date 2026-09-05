@@ -2,7 +2,8 @@ import { z } from "zod";
 import { tagArraySchema } from "@/lib/tags";
 import { paginationQuerySchema } from "./common";
 
-const title = z.string().trim().min(1, "Title is required").max(140);
+// Optional — plenty of video posts have nothing to say beyond the caption.
+const title = z.string().trim().max(140).optional().default("");
 const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
 
