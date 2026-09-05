@@ -223,7 +223,11 @@ export function PostEditor({
         />
       </Field>
 
-      <Field label={t("editor.video")} htmlFor="video">
+      <Field
+        label={t("editor.video")}
+        htmlFor="video"
+        hint={t("editor.videoHint")}
+      >
         <MediaUpload
           kind="video"
           value={values.videoUrl}

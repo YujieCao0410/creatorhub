@@ -193,6 +193,7 @@
     "cover": "封面图",
     "coverHint": "显示在列表里，也是视频的缩略图",
     "video": "视频",
+    "videoHint": "支持 MP4、WebM、MOV,最大 200MB",
     "coverImageUrl": "封面图链接",
     "content": "正文",
     "contentHint": "有视频或封面图时可以不填",

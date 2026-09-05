@@ -193,6 +193,7 @@
     "cover": "Cover image",
     "coverHint": "Shown in lists and as the video thumbnail",
     "video": "Video",
+    "videoHint": "MP4, WebM, or MOV — up to 200MB",
     "coverImageUrl": "Cover image URL",
     "content": "Content",
     "contentHint": "Optional when you have a video or cover image",
