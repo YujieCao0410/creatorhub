@@ -226,6 +226,10 @@
   "integrations": {
     "title": "已连接的账号",
     "hint": "连接账号后 CreatorHub 可以直接发布过去。没连接也没关系,分发时会给你文案手动粘贴。",
+    "firstTimeTitle": "第一次发布前",
+    "firstTimeStep1": "在这个浏览器里,把你要发布的每个平台账号都登录好。",
+    "firstTimeStep2": "在下面挨个点「连接」并授权 —— 每个平台只需一次,之后一直保持连接。",
+    "firstTimeStep3": "之后直接上传视频(把封面做在第一帧)点发布,CreatorHub 会自动发到所有平台。",
     "connect": "连接",
     "disconnect": "断开",
     "connectedAs": "已连接:{name}",

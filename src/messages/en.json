@@ -226,6 +226,10 @@
   "integrations": {
     "title": "Connected accounts",
     "hint": "Connect an account and CreatorHub can publish there directly. Not connected? Distribute still gives you a caption to paste.",
+    "firstTimeTitle": "Before your first publish",
+    "firstTimeStep1": "In this browser, log in to every platform account you want to publish to.",
+    "firstTimeStep2": "Click Connect on each one below and approve access — once per platform, then it stays connected.",
+    "firstTimeStep3": "After that, just upload a video (put your cover in the first frame) and hit publish — CreatorHub posts it everywhere.",
     "connect": "Connect",
     "disconnect": "Disconnect",
     "connectedAs": "Connected as {name}",

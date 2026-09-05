@@ -56,6 +56,16 @@ export function IntegrationsPanel({ providers }: { providers: ProviderRow[] }) {
     <Card className="space-y-3">
       <h2 className="font-medium">{t("integrations.title")}</h2>
       <p className="text-xs text-muted">{t("integrations.hint")}</p>
+
+      <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
+        <p className="font-medium">{t("integrations.firstTimeTitle")}</p>
+        <ol className="mt-1 list-decimal space-y-1 pl-5 text-muted">
+          <li>{t("integrations.firstTimeStep1")}</li>
+          <li>{t("integrations.firstTimeStep2")}</li>
+          <li>{t("integrations.firstTimeStep3")}</li>
+        </ol>
+      </div>
+
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
 
       <div className="divide-y divide-border">
