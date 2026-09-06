@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from "@/lib/errors";
 import { fullCaption, toCaptionMap } from "@/lib/caption";
+import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
 import { publishVideo as publishFacebookVideo } from "@/lib/facebook";
 import { publishReel } from "@/lib/instagram";
@@ -44,18 +45,21 @@ export async function saveIntegration(
   tokens: TokenSet,
   accountName: string | null,
 ): Promise<void> {
+  const encryptedRefresh = tokens.refreshToken
+    ? encryptSecret(tokens.refreshToken)
+    : null;
   const data = {
     accountName,
-    accessToken: tokens.accessToken,
+    accessToken: encryptSecret(tokens.accessToken),
     scope: tokens.scope,
     expiresAt: tokens.expiresAt,
     // Google only returns a refresh token on the first consent; keep the old
     // one if this re-auth didn't include a new one.
-    ...(tokens.refreshToken ? { refreshToken: tokens.refreshToken } : {}),
+    ...(encryptedRefresh ? { refreshToken: encryptedRefresh } : {}),
   };
   await prisma.integration.upsert({
     where: { userId_provider: { userId, provider } },
-    create: { userId, provider, refreshToken: tokens.refreshToken, ...data },
+    create: { userId, provider, refreshToken: encryptedRefresh, ...data },
     update: data,
   });
 }
@@ -75,7 +79,7 @@ async function validAccessToken(
   const fresh =
     integration.expiresAt &&
     integration.expiresAt.getTime() - 60_000 > Date.now();
-  if (fresh) return integration.accessToken;
+  if (fresh) return decryptSecret(integration.accessToken);
 
   if (!integration.refreshToken) {
     throw new ValidationError(
@@ -84,15 +88,15 @@ async function validAccessToken(
     );
   }
   const refreshed = await PROVIDERS[provider].refreshToken(
-    integration.refreshToken,
+    decryptSecret(integration.refreshToken),
   );
   await prisma.integration.update({
     where: { id: integration.id },
     data: {
-      accessToken: refreshed.accessToken,
+      accessToken: encryptSecret(refreshed.accessToken),
       expiresAt: refreshed.expiresAt,
       ...(refreshed.refreshToken
-        ? { refreshToken: refreshed.refreshToken }
+        ? { refreshToken: encryptSecret(refreshed.refreshToken) }
         : {}),
     },
   });

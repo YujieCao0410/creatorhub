@@ -18,6 +18,13 @@ const envSchema = z.object({
   /** Public origin, used to build Stripe redirect URLs. */
   APP_URL: z.url().default("http://localhost:3000"),
 
+  /**
+   * AES-256 key for encrypting stored OAuth tokens at rest (32 bytes as 64 hex
+   * chars or base64). Optional — without it tokens are stored in plaintext, so
+   * production MUST set it. Generate with `openssl rand -hex 32`.
+   */
+  TOKEN_ENCRYPTION_KEY: z.string().optional(),
+
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   /** Default Pro price (CAD). */
