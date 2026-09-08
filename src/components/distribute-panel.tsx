@@ -26,6 +26,9 @@ export function DistributePanel({ post }: { post: PostSummary }) {
   const [lang, setLang] = useState<Record<string, string>>({});
   const [caption, setCaption] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   const publishedCount = targets.filter((x) => x.status === "published").length;
@@ -97,13 +100,40 @@ export function DistributePanel({ post }: { post: PostSummary }) {
   }
 
   async function distribute() {
+    const selected = [...checked];
     setBusy(true);
     setError(null);
+    setProgress({ done: 0, total: selected.length });
+
+    // The POST publishes every platform in one request; poll the plan while it
+    // runs so the user watches each one land instead of staring at a spinner.
+    let polling = true;
+    (async () => {
+      while (polling) {
+        await new Promise((r) => setTimeout(r, 2000));
+        if (!polling) break;
+        try {
+          const plan = await api.get<DistributionPlan>(
+            `/api/posts/${post.slug}/distribute`,
+          );
+          setTargets(plan.targets);
+          const done = plan.targets.filter(
+            (x) =>
+              selected.includes(x.platform) &&
+              (x.status === "published" || x.status === "failed"),
+          ).length;
+          setProgress({ done, total: selected.length });
+        } catch {
+          /* transient — keep polling */
+        }
+      }
+    })();
+
     try {
       const plan = await api.post<DistributionPlan>(
         `/api/posts/${post.slug}/distribute`,
         {
-          targets: [...checked].map((platform) => ({
+          targets: selected.map((platform) => ({
             platform,
             lang: langFor(platform),
             caption: captionFor(platform),
@@ -111,11 +141,13 @@ export function DistributePanel({ post }: { post: PostSummary }) {
         },
       );
       setTargets(plan.targets);
-      router.refresh();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : t("distribute.failed"));
     } finally {
+      polling = false;
       setBusy(false);
+      setProgress(null);
+      router.refresh();
     }
   }
 
@@ -175,6 +207,29 @@ export function DistributePanel({ post }: { post: PostSummary }) {
               <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
                 {error}
               </p>
+            )}
+
+            {progress && (
+              <div className="mt-3">
+                <div className="mb-1 flex justify-between text-xs text-muted">
+                  <span>{t("distribute.status.publishing")}</span>
+                  <span className="tabular-nums">
+                    {progress.done} / {progress.total}
+                  </span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-brand-600 transition-all"
+                    style={{
+                      width: `${
+                        progress.total
+                          ? (progress.done / progress.total) * 100
+                          : 0
+                      }%`,
+                    }}
+                  />
+                </div>
+              </div>
             )}
 
             <div className="mt-4 space-y-2">
