@@ -6,6 +6,7 @@ import { paginationQuerySchema } from "./common";
 const title = z.string().trim().max(140).optional().default("");
 const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
+const location = z.string().trim().max(120).optional();
 
 /**
  * Per-language platform captions: `{ "<lang>": "<text>" }`. Language keys are
@@ -19,14 +20,17 @@ const captions = z
   .refine((map) => Object.keys(map).length <= 30, "Too many languages")
   .optional();
 
-/** A post must carry *something*: body text, a video, or a cover image. */
+/** A post must carry *something*: a caption, body text, a video, or a cover. */
 function hasBody(data: {
   content?: string;
+  captions?: Record<string, string>;
   videoUrl?: string | null;
   coverImageUrl?: string | null;
 }) {
+  const hasCaption = Object.values(data.captions ?? {}).some((c) => c.trim());
   return Boolean(
-    (data.content && data.content.trim()) ||
+    hasCaption ||
+      (data.content && data.content.trim()) ||
       data.videoUrl ||
       data.coverImageUrl,
   );
@@ -51,6 +55,7 @@ export const createPostSchema = z
     title,
     content,
     excerpt,
+    location,
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
@@ -70,6 +75,7 @@ export const updatePostSchema = z
     title: title.optional(),
     content: z.string().trim().max(50_000).optional(),
     excerpt,
+    location: z.string().trim().max(120).optional(),
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,

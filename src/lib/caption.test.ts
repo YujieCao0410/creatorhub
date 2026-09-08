@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { captionBody, fullCaption, hashtagLine } from "./caption";
+import { captionBody, deriveTitle, fullCaption, hashtagLine } from "./caption";
 
 const post = {
   title: "Bloom at your own pace",
@@ -43,15 +43,45 @@ describe("hashtagLine", () => {
 });
 
 describe("fullCaption", () => {
-  it("joins body and hashtags for a platform + language", () => {
-    expect(fullCaption(post, "tiktok", "en")).toBe(
-      "Bloom at your own pace\n\nA short body.\n\n#dance #fyp #foxc",
-    );
+  it("returns the caption body for the language (creator types hashtags inline)", () => {
+    expect(
+      fullCaption(
+        { ...post, captions: { en: "dance time #fyp #foxc" } },
+        "tiktok",
+        "en",
+      ),
+    ).toBe("dance time #fyp #foxc");
   });
 
   it("uses the requested language's caption", () => {
     expect(
-      fullCaption({ ...post, captions: { zh: "跳舞" } }, "instagram", "zh"),
-    ).toBe("跳舞\n\n#dance #fyp #foxc");
+      fullCaption({ ...post, captions: { zh: "跳舞 #foxc" } }, "instagram", "zh"),
+    ).toBe("跳舞 #foxc");
+  });
+
+  it("appends a location line when set", () => {
+    expect(
+      fullCaption(
+        { ...post, captions: { en: "great show" }, location: "Toronto" },
+        "instagram",
+        "en",
+      ),
+    ).toBe("great show\n📍 Toronto");
+  });
+
+  it("truncates to the platform's caption limit", () => {
+    const long = "x".repeat(600);
+    expect(
+      fullCaption({ ...post, captions: { en: long } }, "threads", "en").length,
+    ).toBe(500);
+  });
+});
+
+describe("deriveTitle", () => {
+  it("takes the first line, drops hashtags, caps length", () => {
+    expect(deriveTitle("My dance video #fyp #foxc\n\nmore text")).toBe(
+      "My dance video",
+    );
+    expect(deriveTitle("x".repeat(200)).length).toBe(100);
   });
 });

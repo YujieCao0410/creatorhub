@@ -6,7 +6,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/lib/errors";
-import { fullCaption, toCaptionMap } from "@/lib/caption";
+import { deriveTitle, fullCaption, toCaptionMap } from "@/lib/caption";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
 import { publishVideo as publishFacebookVideo } from "@/lib/facebook";
@@ -120,7 +120,13 @@ async function loadVideoPost(userId: string, slug: string) {
 }
 
 function composedCaption(
-  post: { title: string; content: string; captions: unknown; tags: string },
+  post: {
+    title: string;
+    content: string;
+    captions: unknown;
+    tags: string;
+    location?: string;
+  },
   platform: string,
   lang: string,
   override: string | null,
@@ -134,6 +140,7 @@ function composedCaption(
         content: post.content,
         captions: toCaptionMap(post.captions),
         tags,
+        location: post.location,
       },
       platform,
       lang,
@@ -197,12 +204,15 @@ export async function publishPostToYouTube(
 
   const tags = post.tags.split(" ").filter(Boolean);
   const description = composedCaption(post, "youtube", lang, captionOverride);
+  // YouTube requires a title (max 100 chars). The creator may not have set one,
+  // so fall back to the first line of the caption.
+  const title = post.title.trim() || deriveTitle(description, 100) || "Untitled";
 
   const { videoId, url } = await uploadVideo({
     accessToken,
     bytes,
     contentType,
-    title: post.title,
+    title,
     description,
     tags,
     privacy: "public",

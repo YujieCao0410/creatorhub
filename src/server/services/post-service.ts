@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma";
-import { toCaptionMap } from "@/lib/caption";
+import { deriveTitle, toCaptionMap } from "@/lib/caption";
 import { prisma } from "@/lib/db";
-import { parseTags, serializeTags } from "@/lib/tags";
+import { extractHashtags, parseTags, serializeTags } from "@/lib/tags";
 import type { PostDetail, PostList, PostSummary } from "@/lib/dto";
 import {
   AuthorizationError,
@@ -38,16 +38,20 @@ type PostRow = Prisma.PostGetPayload<{ include: typeof postInclude }>;
 
 
 function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
+  const captions = toCaptionMap(row.captions);
   return {
     id: row.id,
     slug: row.slug,
-    title: row.title,
+    // Posts no longer have a separate title field in the editor — show the
+    // creator's own title if they set one, else the first line of the caption.
+    title: row.title || deriveTitle(Object.values(captions)[0] ?? "", 80),
     excerpt: row.excerpt,
     coverImageUrl: row.coverImageUrl,
     videoUrl: row.videoUrl,
     youtubeUrl: row.youtubeUrl,
     tags: parseTags(row.tags),
-    captions: toCaptionMap(row.captions),
+    location: row.location,
+    captions,
     publishTargets: row.publishTargets
       .map((t) => ({
         platform: t.platform,
@@ -109,18 +113,28 @@ export async function createPost(
 
   const publishedAt = input.publish ? new Date() : null;
 
+  // The creator writes one caption box (with #hashtags inline). Derive the
+  // search tags and a slug/title fallback from it.
+  const captionText = Object.values(input.captions ?? {}).join(" ").trim();
+  const tags =
+    input.tags && input.tags.length
+      ? serializeTags(input.tags)
+      : serializeTags(extractHashtags(captionText));
+  const slugSeed = input.title || deriveTitle(captionText, 60);
+
   // Retry on the astronomically unlikely slug collision.
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       const row = await prisma.post.create({
         data: {
-          slug: uniqueSlug(input.title),
+          slug: uniqueSlug(slugSeed),
           title: input.title,
           content: input.content,
           excerpt: input.excerpt ?? null,
+          location: input.location ?? "",
           coverImageUrl: input.coverImageUrl ?? null,
           videoUrl: input.videoUrl ?? null,
-          tags: serializeTags(input.tags),
+          tags,
           captions: input.captions ?? {},
           // Default: a post published to CreatorHub shows in the community
           // feed. Uncheck to publish/distribute without joining the feed.
@@ -298,10 +312,23 @@ export async function updatePost(
       title: input.title,
       content: input.content,
       excerpt: input.excerpt,
+      ...(input.location !== undefined ? { location: input.location } : {}),
       coverImageUrl: input.coverImageUrl,
       videoUrl: input.videoUrl,
-      ...(input.tags !== undefined ? { tags: serializeTags(input.tags) } : {}),
-      ...(input.captions !== undefined ? { captions: input.captions } : {}),
+      ...(input.captions !== undefined
+        ? {
+            captions: input.captions,
+            // Keep search tags in sync with the caption's #hashtags unless the
+            // caller sent an explicit tag list.
+            tags: serializeTags(
+              input.tags && input.tags.length
+                ? input.tags
+                : extractHashtags(Object.values(input.captions).join(" ")),
+            ),
+          }
+        : input.tags !== undefined
+          ? { tags: serializeTags(input.tags) }
+          : {}),
       ...(input.shareToCommunity !== undefined
         ? { shareToCommunity: input.shareToCommunity }
         : {}),

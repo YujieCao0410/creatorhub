@@ -98,7 +98,10 @@ model Post {
   /// Path to an uploaded video (served from /uploads). Null for text posts.
   videoUrl      String?
   /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
+  /// Auto-extracted from the caption's #hashtags; feeds CreatorHub search.
   tags          String    @default("")
+  /// Optional place name shown under the video on every platform ("📍 …").
+  location      String    @default("")
   /// Per-language platform captions as a JSON map `{ "<lang>": "<text>" }`
   /// (e.g. `{ "en": "...", "zh": "...", "ja": "..." }`). Falls back to
   /// title + content for a language that has no caption.

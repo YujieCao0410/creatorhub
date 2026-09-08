@@ -39,17 +39,22 @@ export function Field({
   htmlFor,
   error,
   hint,
+  required,
   children,
 }: {
   label: string;
   htmlFor: string;
   error?: string;
   hint?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <Label htmlFor={htmlFor}>{label}</Label>
+      <Label htmlFor={htmlFor}>
+        {label}
+        {required && <span className="ml-0.5 text-red-600">*</span>}
+      </Label>
       {children}
       {hint && !error && (
         <p className="mt-1 text-xs text-muted">{hint}</p>

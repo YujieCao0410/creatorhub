@@ -13,6 +13,18 @@ export function parseTags(stored: string | null | undefined): string[] {
   return (stored ?? "").split(" ").filter(Boolean);
 }
 
+/**
+ * Pulls `#hashtags` out of free text (the caption box). Lowercased, de-duped,
+ * capped at {@link MAX_TAGS}. Creators now type tags inline with the caption,
+ * and this keeps CreatorHub's own search index populated.
+ */
+export function extractHashtags(text: string | null | undefined): string[] {
+  const found = (text ?? "").match(/#[\p{L}\p{N}_-]{1,30}/gu) ?? [];
+  return [
+    ...new Set(found.map((t) => t.slice(1).toLowerCase())),
+  ].slice(0, MAX_TAGS);
+}
+
 /** Normalizes and joins tags for storage: lowercase, trim, dedupe, cap. */
 export function serializeTags(tags: string[] | undefined): string {
   if (!tags) return "";

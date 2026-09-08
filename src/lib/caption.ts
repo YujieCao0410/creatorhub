@@ -17,6 +17,8 @@ export type CaptionInput = {
   content: string;
   captions: CaptionMap;
   tags: string[];
+  /** Optional place name, appended to every platform's caption as "📍 …". */
+  location?: string;
 };
 
 /** Non-empty caption language codes on a post, in insertion order. */
@@ -54,13 +56,35 @@ export function hashtagLine(tags: string[], platformId: string): string {
     .join(" ");
 }
 
-/** The full caption a creator pastes into a platform: body + hashtag line. */
+/**
+ * The caption CreatorHub sends to a platform. The creator now writes the
+ * caption and its hashtags together in one box, so this is just the body for
+ * the target language, trimmed to what the platform accepts. An optional
+ * location line is appended.
+ */
 export function fullCaption(
   post: CaptionInput,
   platformId: string,
   lang: string,
 ): string {
-  const body = captionBody(post, lang);
-  const tags = hashtagLine(post.tags, platformId);
-  return [body, tags].filter(Boolean).join("\n\n");
+  let body = captionBody(post, lang);
+  if (post.location?.trim()) {
+    body = `${body}\n📍 ${post.location.trim()}`.trim();
+  }
+  const limit = getPlatform(platformId)?.captionLimit;
+  return limit ? body.slice(0, limit) : body;
+}
+
+/**
+ * A title for platforms that need one (YouTube). Takes the first non-empty
+ * line of the caption, drops any hashtags, and caps it at `max` characters.
+ */
+export function deriveTitle(caption: string, max = 100): string {
+  const firstLine =
+    caption
+      .split("\n")
+      .map((l) => l.trim())
+      .find(Boolean) ?? "";
+  const noTags = firstLine.replace(/#[\p{L}\p{N}_-]+/gu, "").replace(/\s+/g, " ").trim();
+  return (noTags || firstLine).slice(0, max).trim();
 }

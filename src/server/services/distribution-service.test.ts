@@ -25,8 +25,7 @@ async function videoPost() {
     title: "My clip",
     content: "watch this",
     videoUrl: "/uploads/abc.mp4",
-    tags: ["dance", "fyp"],
-    captions: { zh: "看这个", ja: "これ見て" },
+    captions: { zh: "看这个 #dance #fyp", ja: "これ見て #dance" },
     publish: true,
   });
 }
@@ -37,7 +36,7 @@ describe("distribution", () => {
     const plan = await getDistributionPlan(author.id, post.slug);
 
     // Every platform defaults to English; with no English caption on the post
-    // the body falls back to another available caption, hashtags still appended.
+    // the body falls back to another available caption (hashtags are inline).
     const tiktok = plan.captions.find((c) => c.platform === "tiktok");
     expect(tiktok?.lang).toBe("en");
     expect(tiktok?.caption).toContain("#dance");

@@ -1,28 +1,22 @@
 import { expect, test } from "@playwright/test";
 import { registerNewUser } from "./helpers";
 
-test.describe("media & tags", () => {
-  test("add tags to a post", async ({ page }) => {
+test.describe("post editor", () => {
+  test("caption with inline hashtags becomes the post's tags", async ({
+    page,
+  }) => {
     await registerNewUser(page);
     await page.goto("/dashboard/posts/new");
 
-    await page.getByLabel("Title").fill("Post with media");
-    await page.getByLabel("Content").fill("body text");
-
-    // Tags: type + Enter.
-    const tagInput = page.getByRole("textbox", { name: "Tags" });
-    await tagInput.fill("design");
-    await tagInput.press("Enter");
-    await tagInput.fill("workflow");
-    await tagInput.press("Enter");
-    await expect(page.getByText("#design")).toBeVisible();
-    await expect(page.getByText("#workflow")).toBeVisible();
+    await page
+      .getByLabel(/Caption/)
+      .fill("my first dance video #design #workflow");
 
     await page.getByRole("button", { name: "Publish" }).click();
     await page.waitForURL("**/dashboard/posts");
-    await expect(page.getByText("Post with media")).toBeVisible();
+    await expect(page.getByText("my first dance video")).toBeVisible();
 
-    // The tags render on the public post.
+    // Hashtags from the caption are extracted and render on the public post.
     await page.goto("/feed");
     await expect(
       page.getByRole("link", { name: "#design" }).first(),

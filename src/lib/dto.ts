@@ -72,6 +72,8 @@ export type PostSummary = {
   videoUrl: string | null;
   youtubeUrl: string | null;
   tags: string[];
+  /** Optional place name, shown under the video on every platform. */
+  location: string;
   /** Per-language captions: `{ "<lang>": "<text>" }`. */
   captions: Record<string, string>;
   publishTargets: PublishTargetDTO[];
