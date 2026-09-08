@@ -57,7 +57,7 @@ function languageList(codes: string[]): string {
 }
 
 function buildSystem(languages: string[]): string {
-  return `You help an individual video creator (think dancer / musician / lifestyle) cross-post one short video worldwide (YouTube, TikTok, Instagram, Threads, Facebook).
+  return `You help an individual video creator (think dancer / musician / lifestyle) cross-post one short video worldwide (YouTube, TikTok, Instagram, Threads).
 
 Do this:
 1. Use web search to check what hashtags are currently popular for this kind of video, if it helps — but the creator usually has their own fixed tags, so keep suggestions light.

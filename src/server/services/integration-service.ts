@@ -9,7 +9,6 @@ import {
 import { deriveTitle, fullCaption, toCaptionMap } from "@/lib/caption";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { isOwnMedia, publicMediaUrl, readMediaBytes } from "@/lib/media";
-import { publishVideo as publishFacebookVideo } from "@/lib/facebook";
 import { publishReel } from "@/lib/instagram";
 import { PROVIDERS, type ProviderId } from "@/lib/integrations";
 import { publishVideo as publishThreadsVideo } from "@/lib/threads";
@@ -307,23 +306,5 @@ export async function publishPostToThreads(
     accessToken,
     videoUrl: publicMediaUrl(post.videoUrl!),
     caption: composedCaption(post, "threads", lang, captionOverride),
-  });
-}
-
-/** Posts a post's video to the creator's Facebook Page (needs a public APP_URL). */
-export async function publishPostToFacebook(
-  userId: string,
-  slug: string,
-  lang = "en",
-  captionOverride: string | null = null,
-): Promise<{ url: string | null }> {
-  const post = await loadVideoPost(userId, slug);
-  const integration = await connectedIntegration(userId, "facebook");
-  const accessToken = await validAccessToken(integration, "facebook");
-
-  return publishFacebookVideo({
-    accessToken,
-    videoUrl: publicMediaUrl(post.videoUrl!),
-    caption: composedCaption(post, "facebook", lang, captionOverride),
   });
 }

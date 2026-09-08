@@ -1,5 +1,4 @@
 import "server-only";
-import * as facebook from "./facebook";
 import * as instagram from "./instagram";
 import * as threads from "./threads";
 import * as tiktok from "./tiktok";
@@ -11,12 +10,7 @@ import * as youtube from "./youtube";
  * wraps its platform's OAuth flow so the `/api/integrations/[provider]/*`
  * routes stay provider-agnostic.
  */
-export type ProviderId =
-  | "youtube"
-  | "tiktok"
-  | "instagram"
-  | "threads"
-  | "facebook";
+export type ProviderId = "youtube" | "tiktok" | "instagram" | "threads";
 
 export type ProviderAuth = {
   id: ProviderId;
@@ -64,15 +58,6 @@ export const PROVIDERS: Record<ProviderId, ProviderAuth> = {
     exchangeCode: threads.exchangeCode,
     refreshToken: threads.refreshAccessToken,
     fetchAccountName: threads.getUsername,
-  },
-  facebook: {
-    id: "facebook",
-    label: "Facebook",
-    configured: facebook.facebookConfigured,
-    buildAuthUrl: facebook.buildAuthUrl,
-    exchangeCode: facebook.exchangeCode,
-    refreshToken: facebook.refreshAccessToken,
-    fetchAccountName: facebook.getPageName,
   },
 };
 

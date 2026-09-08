@@ -10,12 +10,7 @@
  * another — it's only a default, every target's language is editable.
  */
 
-export type PlatformId =
-  | "youtube"
-  | "tiktok"
-  | "instagram"
-  | "threads"
-  | "facebook";
+export type PlatformId = "youtube" | "tiktok" | "instagram" | "threads";
 
 export type Platform = {
   id: PlatformId;
@@ -34,7 +29,6 @@ export const PLATFORMS: Platform[] = [
   { id: "tiktok", label: "TikTok", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "instagram", label: "Instagram", defaultLang: "en", api: true, captionLimit: 2200, hashtagLimit: 10 },
   { id: "threads", label: "Threads", defaultLang: "en", api: true, captionLimit: 500, hashtagLimit: 5 },
-  { id: "facebook", label: "Facebook", defaultLang: "en", api: true, captionLimit: 5000, hashtagLimit: 10 },
 ];
 
 const BY_ID = new Map(PLATFORMS.map((p) => [p.id, p]));
