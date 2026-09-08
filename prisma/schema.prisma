@@ -100,7 +100,9 @@ model Post {
   /// Space-separated, normalized tags (lowercase, no "#"). Empty string = none.
   /// Auto-extracted from the caption's #hashtags; feeds CreatorHub search.
   tags          String    @default("")
-  /// Optional place name shown under the video on every platform ("📍 …").
+  /// Unused. A location feature was tried and dropped — the platform APIs
+  /// (TikTok, Threads) don't accept a geotag. Column kept to avoid a
+  /// destructive migration; always "".
   location      String    @default("")
   /// Per-language platform captions as a JSON map `{ "<lang>": "<text>" }`
   /// (e.g. `{ "en": "...", "zh": "...", "ja": "..." }`). Falls back to

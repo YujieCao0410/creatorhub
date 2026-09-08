@@ -52,13 +52,7 @@ export function DistributePanel({ post }: { post: PostSummary }) {
     const existing = targetByPlatform.get(id)?.caption;
     if (existing) return existing;
     return fullCaption(
-      {
-        title: post.title,
-        content: "",
-        captions: post.captions,
-        tags: post.tags,
-        location: post.location,
-      },
+      { title: post.title, content: "", captions: post.captions, tags: post.tags },
       id,
       langFor(id),
     );

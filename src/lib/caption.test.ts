@@ -59,16 +59,6 @@ describe("fullCaption", () => {
     ).toBe("跳舞 #foxc");
   });
 
-  it("appends a location line when set", () => {
-    expect(
-      fullCaption(
-        { ...post, captions: { en: "great show" }, location: "Toronto" },
-        "instagram",
-        "en",
-      ),
-    ).toBe("great show\n📍 Toronto");
-  });
-
   it("truncates to the platform's caption limit", () => {
     const long = "x".repeat(600);
     expect(

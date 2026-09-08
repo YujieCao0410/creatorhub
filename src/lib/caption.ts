@@ -17,8 +17,6 @@ export type CaptionInput = {
   content: string;
   captions: CaptionMap;
   tags: string[];
-  /** Optional place name, appended to every platform's caption as "📍 …". */
-  location?: string;
 };
 
 /** Non-empty caption language codes on a post, in insertion order. */
@@ -57,20 +55,16 @@ export function hashtagLine(tags: string[], platformId: string): string {
 }
 
 /**
- * The caption CreatorHub sends to a platform. The creator now writes the
- * caption and its hashtags together in one box, so this is just the body for
- * the target language, trimmed to what the platform accepts. An optional
- * location line is appended.
+ * The caption CreatorHub sends to a platform. The creator writes the caption
+ * and its hashtags together in one box, so this is just the body for the
+ * target language, trimmed to what the platform accepts.
  */
 export function fullCaption(
   post: CaptionInput,
   platformId: string,
   lang: string,
 ): string {
-  let body = captionBody(post, lang);
-  if (post.location?.trim()) {
-    body = `${body}\n📍 ${post.location.trim()}`.trim();
-  }
+  const body = captionBody(post, lang);
   const limit = getPlatform(platformId)?.captionLimit;
   return limit ? body.slice(0, limit) : body;
 }

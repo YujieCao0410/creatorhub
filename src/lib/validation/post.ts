@@ -6,7 +6,6 @@ import { paginationQuerySchema } from "./common";
 const title = z.string().trim().max(140).optional().default("");
 const content = z.string().trim().max(50_000).optional().default("");
 const excerpt = z.string().trim().max(280).nullable().optional();
-const location = z.string().trim().max(120).optional();
 
 /**
  * Per-language platform captions: `{ "<lang>": "<text>" }`. Language keys are
@@ -55,7 +54,6 @@ export const createPostSchema = z
     title,
     content,
     excerpt,
-    location,
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,
@@ -75,7 +73,6 @@ export const updatePostSchema = z
     title: title.optional(),
     content: z.string().trim().max(50_000).optional(),
     excerpt,
-    location: z.string().trim().max(120).optional(),
     coverImageUrl: mediaRef,
     videoUrl: mediaRef,
     tags,

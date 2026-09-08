@@ -77,7 +77,6 @@ function composedCaption(post: OwnedPost, platformId: string): string {
     content: post.content,
     captions: toCaptionMap(post.captions),
     tags: post.tags.split(" ").filter(Boolean),
-    location: post.location,
   };
   return fullCaption(input, platformId, langFor(post, platformId));
 }

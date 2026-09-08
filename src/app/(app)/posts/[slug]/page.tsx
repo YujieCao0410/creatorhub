@@ -128,7 +128,6 @@ export default async function PostDetailPage({
 
       <div className="whitespace-pre-wrap text-[15px] leading-7">
         {post.content || Object.values(post.captions)[0] || ""}
-        {post.location && `\n📍 ${post.location}`}
       </div>
 
       <div className="flex items-center gap-5 border-y border-border py-3">

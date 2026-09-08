@@ -120,13 +120,7 @@ async function loadVideoPost(userId: string, slug: string) {
 }
 
 function composedCaption(
-  post: {
-    title: string;
-    content: string;
-    captions: unknown;
-    tags: string;
-    location?: string;
-  },
+  post: { title: string; content: string; captions: unknown; tags: string },
   platform: string,
   lang: string,
   override: string | null,
@@ -140,7 +134,6 @@ function composedCaption(
         content: post.content,
         captions: toCaptionMap(post.captions),
         tags,
-        location: post.location,
       },
       platform,
       lang,

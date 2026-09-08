@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useT } from "@/components/i18n-provider";
 import { MediaUpload } from "@/components/media-upload";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Textarea } from "@/components/ui/field";
+import { Field, Textarea } from "@/components/ui/field";
 import { Alert } from "@/components/ui/misc";
 import { api, ApiError } from "@/lib/api-client";
 import type { PostDetail } from "@/lib/dto";
@@ -49,7 +49,6 @@ export function PostEditor({
       ? "\n\n" + defaultTags.map((x) => `#${x}`).join(" ")
       : "";
   });
-  const [location, setLocation] = useState(post?.location ?? "");
   const [videoUrl, setVideoUrl] = useState<string | null>(post?.videoUrl ?? null);
   const [shareToCommunity, setShareToCommunity] = useState(
     post?.shareToCommunity ?? true,
@@ -91,7 +90,6 @@ export function PostEditor({
 
   function createPayload() {
     return {
-      location: location.trim(),
       videoUrl,
       tags: extractHashtags(caption),
       captions: { [primaryLang]: caption.trim() },
@@ -214,20 +212,6 @@ export function PostEditor({
             {aiError}
           </p>
         )}
-      </Field>
-
-      <Field
-        label={t("editor.location")}
-        htmlFor="location"
-        hint={t("editor.locationHint")}
-      >
-        <Input
-          id="location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          maxLength={120}
-          placeholder={t("editor.locationPlaceholder")}
-        />
       </Field>
 
       <details className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">

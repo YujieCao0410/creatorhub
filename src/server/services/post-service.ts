@@ -50,7 +50,6 @@ function toSummary(row: PostRow, viewerHasLiked: boolean): PostSummary {
     videoUrl: row.videoUrl,
     youtubeUrl: row.youtubeUrl,
     tags: parseTags(row.tags),
-    location: row.location,
     captions,
     publishTargets: row.publishTargets
       .map((t) => ({
@@ -131,7 +130,6 @@ export async function createPost(
           title: input.title,
           content: input.content,
           excerpt: input.excerpt ?? null,
-          location: input.location ?? "",
           coverImageUrl: input.coverImageUrl ?? null,
           videoUrl: input.videoUrl ?? null,
           tags,
@@ -312,7 +310,6 @@ export async function updatePost(
       title: input.title,
       content: input.content,
       excerpt: input.excerpt,
-      ...(input.location !== undefined ? { location: input.location } : {}),
       coverImageUrl: input.coverImageUrl,
       videoUrl: input.videoUrl,
       ...(input.captions !== undefined
